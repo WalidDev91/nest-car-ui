@@ -21,12 +21,13 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
-              "src/assets/adminkit/css/app.css",
-              "src/styles.css"
+              "src/styles.css",
+              "src/assets/adminkit/css/app.css"
             ],
             "scripts": [
               "src/assets/adminkit/js/app.js"
