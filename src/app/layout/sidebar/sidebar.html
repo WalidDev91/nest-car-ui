@@ -1,46 +1,46 @@
 <nav id="sidebar" class="sidebar js-sidebar">
 			<div class="sidebar-content js-simplebar">
-				<a class="sidebar-brand" href="index.html">
-          		<span class="align-middle">Nest-Car</span>
-        		</a>
+				<a class="sidebar-brand" routerLink="/dashboard">
+  					<span class="align-middle">Nest-Car</span>
+				</a>
 
 				<ul class="sidebar-nav">
 					<li class="sidebar-header">
 						Main Menu
 					</li>
 
-							<li class="sidebar-item active">
-						<a class="sidebar-link" href="index.html">
+							<li class="sidebar-item">
+  								<a class="sidebar-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
              			 <i class="align-middle" data-feather="bar-chart-2"></i> <span class="align-middle">Dashboard</span>
             					</a>
 							</li>
 
 							<li class="sidebar-item">
-						<a class="sidebar-link" href="pages-profile.html">
+  								<a class="sidebar-link" routerLink="/drivers" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
              				 <i class="align-middle" data-feather="user"></i> <span class="align-middle">Drivers</span>
-          			  </a>
+          			  			</a>
 							</li>
 
 							<li class="sidebar-item">
-						<a class="sidebar-link" href="pages-sign-in.html">
+  								<a class="sidebar-link" routerLink="/vehicles" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             			  <i class="align-middle" data-feather="truck"></i> <span class="align-middle">Vehicles</span>
            				 </a>
 								</li>
 
 							<li class="sidebar-item">
-						<a class="sidebar-link" href="pages-sign-up.html">
+  								<a class="sidebar-link" routerLink="/missions" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
              				 <i class="align-middle" data-feather="map"></i> <span class="align-middle">Missions</span>
            				 </a>
 						</li>
 
 						<li class="sidebar-item">
-						<a class="sidebar-link" href="pages-blank.html">
+  								<a class="sidebar-link" routerLink="/documents" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
              			 <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">Documents</span>
            				 </a>
 						</li>
 
 						<li class="sidebar-item">
-						<a class="sidebar-link" href="pages-blank.html">
+  								<a class="sidebar-link" routerLink="/administration" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
              			 <i class="align-middle" data-feather="settings"></i> <span class="align-middle">Administration</span>
            				 </a>
 						</li>
