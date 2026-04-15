@@ -26,8 +26,8 @@
               }
             ],
             "styles": [
-              "src/styles.css",
-              "src/assets/adminkit/css/app.css"
+              "src/assets/adminkit/css/app.css",
+              "src/styles.css"
             ],
             "scripts": [
               "src/assets/adminkit/js/app.js"
