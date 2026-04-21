@@ -2,20 +2,21 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
-
 @Injectable({
   providedIn: 'root',
 })
-export class Api {
-  private baseUrl = environment.apiUrl;
+export class User {
+
+  private baseUrl = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) { }
 
-  getDrivers() {
-    return this.http.get<any[]>(`${this.baseUrl}/drivers`);
+  getAll() {
+    return this.http.get<any[]>(this.baseUrl);
   }
 
-  getVehicles() {
-    return this.http.get<any[]>(`${this.baseUrl}/vehicles`);
+  getByRole(role: string) {
+    return this.http.get<any[]>(`${this.baseUrl}?role=${role}`);
   }
+
 }
