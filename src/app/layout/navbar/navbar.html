@@ -172,58 +172,53 @@
 </nav> -->
 <nav class="navbar navbar-expand navbar-light navbar-bg">
 
-  <!-- Sidebar toggle -->
-  <a class="sidebar-toggle js-sidebar-toggle">
-    <i class="hamburger align-self-center"></i>
-  </a>
+	<!-- Sidebar toggle -->
+	<a class="sidebar-toggle js-sidebar-toggle">
+		<i class="hamburger align-self-center"></i>
+	</a>
 
-  <div class="navbar-collapse collapse">
-    <ul class="navbar-nav navbar-align ms-auto">
+	<div class="navbar-collapse collapse">
+		<ul class="navbar-nav navbar-align ms-auto">
 
-      <!-- Language switch -->
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle"
-           href="#"
-           data-bs-toggle="dropdown">
-          🇬🇧
-        </a>
+			<!-- Language switch -->
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+					🇬🇧
+				</a>
 
-        <div class="dropdown-menu dropdown-menu-end">
-          <a class="dropdown-item" href="#">🇬🇧 English</a>
-          <a class="dropdown-item" href="#">🇫🇷 Français</a>
-        </div>
-      </li>
+				<div class="dropdown-menu dropdown-menu-end">
+					<a class="dropdown-item" href="#">🇬🇧 English</a>
+					<a class="dropdown-item" href="#">🇫🇷 Français</a>
+				</div>
+			</li>
 
-      <!-- User dropdown -->
-      <li class="nav-item dropdown">
+			<!-- User dropdown -->
+			<li class="nav-item dropdown">
 
-        <a class="nav-link dropdown-toggle d-none d-sm-inline-block"
-           href="#"
-           data-bs-toggle="dropdown">
+				<a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
 
-          <img src="/assets/adminkit/img/avatars/avatar.jpg"
-               class="avatar img-fluid rounded me-1"
-               alt="User" />
+					<img src="/assets/adminkit/img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1"
+						alt="User" />
 
-          <span class="text-dark">Admin</span>
-        </a>
+					<span class="text-dark">Admin</span>
+				</a>
 
-        <div class="dropdown-menu dropdown-menu-end">
+				<div class="dropdown-menu dropdown-menu-end">
 
-          <a class="dropdown-item" href="#">
-            Profile
-          </a>
+					<a class="dropdown-item" href="#">
+						Profile
+					</a>
 
-          <div class="dropdown-divider"></div>
+					<div class="dropdown-divider"></div>
 
-          <a class="dropdown-item" href="#">
-            Logout
-          </a>
+					<a class="dropdown-item" (click)="logout()">
+						Logout
+					</a>
 
-        </div>
-      </li>
+				</div>
+			</li>
 
-    </ul>
-  </div>
+		</ul>
+	</div>
 
 </nav>

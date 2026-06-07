@@ -6,6 +6,7 @@ import { Vehicles } from './pages/vehicles/vehicles';
 import { Missions } from './pages/missions/missions';
 import { Documents } from './pages/documents/documents';
 import { Administration } from './pages/administration/administration';
+import { Login } from './auth/login/login';
 
 export const routes: Routes = [
   { path: '', component: Dashboard },
@@ -16,4 +17,5 @@ export const routes: Routes = [
   { path: 'missions', component: Missions },
   { path: 'documents', component: Documents },
   { path: 'administration', component: Administration },
+  { path: 'login', component: Login },
 ];
