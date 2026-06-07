@@ -1,12 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { Layout } from './layout/layout';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [Layout],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('fleet-management-ui');
+
 }
