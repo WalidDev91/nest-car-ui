@@ -32,7 +32,14 @@ export const routes: Routes = [
     path: '',
     component: AuthLayout,
     children: [
-      { path: 'login', component: Login }
+      { path: 'login', component: Login },
+
+      {
+        path: 'register',
+        loadComponent: () =>
+          import('./auth/register/register')
+            .then(m => m.Register)
+      }
     ]
   }
 

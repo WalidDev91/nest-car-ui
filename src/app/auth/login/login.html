@@ -20,38 +20,21 @@
                   <!-- EMAIL -->
                   <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input
-                      class="form-control form-control-lg"
-                      type="email"
-                      name="email"
-                      placeholder="Enter your email"
-                      [(ngModel)]="email"
-                      required
-                    />
+                    <input class="form-control form-control-lg" type="email" name="email" placeholder="Enter your email"
+                      [(ngModel)]="email" required />
                   </div>
 
                   <!-- PASSWORD -->
                   <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input
-                      class="form-control form-control-lg"
-                      type="password"
-                      name="password"
-                      placeholder="Enter your password"
-                      [(ngModel)]="password"
-                      required
-                    />
+                    <input class="form-control form-control-lg" type="password" name="password"
+                      placeholder="Enter your password" [(ngModel)]="password" required />
                   </div>
 
                   <!-- REMEMBER ME (static only) -->
                   <div>
                     <div class="form-check align-items-center">
-                      <input
-                        id="customControlInline"
-                        type="checkbox"
-                        class="form-check-input"
-                        checked
-                      />
+                      <input id="customControlInline" type="checkbox" class="form-check-input" checked />
                       <label class="form-check-label text-small" for="customControlInline">
                         Remember me
                       </label>
@@ -72,8 +55,9 @@
           </div>
 
           <div class="text-center mb-3">
-            Don't have an account?
-            <a routerLink="/register">Sign up</a>
+            Don't have an account? <a routerLink="/register" class="text-primary">
+              Sign up
+            </a>
           </div>
 
         </div>
