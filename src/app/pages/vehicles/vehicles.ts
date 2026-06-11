@@ -1,22 +1,26 @@
-import { Component } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { Vehicle } from '../../services/vehicle';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { VehicleService } from '../../services/vehicle.service';
+import { Vehicle } from '../../models/vehicle';
 
 
 @Component({
   selector: 'app-vehicles',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './vehicles.html',
   styleUrl: './vehicles.css',
 })
 export class Vehicles implements OnInit {
 
-  constructor(private vehicle: Vehicle) {}
+  vehicles = signal<Vehicle[]>([]);
 
-  ngOnInit() {
-    this.vehicle.getAll().subscribe({
+  constructor(private vehicleService: VehicleService
+  ) { }
+
+  ngOnInit(): void {
+    this.vehicleService.getAll().subscribe({
       next: (data) => {
-        console.log('Vehicles from backend:', data);
+        this.vehicles.set(data);
       },
       error: (err) => {
         console.error('Vehicle error:', err);

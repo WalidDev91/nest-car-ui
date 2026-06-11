@@ -36,7 +36,6 @@ export class Register {
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
 
-        console.log('Registration success:', response);
 
         this.router.navigate(['/dashboard']);
       },

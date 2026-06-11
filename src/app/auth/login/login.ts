@@ -30,7 +30,6 @@ export class Login {
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
 
-        console.log('Login success:', response);
 
         this.router.navigate(['/dashboard']);
       },

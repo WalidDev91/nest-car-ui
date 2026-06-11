@@ -18,7 +18,7 @@ export const routes: Routes = [
     component: DashboardLayout,
     canActivate: [authGuard],
     children: [
-      { path: '', component: Dashboard },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
       { path: 'users', component: Users },
       { path: 'vehicles', component: Vehicles },
@@ -29,11 +29,10 @@ export const routes: Routes = [
   },
 
   {
-    path: '',
+    path: 'auth',
     component: AuthLayout,
     children: [
       { path: 'login', component: Login },
-
       {
         path: 'register',
         loadComponent: () =>
@@ -41,6 +40,8 @@ export const routes: Routes = [
             .then(m => m.Register)
       }
     ]
-  }
+  },
+
+  { path: '**', redirectTo: 'auth/login' }
 
 ];
