@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { OnInit } from '@angular/core';
-import { User } from '../../services/user';
+import { UserService } from '../../services/user.service';
 
 
 @Component({
@@ -13,7 +13,7 @@ export class Users implements OnInit {
 
   users: any[] = [];
 
-  constructor(private user: User) {}
+  constructor(private user: UserService) {}
 
   ngOnInit() {
     this.user.getAll().subscribe({
