@@ -1,1 +1,59 @@
-<p>users works!</p>
+<div class="container-fluid p-0">
+
+  <h1 class="h3 mb-3">
+    Users
+  </h1>
+
+  <div class="card">
+    <div class="card-body">
+
+      <table class="table table-hover">
+
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Admin</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let user of users()">
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-danger':   user.role === 'SUPER_ADMIN',
+                'bg-primary':  user.role === 'ADMIN',
+                'bg-info':     user.role === 'FLEET_MANAGER',
+                'bg-secondary': user.role === 'DRIVER'
+              }">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-success': user.isValidate,
+                'bg-danger':  !user.isValidate
+              }">
+                {{ user.isValidate ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>{{ user.adminName }}</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+
+</div>
