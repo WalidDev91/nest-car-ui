@@ -10,10 +10,13 @@ import { AuthService } from '../../services/auth.service';
 })
 export class Navbar {
 
+  firstName = localStorage.getItem('firstName');
+  lastName = localStorage.getItem('lastName');
+
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   logout() {
     this.authService.logout();

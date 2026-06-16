@@ -1,77 +1,170 @@
 <div class="container-fluid p-0">
 
-    <h1 class="h3 mb-3"><strong>Dashboard</strong></h1>
+  <!-- Welcome -->
+  <h1 class="h3 mb-3">
+    Welcome back, <strong>{{ loggedInName }}</strong> 👋
+  </h1>
 
-    <div class="row">
+  <!-- Summary Cards -->
+  <div class="row">
 
-        <!-- Total Users -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title mb-0">Users</h5>
-                            <h1 class="mt-1 mb-0">10</h1>
-                        </div>
-                        <div class="text-primary">
-                            <i data-feather="users"></i>
-                        </div>
-                    </div>
-                </div>
+    <div class="col-sm-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col mt-0">
+              <h5 class="card-title">Drivers</h5>
             </div>
-        </div>
-
-        <!-- Total Vehicles -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title mb-0">Vehicles</h5>
-                            <h1 class="mt-1 mb-0">8</h1>
-                        </div>
-                        <div class="text-success">
-                            <i data-feather="truck"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-auto">
+              <div class="stat text-primary">
+                <i class="align-middle" data-feather="user"></i>
+              </div>
             </div>
+          </div>
+          <h1 class="mt-1 mb-3">{{ totalDrivers() }}</h1>
+          <div class="mb-0">
+            <span class="text-muted">Total registered drivers</span>
+          </div>
         </div>
-
-        <!-- Active Missions -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title mb-0">Missions</h5>
-                            <h1 class="mt-1 mb-0">5</h1>
-                        </div>
-                        <div class="text-warning">
-                            <i data-feather="map"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending Documents -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5 class="card-title mb-0">Documents</h5>
-                            <h1 class="mt-1 mb-0">3</h1>
-                        </div>
-                        <div class="text-danger">
-                            <i data-feather="file-text"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+      </div>
     </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col mt-0">
+              <h5 class="card-title">Vehicles</h5>
+            </div>
+            <div class="col-auto">
+              <div class="stat text-primary">
+                <i class="align-middle" data-feather="truck"></i>
+              </div>
+            </div>
+          </div>
+          <h1 class="mt-1 mb-3">{{ totalVehicles() }}</h1>
+          <div class="mb-0">
+            <span class="text-muted">Total vehicles in fleet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col mt-0">
+              <h5 class="card-title">Missions</h5>
+            </div>
+            <div class="col-auto">
+              <div class="stat text-primary">
+                <i class="align-middle" data-feather="map"></i>
+              </div>
+            </div>
+          </div>
+          <h1 class="mt-1 mb-3">{{ totalMissions() }}</h1>
+          <div class="mb-0">
+            <span class="text-muted">Total missions created</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col mt-0">
+              <h5 class="card-title">Active Missions</h5>
+            </div>
+            <div class="col-auto">
+              <div class="stat text-primary">
+                <i class="align-middle" data-feather="navigation"></i>
+              </div>
+            </div>
+          </div>
+          <h1 class="mt-1 mb-3">{{ activeMissions() }}</h1>
+          <div class="mb-0">
+            <span class="text-muted">Currently in progress</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Charts -->
+  <div class="row">
+
+    <div class="col-12 col-xl-8">
+      <div class="card flex-fill w-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Missions Per Month</h5>
+        </div>
+        <div class="card-body py-3">
+          <div class="chart chart-sm" style="height: 250px;">
+            <canvas #missionsPerMonthChart></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-4">
+      <div class="card flex-fill w-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Missions by Status</h5>
+        </div>
+        <div class="card-body py-3">
+          <div class="chart chart-sm" style="height: 250px;">
+            <canvas #missionStatusChart></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Missions -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Recent Missions</h5>
+        </div>
+        <table class="table table-hover my-0">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Driver</th>
+              <th>Vehicle</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let mission of recentMissions()">
+              <td>{{ mission.title }}</td>
+              <td>{{ mission.driverName }}</td>
+              <td>{{ mission.vehiclePlateNumber }}</td>
+              <td>{{ mission.startDate | date:'dd/MM/yyyy' }}</td>
+              <td>{{ mission.endDate | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-warning':  mission.status === 'PLANNED',
+                  'bg-primary':  mission.status === 'IN_PROGRESS',
+                  'bg-success':  mission.status === 'COMPLETED',
+                  'bg-danger':   mission.status === 'CANCELLED'
+                }">
+                  {{ mission.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
 </div>

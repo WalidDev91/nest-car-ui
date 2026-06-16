@@ -17,7 +17,7 @@ export class Login {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   login() {
     this.authService.login({
@@ -29,6 +29,8 @@ export class Login {
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
+        localStorage.setItem('firstName', response.firstName);
+        localStorage.setItem('lastName', response.lastName);
 
 
         this.router.navigate(['/dashboard']);

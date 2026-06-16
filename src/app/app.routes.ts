@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Users } from './pages/users/users';
 import { Vehicles } from './pages/vehicles/vehicles';
@@ -9,6 +8,7 @@ import { Administration } from './pages/administration/administration';
 import { Login } from './auth/login/login';
 import { authGuard } from './guards/auth-guard'
 import { AuthLayout } from './layout/auth-layout/auth-layout';
+import { guestGuard } from './guards/guest-guard';
 import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
 
 export const routes: Routes = [
@@ -31,8 +31,10 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayout,
+    canActivate: [guestGuard],
     children: [
       { path: 'login', component: Login },
+
       {
         path: 'register',
         loadComponent: () =>

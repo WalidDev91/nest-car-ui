@@ -20,7 +20,7 @@ export class Register {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   register() {
     this.authService.register({
@@ -35,6 +35,8 @@ export class Register {
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
+        localStorage.setItem('firstName', response.firstName);
+        localStorage.setItem('lastName', response.lastName);
 
 
         this.router.navigate(['/dashboard']);
