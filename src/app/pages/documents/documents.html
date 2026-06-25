@@ -1,1 +1,172 @@
-<p>documents works!</p>
+<div class="container-fluid p-0">
+
+  <h1 class="h3 mb-3">Documents</h1>
+
+  <div class="card">
+
+    <!-- Tabs Header -->
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs">
+
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="selectedTab() === 'driver'" (click)="selectTab('driver')">
+            <i class="align-middle me-1" data-feather="user"></i>
+            Driver Documents
+            <span class="badge bg-secondary ms-1">{{ driverDocs().length }}</span>
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="selectedTab() === 'vehicle'" (click)="selectTab('vehicle')">
+            <i class="align-middle me-1" data-feather="truck"></i>
+            Vehicle Documents
+            <span class="badge bg-secondary ms-1">{{ vehicleDocs().length }}</span>
+          </button>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link" [class.active]="selectedTab() === 'mission'" (click)="selectTab('mission')">
+            <i class="align-middle me-1" data-feather="map"></i>
+            Mission Documents
+            <span class="badge bg-secondary ms-1">{{ missionDocs().length }}</span>
+          </button>
+        </li>
+
+      </ul>
+    </div>
+
+    <div class="card-body">
+
+      <!-- DRIVER DOCUMENTS -->
+      <div *ngIf="selectedTab() === 'driver'">
+        <div class="card mb-3">
+          <div class="card-body">
+
+            <h5 class="card-title">Upload Driver Document</h5>
+
+            <div class="row g-2">
+
+              <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Title" [(ngModel)]="uploadTitle">
+              </div>
+
+              <div class="col-md-3">
+                <select class="form-select" [(ngModel)]="uploadType">
+
+                  <option value="DRIVER_LICENSE">
+                    Driver License
+                  </option>
+
+                  <option value="ID_CARD">
+                    ID Card
+                  </option>
+
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <input type="text" class="form-control" placeholder="Driver UUID" [(ngModel)]="uploadDriverId">
+              </div>
+
+              <div class="col-md-3">
+                <input type="file" class="form-control" (change)="onFileSelected($event)">
+              </div>
+
+            </div>
+
+            <button class="btn btn-primary mt-3" (click)="uploadDriverDocument()">
+
+              Upload
+            </button>
+
+          </div>
+        </div>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Driver</th>
+              <th>Uploaded At</th>
+              <th>Validated At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let doc of driverDocs()">
+              <td>{{ doc.title }}</td>
+              <td>
+                <span class="badge bg-light text-dark">
+                  {{ doc.type === 'DRIVER_LICENSE' ? 'Driver License' : 'ID Card' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-warning': doc.status === 'PENDING',
+                  'bg-success': doc.status === 'APPROVED',
+                  'bg-danger':  doc.status === 'REJECTED'
+                }">
+                  {{ doc.status }}
+                </span>
+              </td>
+              <td>{{ doc.driverName }}</td>
+              <td>{{ doc.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ doc.validatedAt ? (doc.validatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VEHICLE DOCUMENTS -->
+      <div *ngIf="selectedTab() === 'vehicle'">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Vehicle</th>
+              <th>Year</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let doc of vehicleDocs()">
+              <td>{{ doc.title }}</td>
+              <td>
+                <span class="badge bg-light text-dark">
+                  {{ doc.type === 'LICENSE' ? 'License' :
+                  doc.type === 'TECHNICAL_CHECK' ? 'Technical Check' : 'Insurance' }}
+                </span>
+              </td>
+              <td>{{ doc.vehiclePlateNumber }}</td>
+              <td>{{ doc.year }}</td>
+              <td>{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MISSION DOCUMENTS -->
+      <div *ngIf="selectedTab() === 'mission'">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Mission</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let doc of missionDocs()">
+              <td>{{ doc.title }}</td>
+              <td>{{ doc.missionTitle }}</td>
+              <td>{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div>

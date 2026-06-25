@@ -86,7 +86,7 @@
           </div>
           <h1 class="mt-1 mb-3">{{ activeMissions() }}</h1>
           <div class="mb-0">
-            <span class="text-muted">Currently in progress</span>
+            <span class="text-muted">Currently ongoing</span>
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@
               <td>
                 <span class="badge" [ngClass]="{
                   'bg-warning':  mission.status === 'PLANNED',
-                  'bg-primary':  mission.status === 'IN_PROGRESS',
+                  'bg-primary':  mission.status === 'ONGOING',
                   'bg-success':  mission.status === 'COMPLETED',
                   'bg-danger':   mission.status === 'CANCELLED'
                 }">

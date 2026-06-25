@@ -60,7 +60,7 @@ export class Dashboard implements OnInit, AfterViewInit {
     this.missionService.getAll().subscribe({
       next: (data) => {
         this.totalMissions.set(data.length);
-        this.activeMissions.set(data.filter(m => m.status === 'IN_PROGRESS').length);
+        this.activeMissions.set(data.filter(m => m.status === 'ONGOING').length);
         this.recentMissions.set(data.slice(0, 5));
         this.allMissions = data;
         this.dataLoaded = true;
@@ -81,7 +81,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   buildStatusChart(): void {
     const counts = {
       PLANNED: this.allMissions.filter(m => m.status === 'PLANNED').length,
-      IN_PROGRESS: this.allMissions.filter(m => m.status === 'IN_PROGRESS').length,
+      ONGOING: this.allMissions.filter(m => m.status === 'ONGOING').length,
       COMPLETED: this.allMissions.filter(m => m.status === 'COMPLETED').length,
       CANCELLED: this.allMissions.filter(m => m.status === 'CANCELLED').length,
     };
@@ -89,9 +89,9 @@ export class Dashboard implements OnInit, AfterViewInit {
     new Chart(this.missionStatusChartRef.nativeElement, {
       type: 'doughnut',
       data: {
-        labels: ['Planned', 'In Progress', 'Completed', 'Cancelled'],
+        labels: ['Planned', 'Ongoing', 'Completed', 'Cancelled'],
         datasets: [{
-          data: [counts.PLANNED, counts.IN_PROGRESS, counts.COMPLETED, counts.CANCELLED],
+          data: [counts.PLANNED, counts.ONGOING, counts.COMPLETED, counts.CANCELLED],
           backgroundColor: ['#ffc107', '#3b7ddd', '#28a745', '#dc3545'],
           borderWidth: 5
         }]

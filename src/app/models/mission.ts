@@ -4,7 +4,7 @@ export interface Mission {
   description: string;
   startDate: string;
   endDate: string;
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: 'PLANNED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED';
   driverId: string;
   driverName: string;
   vehicleId: string;

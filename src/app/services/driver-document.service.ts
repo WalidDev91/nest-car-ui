@@ -14,4 +14,18 @@ export class DriverDocumentService {
   getAll() {
     return this.http.get<DriverDocument[]>(this.baseUrl);
   }
+
+  upload(file: File, title: string, type: string, driverId: string) {
+  const formData = new FormData();
+
+  formData.append('file', file);
+  formData.append('title', title);
+  formData.append('type', type);
+  formData.append('driverId', driverId);
+
+  return this.http.post(
+    `${this.baseUrl}/upload`,
+    formData
+  );
+}
 }
