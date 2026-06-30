@@ -4,6 +4,7 @@ import { Users } from './pages/users/users';
 import { Vehicles } from './pages/vehicles/vehicles';
 import { Missions } from './pages/missions/missions';
 import { Documents } from './pages/documents/documents';
+import { DriverDocumentDetails } from './pages/documents/driver-document-details';
 import { Administration } from './pages/administration/administration';
 import { Login } from './auth/login/login';
 import { authGuard } from './guards/auth-guard'
@@ -24,6 +25,7 @@ export const routes: Routes = [
       { path: 'vehicles', component: Vehicles },
       { path: 'missions', component: Missions },
       { path: 'documents', component: Documents },
+      { path: 'documents/driver/:id', component: DriverDocumentDetails },
       { path: 'administration', component: Administration }
     ]
   },

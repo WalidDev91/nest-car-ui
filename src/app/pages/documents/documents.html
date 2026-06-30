@@ -90,6 +90,7 @@
               <th>Driver</th>
               <th>Uploaded At</th>
               <th>Validated At</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -112,6 +113,15 @@
               <td>{{ doc.driverName }}</td>
               <td>{{ doc.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>{{ doc.validatedAt ? (doc.validatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDetails(doc.id)">
+                  <i data-feather="eye"></i>
+                </button>
+
+                <button class="btn btn-sm btn-outline-primary" (click)="download(doc.id)">
+                  <i data-feather="download"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
