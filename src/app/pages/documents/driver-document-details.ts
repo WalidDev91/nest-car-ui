@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DriverDocumentService } from '../../services/driver-document.service';
 import { DriverDocument } from '../../models/driver-document';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-driver-document-details',
@@ -16,7 +17,8 @@ export class DriverDocumentDetails implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private documentService: DriverDocumentService
+    private documentService: DriverDocumentService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -33,4 +35,39 @@ export class DriverDocumentDetails implements OnInit {
       });
     }
   }
+
+
+  approve() {
+
+  const doc = this.document();
+
+  if (!doc) return;
+
+  this.documentService.updateStatus(doc.id, 'APPROVED')
+    .subscribe({
+      next: () => {
+        this.router.navigate(['/documents']);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+}
+
+reject() {
+
+  const doc = this.document();
+
+  if (!doc) return;
+
+  this.documentService.updateStatus(doc.id, 'REJECTED')
+    .subscribe({
+      next: () => {
+        this.router.navigate(['/documents']);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+}
 }

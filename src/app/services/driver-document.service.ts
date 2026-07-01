@@ -20,16 +20,26 @@ export class DriverDocumentService {
   }
 
   upload(file: File, title: string, type: string, driverId: string) {
-  const formData = new FormData();
+    const formData = new FormData();
 
-  formData.append('file', file);
-  formData.append('title', title);
-  formData.append('type', type);
-  formData.append('driverId', driverId);
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('type', type);
+    formData.append('driverId', driverId);
 
-  return this.http.post(
-    `${this.baseUrl}/upload`,
-    formData
-  );
-}
+    return this.http.post(
+      `${this.baseUrl}/upload`,
+      formData
+    );
+  }
+
+
+  updateStatus(id: string, status: string) {
+    return this.http.patch(
+      `${this.baseUrl}/${id}/status?status=${status}`,
+      {}
+    );
+  }
+
+
 }
