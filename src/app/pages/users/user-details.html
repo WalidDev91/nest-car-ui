@@ -1,1 +1,181 @@
-<p>user-details works!</p>
+<div class="container-fluid p-0">
+
+  <h1 class="h3 mb-3">User Details</h1>
+
+  <div class="row" *ngIf="user() as user">
+
+    <!-- LEFT -->
+    <div class="col-12 col-md-4">
+
+      <div class="card">
+
+        <div class="card-body text-center">
+
+          <img
+            src="assets/img/avatars/avatar.jpg"
+            class="img-fluid rounded-circle mb-3"
+            width="128"
+            height="128"
+          />
+
+          <h4 class="card-title mb-0">
+            {{ user.firstName }} {{ user.lastName }}
+          </h4>
+
+          <div class="text-muted mt-1">
+            {{ user.role }}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-12 col-md-8">
+
+      <div class="card">
+
+        <!-- Tabs -->
+        <div class="card-header">
+
+          <ul class="nav nav-tabs card-header-tabs">
+
+            <li class="nav-item">
+              <button
+                class="nav-link"
+                [class.active]="selectedTab() === 'info'"
+                (click)="selectTab('info')">
+
+                Information
+
+              </button>
+            </li>
+
+            <!-- ONLY FOR DRIVER -->
+            <li class="nav-item" *ngIf="user.role === 'DRIVER'">
+              <button
+                class="nav-link"
+                [class.active]="selectedTab() === 'documents'"
+                (click)="selectTab('documents')">
+
+                Documents
+
+              </button>
+            </li>
+
+          </ul>
+
+        </div>
+
+        <div class="card-body">
+
+          <!-- INFO TAB -->
+          <div *ngIf="selectedTab() === 'info'">
+
+            <table class="table table-borderless">
+
+              <tbody>
+
+                <tr>
+                  <th>Email</th>
+                  <td>{{ user.email }}</td>
+                </tr>
+
+                <tr>
+                  <th>Phone</th>
+                  <td>{{ user.phone }}</td>
+                </tr>
+
+                <tr>
+                  <th>Role</th>
+                  <td>{{ user.role }}</td>
+                </tr>
+
+                <tr>
+                  <th>Status</th>
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'bg-success': user.isValidate,
+                      'bg-danger': !user.isValidate
+                    }">
+                      {{ user.isValidate ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <th>Supervisor</th>
+                  <td>{{ user.adminName }}</td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <!-- DOCUMENTS TAB (ONLY DRIVER) -->
+          <div *ngIf="selectedTab() === 'documents' && user.role === 'DRIVER'">
+
+            <table class="table">
+
+              <tbody>
+
+                <tr>
+                  <th>Driver License</th>
+                  <td>
+                    <span class="badge"
+                          [ngClass]="hasLicense() ? 'bg-success' : 'bg-danger'">
+                      {{ hasLicense() ? 'Present' : 'Missing' }}
+                    </span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <th>ID Card</th>
+                  <td>
+                    <span class="badge"
+                          [ngClass]="hasIdCard() ? 'bg-success' : 'bg-danger'">
+                      {{ hasIdCard() ? 'Present' : 'Missing' }}
+                    </span>
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+            <!-- GLOBAL STATUS -->
+            <div class="alert mt-3"
+                 [ngClass]="(hasLicense() && hasIdCard())
+                   ? 'alert-success'
+                   : 'alert-warning'">
+
+              {{
+                (hasLicense() && hasIdCard())
+                  ? 'All documents complete'
+                  : 'Some documents are missing'
+              }}
+
+            </div>
+
+          </div>
+
+          <!-- NON DRIVER -->
+          <div *ngIf="user.role !== 'DRIVER' && selectedTab() === 'documents'">
+            <div class="alert alert-info">
+              No driver documents required.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -19,7 +19,7 @@ export class DriverDocumentDetails implements OnInit {
     private route: ActivatedRoute,
     private documentService: DriverDocumentService,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -39,35 +39,64 @@ export class DriverDocumentDetails implements OnInit {
 
   approve() {
 
-  const doc = this.document();
+    const doc = this.document();
 
-  if (!doc) return;
+    if (!doc) return;
 
-  this.documentService.updateStatus(doc.id, 'APPROVED')
-    .subscribe({
+    this.documentService.updateStatus(doc.id, 'APPROVED')
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/documents']);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+  }
+
+  reject() {
+
+    const doc = this.document();
+
+    if (!doc) return;
+
+    this.documentService.updateStatus(doc.id, 'REJECTED')
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/documents']);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+  }
+
+  deleteDocument() {
+
+    const doc = this.document();
+
+    if (!doc) {
+      return;
+    }
+
+    const confirmed = confirm(
+      'Are you sure you want to delete this document?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.documentService.delete(doc.id).subscribe({
       next: () => {
+        alert('Document deleted');
+
         this.router.navigate(['/documents']);
       },
       error: (err) => {
         console.error(err);
+        alert('Delete failed');
       }
     });
-}
-
-reject() {
-
-  const doc = this.document();
-
-  if (!doc) return;
-
-  this.documentService.updateStatus(doc.id, 'REJECTED')
-    .subscribe({
-      next: () => {
-        this.router.navigate(['/documents']);
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
-}
+  }
 }

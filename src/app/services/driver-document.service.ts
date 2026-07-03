@@ -19,6 +19,12 @@ export class DriverDocumentService {
     return this.http.get<DriverDocument>(`${this.baseUrl}/${id}`);
   }
 
+  getByDriverId(driverId: string) {
+    return this.http.get<DriverDocument[]>(
+      `${this.baseUrl}/driver/${driverId}`
+    );
+  }
+
   upload(file: File, title: string, type: string, driverId: string) {
     const formData = new FormData();
 
@@ -38,6 +44,12 @@ export class DriverDocumentService {
     return this.http.patch(
       `${this.baseUrl}/${id}/status?status=${status}`,
       {}
+    );
+  }
+
+  delete(id: string) {
+    return this.http.delete(
+      `${this.baseUrl}/${id}`
     );
   }
 

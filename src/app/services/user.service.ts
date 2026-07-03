@@ -17,6 +17,10 @@ export class UserService {
     return this.http.get<User[]>(this.baseUrl);
   }
 
+  getById(id: string) {
+    return this.http.get<User>(`${this.baseUrl}/${id}`);
+  }
+
   getByRole(role: string) {
     return this.http.get<any[]>(`${this.baseUrl}?role=${role}`);
   }
