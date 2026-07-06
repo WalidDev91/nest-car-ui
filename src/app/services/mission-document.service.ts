@@ -14,4 +14,40 @@ export class MissionDocumentService {
   getAll() {
     return this.http.get<MissionDocument[]>(this.baseUrl);
   }
+
+  getById(id: string) {
+    return this.http.get<MissionDocument>(
+      `${this.baseUrl}/${id}`
+    );
+  }
+
+  getByMissionId(missionId: string) {
+    return this.http.get<MissionDocument[]>(
+      `${this.baseUrl}/mission/${missionId}`
+    );
+  }
+
+  upload(
+    file: File,
+    title: string,
+    missionId: string
+  ) {
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('missionId', missionId);
+
+    return this.http.post(
+      `${this.baseUrl}/upload`,
+      formData
+    );
+  }
+
+  delete(id: string) {
+    return this.http.delete(
+      `${this.baseUrl}/${id}`
+    );
+  }
 }

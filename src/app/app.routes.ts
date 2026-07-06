@@ -6,6 +6,8 @@ import { Vehicles } from './pages/vehicles/vehicles';
 import { Missions } from './pages/missions/missions';
 import { Documents } from './pages/documents/documents';
 import { DriverDocumentDetails } from './pages/documents/driver-document-details';
+import { VehicleDocumentDetails } from './pages/documents/vehicle-document-details';
+import { MissionDocumentDetails } from './pages/documents/mission-document-details';
 import { Administration } from './pages/administration/administration';
 import { Login } from './auth/login/login';
 import { authGuard } from './guards/auth-guard'
@@ -28,6 +30,8 @@ export const routes: Routes = [
       { path: 'missions', component: Missions },
       { path: 'documents', component: Documents },
       { path: 'documents/driver/:id', component: DriverDocumentDetails },
+      { path: 'documents/vehicle/:id', component: VehicleDocumentDetails },
+      { path: 'documents/mission/:id', component: MissionDocumentDetails },
       { path: 'administration', component: Administration }
     ]
   },

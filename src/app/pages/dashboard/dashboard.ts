@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { MissionService } from '../../services/mission.service';
+import { DriverDocumentService } from '../../services/driver-document.service';
 import { Mission } from '../../models/mission';
 import { Chart, registerables } from 'chart.js';
 
@@ -24,6 +25,10 @@ export class Dashboard implements OnInit, AfterViewInit {
   totalVehicles = signal<number>(0);
   totalMissions = signal<number>(0);
   activeMissions = signal<number>(0);
+  pendingDocuments = signal<number>(0);
+  totalDocuments = signal<number>(0);
+  driversWithMissingDocs = signal<number>(0);
+  totalUsers = signal<number>(0);
 
   // recent missions
   recentMissions = signal<Mission[]>([]);
@@ -40,16 +45,11 @@ export class Dashboard implements OnInit, AfterViewInit {
   constructor(
     private userService: UserService,
     private vehicleService: VehicleService,
-    private missionService: MissionService
+    private missionService: MissionService,
+    private driverDocumentService: DriverDocumentService
   ) { }
 
   ngOnInit(): void {
-    this.userService.getAll().subscribe({
-      next: (data) => {
-        const drivers = data.filter(u => u.role === 'DRIVER');
-        this.totalDrivers.set(drivers.length);
-      }
-    });
 
     this.vehicleService.getAll().subscribe({
       next: (data) => {
@@ -65,6 +65,31 @@ export class Dashboard implements OnInit, AfterViewInit {
         this.allMissions = data;
         this.dataLoaded = true;
         this.buildCharts();
+      }
+    });
+
+    this.driverDocumentService.getAll().subscribe({
+      next: (docs) => {
+        this.totalDocuments.set(docs.length);
+        this.pendingDocuments.set(docs.filter(d => d.status === 'PENDING').length);
+
+        // check missing docs per driver
+        this.userService.getAll().subscribe({
+          next: (users) => {
+            const drivers = users.filter(u => u.role === 'DRIVER');
+            this.totalDrivers.set(drivers.length);
+            this.totalUsers.set(users.length);
+
+            let missing = 0;
+            drivers.forEach(driver => {
+              const driverDocs = docs.filter(d => d.driverId === driver.id);
+              const hasLicense = driverDocs.some(d => d.type === 'DRIVER_LICENSE' && d.status === 'APPROVED');
+              const hasId = driverDocs.some(d => d.type === 'ID_CARD' && d.status === 'APPROVED');
+              if (!hasLicense || !hasId) missing++;
+            });
+            this.driversWithMissingDocs.set(missing);
+          }
+        });
       }
     });
   }

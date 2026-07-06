@@ -14,4 +14,44 @@ export class VehicleDocumentService {
   getAll() {
     return this.http.get<VehicleDocument[]>(this.baseUrl);
   }
+
+  getById(id: string) {
+    return this.http.get<VehicleDocument>(
+      `${this.baseUrl}/${id}`
+    );
+  }
+
+  getByVehicleId(vehicleId: string) {
+    return this.http.get<VehicleDocument[]>(
+      `${this.baseUrl}/vehicle/${vehicleId}`
+    );
+  }
+
+  upload(
+    file: File,
+    title: string,
+    type: string,
+    year: number,
+    vehicleId: string
+  ) {
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('type', type);
+    formData.append('year', year.toString());
+    formData.append('vehicleId', vehicleId);
+
+    return this.http.post(
+      `${this.baseUrl}/upload`,
+      formData
+    );
+  }
+
+  delete(id: string) {
+    return this.http.delete(
+      `${this.baseUrl}/${id}`
+    );
+  }
 }
