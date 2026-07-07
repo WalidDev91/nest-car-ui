@@ -25,5 +25,6 @@ export class AuthService {
     localStorage.removeItem('email');
     localStorage.removeItem('firstName');
     localStorage.removeItem('lastName');
+    localStorage.removeItem('userId');
   }
 }

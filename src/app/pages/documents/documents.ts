@@ -26,20 +26,24 @@ export class Documents implements OnInit {
   vehicleDocs = signal<VehicleDocument[]>([]);
   missionDocs = signal<MissionDocument[]>([]);
 
-  // driver upload fields
+  isAdmin = localStorage.getItem('role') === 'ADMIN';
+
+  currentUserId = localStorage.getItem('userId') ?? '';
+
+  // DRIVER
   selectedFile: File | null = null;
   uploadTitle = '';
   uploadType: 'DRIVER_LICENSE' | 'ID_CARD' = 'DRIVER_LICENSE';
   uploadDriverId = '';
 
-  // vehicle upload fields
+  // VEHICLE
   selectedVehicleFile: File | null = null;
   uploadVehicleTitle = '';
   uploadVehicleType: 'LICENSE' | 'TECHNICAL_CHECK' | 'INSURANCE' = 'LICENSE';
-  uploadVehicleYear: number = new Date().getFullYear();
+  uploadVehicleYear = new Date().getFullYear();
   uploadVehicleId = '';
 
-  // mission upload fields
+  // MISSION
   selectedMissionFile: File | null = null;
   uploadMissionTitle = '';
   uploadMissionId = '';
@@ -61,66 +65,114 @@ export class Documents implements OnInit {
   }
 
   loadAll() {
+
+    // backend now returns:
+    // admin -> all
+    // driver -> only his documents
     this.driverService.getAll().subscribe(data => {
       this.driverDocs.set(data);
       setTimeout(() => feather.replace(), 0);
     });
+
+    // leave unchanged for now
     this.vehicleService.getAll().subscribe(data => {
       this.vehicleDocs.set(data);
       setTimeout(() => feather.replace(), 0);
     });
+
     this.missionService.getAll().subscribe(data => {
       this.missionDocs.set(data);
       setTimeout(() => feather.replace(), 0);
     });
   }
 
-  // ===== DRIVER =====
+  // ================= DRIVER =================
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
+    if (input.files?.length) {
       this.selectedFile = input.files[0];
     }
   }
 
   uploadDriverDocument() {
-    if (!this.selectedFile) { alert('Please select a file'); return; }
+
+    if (!this.selectedFile) {
+      alert('Please select a file');
+      return;
+    }
+
+    const driverId =
+      this.isAdmin
+        ? this.uploadDriverId
+        : this.currentUserId;
+
     this.driverService.upload(
       this.selectedFile,
       this.uploadTitle,
       this.uploadType,
-      this.uploadDriverId
+      driverId
     ).subscribe({
       next: () => {
+
         alert('Upload successful');
+
         this.loadAll();
+
+        this.selectedFile = null;
         this.uploadTitle = '';
         this.uploadType = 'DRIVER_LICENSE';
-        this.uploadDriverId = '';
-        this.selectedFile = null;
+
+        if (this.isAdmin) {
+          this.uploadDriverId = '';
+        }
+
       },
-      error: (err) => { console.error(err); alert('Upload failed'); }
+      error: err => {
+        console.error(err);
+        alert('Upload failed');
+      }
     });
+
+  }
+
+  approveDriver(id: string) {
+    this.driverService.updateStatus(id, 'APPROVED')
+      .subscribe(() => this.loadAll());
+  }
+
+  rejectDriver(id: string) {
+    this.driverService.updateStatus(id, 'REJECTED')
+      .subscribe(() => this.loadAll());
   }
 
   downloadDriver(id: string) {
-    window.open(`http://localhost:8080/api/driver-documents/${id}/download`, '_blank');
+    window.open(
+      `http://localhost:8080/api/driver-documents/${id}/download`,
+      '_blank'
+    );
   }
 
   viewDriverDetails(id: string) {
     this.router.navigate(['/documents/driver', id]);
   }
 
-  // ===== VEHICLE =====
+  // ================= VEHICLE =================
+
   onVehicleFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
+    if (input.files?.length) {
       this.selectedVehicleFile = input.files[0];
     }
   }
 
   uploadVehicleDocument() {
-    if (!this.selectedVehicleFile) { alert('Please select a file'); return; }
+
+    if (!this.selectedVehicleFile) {
+      alert('Please select a file');
+      return;
+    }
+
     this.vehicleService.upload(
       this.selectedVehicleFile,
       this.uploadVehicleTitle,
@@ -129,57 +181,78 @@ export class Documents implements OnInit {
       this.uploadVehicleId
     ).subscribe({
       next: () => {
+
         alert('Upload successful');
+
         this.loadAll();
+
         this.uploadVehicleTitle = '';
         this.uploadVehicleType = 'LICENSE';
         this.uploadVehicleYear = new Date().getFullYear();
         this.uploadVehicleId = '';
         this.selectedVehicleFile = null;
-      },
-      error: (err) => { console.error(err); alert('Upload failed'); }
+
+      }
     });
+
   }
 
   downloadVehicle(id: string) {
-    window.open(`http://localhost:8080/api/vehicle-documents/${id}/download`, '_blank');
+    window.open(
+      `http://localhost:8080/api/vehicle-documents/${id}/download`,
+      '_blank'
+    );
   }
 
   viewVehicleDetails(id: string) {
     this.router.navigate(['/documents/vehicle', id]);
   }
 
-  // ===== MISSION =====
+  // ================= MISSION =================
+
   onMissionFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
+    if (input.files?.length) {
       this.selectedMissionFile = input.files[0];
     }
   }
 
   uploadMissionDocument() {
-    if (!this.selectedMissionFile) { alert('Please select a file'); return; }
+
+    if (!this.selectedMissionFile) {
+      alert('Please select a file');
+      return;
+    }
+
     this.missionService.upload(
       this.selectedMissionFile,
       this.uploadMissionTitle,
       this.uploadMissionId
     ).subscribe({
       next: () => {
+
         alert('Upload successful');
+
         this.loadAll();
+
         this.uploadMissionTitle = '';
         this.uploadMissionId = '';
         this.selectedMissionFile = null;
-      },
-      error: (err) => { console.error(err); alert('Upload failed'); }
+
+      }
     });
+
   }
 
   downloadMission(id: string) {
-    window.open(`http://localhost:8080/api/mission-documents/${id}/download`, '_blank');
+    window.open(
+      `http://localhost:8080/api/mission-documents/${id}/download`,
+      '_blank'
+    );
   }
 
   viewMissionDetails(id: string) {
     this.router.navigate(['/documents/mission', id]);
   }
+
 }
