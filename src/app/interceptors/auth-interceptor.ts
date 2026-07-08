@@ -18,13 +18,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 || error.status === 403) {
-        console.log('Auth error detected, logging out...');
+
+      if (error.status === 401) {
+
+        console.log('Unauthorized - logging out...');
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('email');
+
         router.navigate(['/auth/login']);
       }
+
       return throwError(() => error);
     })
   );

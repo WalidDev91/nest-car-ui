@@ -193,7 +193,7 @@
 
       <!-- VEHICLE DOCUMENTS -->
       <div *ngIf="selectedTab() === 'vehicle'">
-        <div class="card mb-3">
+        <div class="card mb-3" *ngIf="!isDriver">
           <div class="card-body">
             <h5 class="card-title">Upload Vehicle Document</h5>
             <div class="row g-2">
@@ -259,7 +259,7 @@
 
       <!-- MISSION DOCUMENTS -->
       <div *ngIf="selectedTab() === 'mission'">
-        <div class="card mb-3">
+        <div class="card mb-3" *ngIf="!isDriver">
           <div class="card-body">
             <h5 class="card-title">Upload Mission Document</h5>
             <div class="row g-2">

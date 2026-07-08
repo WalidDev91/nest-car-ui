@@ -16,4 +16,16 @@ export class MissionService {
     return this.http.get<Mission[]>(this.baseUrl);
   }
 
+  create(data: any) {
+    return this.http.post<Mission>(this.baseUrl, data);
+  }
+
+  update(id: string, data: any) {
+    return this.http.put<Mission>(`${this.baseUrl}/${id}`, data);
+  }
+
+  delete(id: string) {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+
 }

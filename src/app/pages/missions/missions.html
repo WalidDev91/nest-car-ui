@@ -1,52 +1,297 @@
 <div class="container-fluid p-0">
 
-    <h1 class="h3 mb-3">
-        Missions
-    </h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h1 class="h3">
+            Missions
+        </h1>
+
+
+        <button *ngIf="!isDriver" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMissionModal">
+
+            <i data-feather="plus"></i>
+            Create Mission
+
+        </button>
+
+    </div>
+
+
 
     <div class="card">
+
         <div class="card-body">
+
 
             <table class="table table-hover">
 
                 <thead>
                     <tr>
+
                         <th>Title</th>
+
                         <th>Description</th>
+
                         <th>Start Date</th>
+
                         <th>End Date</th>
+
                         <th>Status</th>
+
                         <th>Driver</th>
+
                         <th>Vehicle</th>
+
                     </tr>
                 </thead>
 
+
                 <tbody>
 
+
                     <tr *ngFor="let mission of missions()">
-                        <td>{{ mission.title }}</td>
-                        <td>{{ mission.description }}</td>
-                        <td>{{ mission.startDate | date:'dd/MM/yyyy' }}</td>
-                        <td>{{ mission.endDate | date:'dd/MM/yyyy' }}</td>
+
+
                         <td>
-                            <span class="badge" [ngClass]="{
-      'bg-warning':  mission.status === 'PLANNED',
-      'bg-primary':  mission.status === 'ONGOING',
-      'bg-success':  mission.status === 'COMPLETED',
-      'bg-danger':   mission.status === 'CANCELLED'
-    }">
-                                {{ mission.status }}
-                            </span>
+                            {{ mission.title }}
                         </td>
-                        <td>{{ mission.driverName }}</td>
-                        <td>{{ mission.vehiclePlateNumber }}</td>
+
+
+                        <td>
+                            {{ mission.description }}
+                        </td>
+
+
+                        <td>
+                            {{ mission.startDate | date:'dd/MM/yyyy' }}
+                        </td>
+
+
+                        <td>
+                            {{ mission.endDate | date:'dd/MM/yyyy' }}
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge" [ngClass]="{
+
+                                'bg-warning': mission.status === 'PLANNED',
+
+                                'bg-primary': mission.status === 'ONGOING',
+
+                                'bg-success': mission.status === 'COMPLETED',
+
+                                'bg-danger': mission.status === 'CANCELLED'
+
+                            }">
+
+                                {{ mission.status }}
+
+                            </span>
+
+                        </td>
+
+
+                        <td>
+                            {{ mission.driverName || 'Not assigned' }}
+                        </td>
+
+
+                        <td>
+                            {{ mission.vehiclePlateNumber || 'Not assigned' }}
+                        </td>
+
+
                     </tr>
+
 
                 </tbody>
 
+
             </table>
 
+
         </div>
+
     </div>
+
+
+
+</div>
+
+
+
+
+
+<!-- CREATE MISSION MODAL -->
+
+<div class="modal fade" id="createMissionModal" tabindex="-1">
+
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+
+        <div class="modal-content">
+
+
+
+
+
+
+            <div class="modal-body">
+
+
+                <div class="row g-3">
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Title
+                        </label>
+
+                        <input class="form-control" [(ngModel)]="title">
+
+                    </div>
+
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Status
+                        </label>
+
+
+                        <select class="form-select" [(ngModel)]="status">
+
+
+                            <option value="PLANNED">
+                                Planned
+                            </option>
+
+
+                            <option value="ONGOING">
+                                Ongoing
+                            </option>
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+                    <div class="col-12">
+
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+
+                        <textarea class="form-control" rows="3" [(ngModel)]="description">
+                        </textarea>
+
+
+                    </div>
+
+
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Start Date
+                        </label>
+
+
+                        <input type="datetime-local" class="form-control" [(ngModel)]="startDate">
+
+                    </div>
+
+
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            End Date
+                        </label>
+
+
+                        <input type="datetime-local" class="form-control" [(ngModel)]="endDate">
+
+                    </div>
+
+
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Driver ID
+                        </label>
+
+
+                        <input class="form-control" [(ngModel)]="driverId">
+
+
+                    </div>
+
+
+
+
+                    <div class="col-md-6">
+
+
+                        <label class="form-label">
+                            Vehicle ID
+                        </label>
+
+
+                        <input class="form-control" [(ngModel)]="vehicleId">
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+            <div class="modal-footer">
+
+
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+
+                <button class="btn btn-primary" (click)="createMission()">
+
+                    Create Mission
+
+                </button>
+
+
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
 
 </div>
