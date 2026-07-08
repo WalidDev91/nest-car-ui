@@ -39,80 +39,156 @@
 
       <!-- DRIVER DOCUMENTS -->
       <div *ngIf="selectedTab() === 'driver'">
-        <div class="card mb-3" *ngIf="!isAdmin">
+
+        <!-- DRIVER ONLY UPLOAD -->
+        <div class="card mb-3" *ngIf="isDriver">
           <div class="card-body">
+
             <h5 class="card-title">
-              {{ isAdmin ? 'Upload Driver Document' : 'Upload My Document' }}
+              Upload My Document
             </h5>
+
             <div class="row g-2">
-              <div class="col-md-3">
+
+              <div class="col-md-4">
                 <input type="text" class="form-control" placeholder="Title" [(ngModel)]="uploadTitle">
               </div>
-              <div class="col-md-3">
+
+
+              <div class="col-md-4">
                 <select class="form-select" [(ngModel)]="uploadType">
-                  <option value="DRIVER_LICENSE">Driver License</option>
-                  <option value="ID_CARD">ID Card</option>
+
+                  <option value="DRIVER_LICENSE">
+                    Driver License
+                  </option>
+
+                  <option value="ID_CARD">
+                    ID Card
+                  </option>
+
                 </select>
               </div>
-              <div class="col-md-3" *ngIf="isAdmin">
-                <input type="text" class="form-control" placeholder="Driver UUID" [(ngModel)]="uploadDriverId">
-              </div>
-              <div [class]="isAdmin ? 'col-md-3' : 'col-md-6'">
+
+
+              <div class="col-md-4">
                 <input type="file" class="form-control" (change)="onFileSelected($event)">
               </div>
+
+
             </div>
+
+
             <button class="btn btn-primary mt-3" (click)="uploadDriverDocument()">
+
               Upload
+
             </button>
+
+
           </div>
         </div>
 
+
+        <!-- DOCUMENT LIST -->
         <table class="table table-hover">
+
           <thead>
             <tr>
               <th>Title</th>
               <th>Type</th>
               <th>Status</th>
-              <th>Driver</th>
               <th>Uploaded At</th>
               <th>Validated At</th>
               <th>Actions</th>
             </tr>
           </thead>
+
+
           <tbody>
+
             <tr *ngFor="let doc of driverDocs()">
-              <td>{{ doc.title }}</td>
+
               <td>
+                {{doc.title}}
+              </td>
+
+
+              <td>
+
                 <span class="badge bg-light text-dark">
-                  {{ doc.type === 'DRIVER_LICENSE' ? 'Driver License' : 'ID Card' }}
+
+                  {{
+                  doc.type === 'DRIVER_LICENSE'
+                  ? 'Driver License'
+                  : 'ID Card'
+                  }}
+
                 </span>
+
               </td>
+
+
               <td>
+
                 <span class="badge" [ngClass]="{
-                  'bg-warning': doc.status === 'PENDING',
-                  'bg-success': doc.status === 'APPROVED',
-                  'bg-danger':  doc.status === 'REJECTED'
-                }">{{ doc.status }}</span>
+
+              'bg-warning': doc.status === 'PENDING',
+
+              'bg-success': doc.status === 'APPROVED',
+
+              'bg-danger': doc.status === 'REJECTED'
+
+            }">
+
+                  {{doc.status}}
+
+                </span>
+
               </td>
-              <td>{{ doc.driverName }}</td>
-              <td>{{ doc.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td>{{ doc.validatedAt ? (doc.validatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+
+
+              <td>
+                {{doc.uploadedAt | date:'dd/MM/yyyy HH:mm'}}
+              </td>
+
+
+              <td>
+
+                {{
+                doc.validatedAt
+                ? (doc.validatedAt | date:'dd/MM/yyyy HH:mm')
+                : '—'
+                }}
+
+              </td>
+
+
               <td>
 
                 <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDriverDetails(doc.id)">
+
                   <i data-feather="eye"></i>
+
                 </button>
 
-                <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadDriver(doc.id)">
+
+                <button class="btn btn-sm btn-outline-primary" (click)="downloadDriver(doc.id)">
+
                   <i data-feather="download"></i>
-                </button>
 
+                </button>
 
 
               </td>
+
+
             </tr>
+
           </tbody>
+
         </table>
+
+
       </div>
 
       <!-- VEHICLE DOCUMENTS -->

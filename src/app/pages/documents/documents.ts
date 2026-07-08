@@ -26,7 +26,8 @@ export class Documents implements OnInit {
   vehicleDocs = signal<VehicleDocument[]>([]);
   missionDocs = signal<MissionDocument[]>([]);
 
-  isAdmin = localStorage.getItem('role') === 'ADMIN';
+
+  isDriver = localStorage.getItem('role') === 'DRIVER';
 
   currentUserId = localStorage.getItem('userId') ?? '';
 
@@ -34,7 +35,6 @@ export class Documents implements OnInit {
   selectedFile: File | null = null;
   uploadTitle = '';
   uploadType: 'DRIVER_LICENSE' | 'ID_CARD' = 'DRIVER_LICENSE';
-  uploadDriverId = '';
 
   // VEHICLE
   selectedVehicleFile: File | null = null;
@@ -102,10 +102,7 @@ export class Documents implements OnInit {
       return;
     }
 
-    const driverId =
-      this.isAdmin
-        ? this.uploadDriverId
-        : this.currentUserId;
+    const driverId = this.currentUserId;
 
     this.driverService.upload(
       this.selectedFile,
@@ -123,10 +120,6 @@ export class Documents implements OnInit {
         this.uploadTitle = '';
         this.uploadType = 'DRIVER_LICENSE';
 
-        if (this.isAdmin) {
-          this.uploadDriverId = '';
-        }
-
       },
       error: err => {
         console.error(err);
@@ -136,15 +129,6 @@ export class Documents implements OnInit {
 
   }
 
-  approveDriver(id: string) {
-    this.driverService.updateStatus(id, 'APPROVED')
-      .subscribe(() => this.loadAll());
-  }
-
-  rejectDriver(id: string) {
-    this.driverService.updateStatus(id, 'REJECTED')
-      .subscribe(() => this.loadAll());
-  }
 
   downloadDriver(id: string) {
     window.open(
