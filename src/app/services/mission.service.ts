@@ -12,6 +12,10 @@ export class MissionService {
 
   constructor(private http: HttpClient) { }
 
+  getById(id: string) {
+    return this.http.get<Mission>(`${this.baseUrl}/${id}`);
+  }
+
   getAll() {
     return this.http.get<Mission[]>(this.baseUrl);
   }
@@ -20,9 +24,10 @@ export class MissionService {
     return this.http.post<Mission>(this.baseUrl, data);
   }
 
-  update(id: string, data: any) {
-    return this.http.put<Mission>(`${this.baseUrl}/${id}`, data);
+  update(id: string, request: any) {
+    return this.http.put<Mission>(`${this.baseUrl}/${id}`, request);
   }
+
 
   delete(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`);

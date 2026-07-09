@@ -14,6 +14,7 @@ import { authGuard } from './guards/auth-guard'
 import { AuthLayout } from './layout/auth-layout/auth-layout';
 import { guestGuard } from './guards/guest-guard';
 import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
+import { MissionDetails } from './pages/missions/mission-details';
 
 export const routes: Routes = [
 
@@ -28,6 +29,7 @@ export const routes: Routes = [
       { path: 'users/:id', component: UserDetails },
       { path: 'vehicles', component: Vehicles },
       { path: 'missions', component: Missions },
+      { path: 'missions/:id', component: MissionDetails },
       { path: 'documents', component: Documents },
       { path: 'documents/driver/:id', component: DriverDocumentDetails },
       { path: 'documents/vehicle/:id', component: VehicleDocumentDetails },

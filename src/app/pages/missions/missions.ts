@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MissionService } from '../../services/mission.service';
 import { Mission } from '../../models/mission';
+import { Router } from '@angular/router';
+import feather from 'feather-icons';
 
 @Component({
   selector: 'app-missions',
@@ -39,12 +41,14 @@ export class Missions implements OnInit {
 
 
   constructor(
-    private missionService: MissionService
+    private missionService: MissionService,
+    private router: Router
   ) { }
 
 
   ngOnInit(): void {
     this.loadMissions();
+    setTimeout(() => feather.replace(), 0);
   }
 
 
@@ -54,6 +58,7 @@ export class Missions implements OnInit {
       .subscribe({
         next: data => {
           this.missions.set(data);
+          setTimeout(() => feather.replace(), 0);
         },
         error: err => {
           console.error(err);
@@ -128,6 +133,10 @@ export class Missions implements OnInit {
     this.driverId = '';
     this.vehicleId = '';
 
+  }
+
+  viewMissionDetails(id: string) {
+    this.router.navigate(['/missions', id]);
   }
 
 }

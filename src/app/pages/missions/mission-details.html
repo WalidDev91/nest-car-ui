@@ -1,1 +1,327 @@
-<p>mission-details works!</p>
+<div class="container-fluid p-0">
+
+    <h1 class="h3 mb-3">
+        Mission Details
+    </h1>
+
+
+    <div class="row" *ngIf="mission() as mission">
+
+
+        <!-- LEFT -->
+        <div class="col-12 col-md-4">
+
+            <div class="card">
+
+                <div class="card-body text-center">
+
+                    <div class="mb-3">
+                        <i data-feather="map" width="80" height="80"></i>
+                    </div>
+
+
+                    <h4 class="card-title mb-0">
+                        {{ mission.title }}
+                    </h4>
+
+
+                    <div class="text-muted mt-1">
+                        {{ mission.status }}
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- RIGHT -->
+        <div class="col-12 col-md-8">
+
+
+            <div class="card">
+
+
+                <!-- Tabs -->
+                <div class="card-header">
+
+                    <ul class="nav nav-tabs card-header-tabs">
+
+
+                        <li class="nav-item">
+
+                            <button class="nav-link" [class.active]="selectedTab() === 'info'"
+                                (click)="selectTab('info')">
+
+                                Information
+
+                            </button>
+
+                        </li>
+
+
+
+                        <li class="nav-item">
+
+                            <button class="nav-link" [class.active]="selectedTab() === 'assignment'"
+                                (click)="selectTab('assignment')">
+
+                                Assignment
+
+                            </button>
+
+                        </li>
+
+
+
+                        <li class="nav-item">
+
+                            <button class="nav-link" [class.active]="selectedTab() === 'inspection'"
+                                (click)="selectTab('inspection')">
+
+                                Inspection
+
+                            </button>
+
+                        </li>
+
+
+                    </ul>
+
+
+                </div>
+
+
+
+                <div class="card-body">
+
+
+
+                    <!-- INFO TAB -->
+                    <div *ngIf="selectedTab() === 'info'">
+
+                        <table class="table table-borderless">
+
+                            <tbody>
+
+                                <tr>
+                                    <th>Title</th>
+                                    <td>{{ mission.title }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Description</th>
+                                    <td>{{ mission.description }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Start Date</th>
+                                    <td>{{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>End Date</th>
+                                    <td>{{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Status</th>
+                                    <td>
+                                        <span class="badge" [ngClass]="{
+                      'bg-warning': mission.status === 'PLANNED',
+                      'bg-primary': mission.status === 'ONGOING',
+                      'bg-success': mission.status === 'COMPLETED',
+                      'bg-danger': mission.status === 'CANCELLED'
+                    }">
+                                            {{ mission.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>Driver</th>
+                                    <td>{{ mission.driverName || 'Not assigned' }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <td>{{ mission.vehiclePlateNumber || 'Not assigned' }}</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-danger" (click)="deleteMission()">
+                                Delete Mission
+                            </button>
+                        </div>
+
+                    </div>
+
+
+
+
+
+                    <!-- ASSIGNMENT TAB -->
+                    <div *ngIf="selectedTab() === 'assignment'">
+
+                        <div class="alert alert-info">
+
+                            {{
+                            mission.driverId || mission.vehicleId
+                            ? 'Update the current assignment.'
+                            : 'Assign a driver and/or vehicle to this mission.'
+                            }}
+
+                        </div>
+
+                        <!-- Current Assignment -->
+
+                        <div class="card mb-3">
+
+                            <div class="card-header">
+                                Current Assignment
+                            </div>
+
+                            <div class="card-body">
+
+                                <p>
+                                    <strong>Driver:</strong>
+                                    {{ mission.driverName || 'Not assigned' }}
+                                </p>
+
+                                <p>
+                                    <strong>Vehicle:</strong>
+                                    {{ mission.vehiclePlateNumber || 'Not assigned' }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Driver -->
+
+                        <div class="mb-3">
+
+                            <label class="form-label">Driver ID</label>
+
+                            <input class="form-control" [(ngModel)]="driverId" placeholder="Driver UUID">
+
+                        </div>
+
+                        <!-- Vehicle -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label">Vehicle ID</label>
+
+                            <input class="form-control" [(ngModel)]="vehicleId" placeholder="Vehicle UUID">
+
+                        </div>
+
+                        <div class="d-flex gap-2">
+
+                            <button class="btn btn-primary" (click)="updateAssignment()">
+
+                                {{ mission.driverId || mission.vehicleId ? 'Update Assignment' : 'Assign' }}
+
+                            </button>
+
+                            <button class="btn btn-outline-danger" (click)="removeAssignment()">
+
+                                Remove Assignment
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                    <!-- INSPECTION TAB -->
+                    <div *ngIf="selectedTab() === 'inspection'">
+
+
+                        <div class="alert alert-secondary">
+
+                            Vehicle inspection module.
+
+                        </div>
+
+
+
+                        <table class="table table-borderless">
+
+
+                            <tbody>
+
+
+                                <tr>
+                                    <th>Mileage</th>
+                                    <td>
+                                        {{ mission.inspection?.mileage || '-' }}
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <th>Fuel Level</th>
+                                    <td>
+                                        {{ mission.inspection?.fuelLevel || '-' }}
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <th>Notes</th>
+                                    <td>
+                                        {{ mission.inspection?.notes || '-' }}
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+
+
+                        </table>
+
+
+
+                        <div class="alert alert-warning">
+
+                            Photos upload will be added here.
+
+                        </div>
+
+
+
+                    </div>
+
+
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>

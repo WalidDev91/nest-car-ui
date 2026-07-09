@@ -1,3 +1,5 @@
+import { MissionVehicleInspection } from './mission-vehicle-inspection';
+
 export interface Mission {
   id: string;
   title: string;
@@ -11,4 +13,5 @@ export interface Mission {
   vehiclePlateNumber: string;
   createdAt: string;
   updatedAt: string;
+  inspection?: MissionVehicleInspection;
 }
