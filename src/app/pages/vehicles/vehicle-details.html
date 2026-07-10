@@ -1,1 +1,221 @@
-<p>vehicle-details works!</p>
+<div class="container-fluid p-0">
+
+    <h1 class="h3 mb-3">
+        Vehicle Details
+    </h1>
+
+    <div class="row" *ngIf="vehicle() as vehicle">
+
+        <!-- LEFT -->
+        <div class="col-12 col-md-4">
+
+            <div class="card">
+
+                <div class="card-body text-center">
+
+                    <div class="mb-3">
+                        <i data-feather="truck" width="80" height="80"></i>
+                    </div>
+
+                    <h4 class="card-title mb-0">
+                        {{ vehicle.plateNumber }}
+                    </h4>
+
+                    <div class="text-muted mt-1">
+                        {{ vehicle.brand }} {{ vehicle.model }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-12 col-md-8">
+
+            <div class="card">
+
+                <!-- Tabs -->
+                <div class="card-header">
+
+                    <ul class="nav nav-tabs card-header-tabs">
+
+                        <li class="nav-item">
+                            <button class="nav-link" [class.active]="selectedTab() === 'info'"
+                                (click)="selectTab('info')">
+
+                                Information
+
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-link" [class.active]="selectedTab() === 'documents'"
+                                (click)="selectTab('documents')">
+
+                                Documents
+
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-link" [class.active]="selectedTab() === 'missions'"
+                                (click)="selectTab('missions')">
+
+                                Missions
+
+                            </button>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <div class="card-body">
+
+                    <!-- INFORMATION -->
+                    <div *ngIf="selectedTab() === 'info'">
+
+                        <table class="table table-borderless">
+
+                            <tbody>
+
+                                <tr>
+                                    <th>Plate Number</th>
+                                    <td>{{ vehicle.plateNumber }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Brand</th>
+                                    <td>{{ vehicle.brand }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Model</th>
+                                    <td>{{ vehicle.model }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Year</th>
+                                    <td>{{ vehicle.year }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Fleet Manager</th>
+                                    <td>{{ vehicle.adminName }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Created</th>
+                                    <td>{{ vehicle.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Updated</th>
+                                    <td>{{ vehicle.updatedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-end gap-2">
+
+                            <button class="btn btn-primary" (click)="editVehicle()">
+
+                                Edit Vehicle
+
+                            </button>
+
+                            <button class="btn btn-danger" (click)="deleteVehicle()">
+
+                                Delete Vehicle
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- DOCUMENTS -->
+                    <div *ngIf="selectedTab() === 'documents'">
+
+                        <div class="alert alert-info">
+
+                            Manage vehicle documents.
+
+                        </div>
+
+                        <table class="table table-hover">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Year</th>
+                                    <th>Actions</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <!-- vehicle documents here -->
+
+                            </tbody>
+
+                        </table>
+
+
+
+                    </div>
+
+                    <!-- MISSIONS -->
+                    <div *ngIf="selectedTab() === 'missions'">
+
+                        <div class="alert alert-secondary">
+
+                            Current mission and mission history.
+
+                        </div>
+
+                        <table class="table table-hover">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Mission</th>
+                                    <th>Driver</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <!-- missions here -->
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

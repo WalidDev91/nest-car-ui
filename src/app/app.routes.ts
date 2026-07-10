@@ -3,6 +3,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Users } from './pages/users/users';
 import { UserDetails } from './pages/users/user-details';
 import { Vehicles } from './pages/vehicles/vehicles';
+import { VehicleDetails } from './pages/vehicles/vehicle-details';
 import { Missions } from './pages/missions/missions';
 import { Documents } from './pages/documents/documents';
 import { DriverDocumentDetails } from './pages/documents/driver-document-details';
@@ -28,6 +29,7 @@ export const routes: Routes = [
       { path: 'users', component: Users },
       { path: 'users/:id', component: UserDetails },
       { path: 'vehicles', component: Vehicles },
+      { path: 'vehicles/:id', component: VehicleDetails },
       { path: 'missions', component: Missions },
       { path: 'missions/:id', component: MissionDetails },
       { path: 'documents', component: Documents },
