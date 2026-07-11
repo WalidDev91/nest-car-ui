@@ -1,1 +1,339 @@
-<p>administration works!</p>
+<div class="container-fluid p-0">
+
+    <h1 class="h3 mb-3">
+        Administration
+    </h1>
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <ul class="nav nav-tabs card-header-tabs">
+
+                <li class="nav-item">
+                    <button class="nav-link" [class.active]="selectedTab() === 'users'" (click)="selectTab('users')">
+
+                        User Management
+
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link" [class.active]="selectedTab() === 'requests'"
+                        (click)="selectTab('requests')">
+
+                        Account Requests
+
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link" [class.active]="selectedTab() === 'settings'"
+                        (click)="selectTab('settings')">
+
+                        Settings
+
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link" [class.active]="selectedTab() === 'audit'" (click)="selectTab('audit')">
+
+                        Audit Log
+
+                    </button>
+                </li>
+
+            </ul>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- ===================================================== -->
+            <!-- USER MANAGEMENT -->
+            <!-- ===================================================== -->
+
+            <div *ngIf="selectedTab() === 'users'">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr *ngFor="let user of users()">
+
+                            <td>
+
+                                {{ user.firstName }}
+                                {{ user.lastName }}
+
+                            </td>
+
+                            <td>
+
+                                {{ user.email }}
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge bg-primary">
+
+                                    {{ user.role }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge" [ngClass]="user.isValidate ? 'bg-success' : 'bg-danger'">
+
+                                    {{ user.isValidate ? 'Active' : 'Inactive' }}
+
+                                </span>
+
+                            </td>
+
+                            <td class="text-end">
+
+                                <button class="btn btn-success btn-sm me-2" (click)="activateUser(user.id)"
+                                    *ngIf="!user.isValidate">
+
+                                    <i data-feather="check"></i>
+
+                                </button>
+
+                                <button class="btn btn-warning btn-sm me-2" (click)="deactivateUser(user.id)"
+                                    *ngIf="user.isValidate">
+
+                                    <i data-feather="slash"></i>
+
+                                </button>
+
+                                <button class="btn btn-info btn-sm me-2" (click)="changeRole(user.id,'ADMIN')">
+
+                                    <i data-feather="shield"></i>
+
+                                </button>
+
+                                <!-- 
+                                <button
+                                    class="btn btn-danger btn-sm"
+                                    (click)="deleteUser(user.id)">
+
+                                    <i data-feather="trash-2"></i>
+
+                                </button>
+                                -->
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- ACCOUNT REQUESTS -->
+            <!-- ===================================================== -->
+
+            <div *ngIf="selectedTab() === 'requests'">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Requested Role</th>
+                            <th class="text-end">Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr *ngFor="let request of pendingRequests()">
+
+                            <td>
+
+                                {{ request.firstName }}
+                                {{ request.lastName }}
+
+                            </td>
+
+                            <td>
+
+                                {{ request.email }}
+
+                            </td>
+
+                            <td>
+
+                                {{ request.role }}
+
+                            </td>
+
+                            <td class="text-end">
+
+                                <button class="btn btn-success btn-sm me-2" (click)="approveRequest(request.id)">
+
+                                    <i data-feather="check-circle"></i>
+
+                                </button>
+
+                                <button class="btn btn-danger btn-sm" (click)="rejectRequest(request.id)">
+
+                                    <i data-feather="x-circle"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- SETTINGS -->
+            <!-- ===================================================== -->
+
+            <div *ngIf="selectedTab() === 'settings'">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Application Name
+
+                            </label>
+
+                            <input class="form-control" [(ngModel)]="settings.applicationName">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Default Language
+
+                            </label>
+
+                            <select class="form-select" [(ngModel)]="settings.language">
+
+                                <option value="EN">English</option>
+                                <option value="FR">French</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Session Timeout (minutes)
+
+                            </label>
+
+                            <input class="form-control" type="number" [(ngModel)]="settings.sessionTimeout">
+
+                        </div>
+
+                        <button class="btn btn-primary" (click)="saveSettings()">
+
+                            Save Settings
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- AUDIT LOG -->
+            <!-- ===================================================== -->
+
+            <div *ngIf="selectedTab() === 'audit'">
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr *ngFor="let log of auditLogs()">
+
+                            <td>
+
+                                {{ log.date }}
+
+                            </td>
+
+                            <td>
+
+                                {{ log.user }}
+
+                            </td>
+
+                            <td>
+
+                                {{ log.action }}
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

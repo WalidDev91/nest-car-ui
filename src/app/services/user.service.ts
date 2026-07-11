@@ -25,4 +25,44 @@ export class UserService {
     return this.http.get<any[]>(`${this.baseUrl}?role=${role}`);
   }
 
+  activate(id: string) {
+
+    return this.http.patch<void>(
+      `${this.baseUrl}/${id}/activate`,
+      {}
+    );
+
+  }
+
+
+  deactivate(id: string) {
+
+    return this.http.patch<void>(
+      `${this.baseUrl}/${id}/deactivate`,
+      {}
+    );
+
+  }
+
+
+  changeRole(id: string, role: string) {
+
+    return this.http.patch<void>(
+      `${this.baseUrl}/${id}/role`,
+      {
+        role: role
+      }
+    );
+
+  }
+
+
+  delete(id: string) {
+
+    return this.http.delete<void>(
+      `${this.baseUrl}/${id}`
+    );
+
+  }
+
 }
