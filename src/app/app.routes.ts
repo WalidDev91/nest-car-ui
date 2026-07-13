@@ -11,6 +11,8 @@ import { VehicleDocumentDetails } from './pages/documents/vehicle-document-detai
 import { MissionDocumentDetails } from './pages/documents/mission-document-details';
 import { Administration } from './pages/administration/administration';
 import { Login } from './auth/login/login';
+import { ForgotPassword } from './auth/forgot-password/forgot-password';
+import { ResetPassword } from './auth/reset-password/reset-password';
 import { authGuard } from './guards/auth-guard'
 import { AuthLayout } from './layout/auth-layout/auth-layout';
 import { guestGuard } from './guards/guest-guard';
@@ -25,17 +27,23 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
       { path: 'dashboard', component: Dashboard },
+
       { path: 'users', component: Users },
       { path: 'users/:id', component: UserDetails },
+
       { path: 'vehicles', component: Vehicles },
       { path: 'vehicles/:id', component: VehicleDetails },
+
       { path: 'missions', component: Missions },
       { path: 'missions/:id', component: MissionDetails },
+
       { path: 'documents', component: Documents },
       { path: 'documents/driver/:id', component: DriverDocumentDetails },
       { path: 'documents/vehicle/:id', component: VehicleDocumentDetails },
       { path: 'documents/mission/:id', component: MissionDocumentDetails },
+
       { path: 'administration', component: Administration }
     ]
   },
@@ -45,7 +53,12 @@ export const routes: Routes = [
     component: AuthLayout,
     canActivate: [guestGuard],
     children: [
+
       { path: 'login', component: Login },
+
+      { path: 'forgot-password', component: ForgotPassword },
+
+      { path: 'reset-password', component: ResetPassword },
 
       {
         path: 'register',
@@ -53,6 +66,7 @@ export const routes: Routes = [
           import('./auth/register/register')
             .then(m => m.Register)
       }
+
     ]
   },
 

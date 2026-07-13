@@ -31,14 +31,20 @@
                       placeholder="Enter your password" [(ngModel)]="password" required />
                   </div>
 
-                  <!-- REMEMBER ME (static only) -->
-                  <div>
-                    <div class="form-check align-items-center">
+                  <!-- REMEMBER ME + FORGOT PASSWORD -->
+                  <div class="d-flex justify-content-between align-items-center">
+
+                    <div class="form-check">
                       <input id="customControlInline" type="checkbox" class="form-check-input" checked />
                       <label class="form-check-label text-small" for="customControlInline">
                         Remember me
                       </label>
                     </div>
+
+                    <a routerLink="/auth/forgot-password" class="text-primary text-decoration-none small">
+                      Forgot password?
+                    </a>
+
                   </div>
 
                   <!-- BUTTON -->
@@ -55,7 +61,8 @@
           </div>
 
           <div class="text-center mb-3">
-            Don't have an account? <a routerLink="/auth/register" class="text-primary">
+            Don't have an account?
+            <a routerLink="/auth/register" class="text-primary">
               Sign up
             </a>
           </div>
