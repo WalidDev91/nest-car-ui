@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -16,6 +16,8 @@ export class Register {
   email = '';
   phone = '';
   password = '';
+  loading = signal(false);
+  error = signal('');
 
   constructor(
     private authService: AuthService,
@@ -23,6 +25,9 @@ export class Register {
   ) { }
 
   register() {
+    this.loading.set(true);
+    this.error.set('');
+
     this.authService.register({
       firstName: this.firstName,
       lastName: this.lastName,
@@ -31,18 +36,17 @@ export class Register {
       password: this.password
     }).subscribe({
       next: (response: any) => {
-
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
         localStorage.setItem('firstName', response.firstName);
         localStorage.setItem('lastName', response.lastName);
-
-
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         console.error('Registration failed:', err);
+        this.error.set('Registration failed. Email may already exist.');
+        this.loading.set(false);
       }
     });
   }

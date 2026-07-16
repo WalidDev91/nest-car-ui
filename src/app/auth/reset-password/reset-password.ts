@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -16,9 +16,9 @@ export class ResetPassword implements OnInit {
   token = '';
   newPassword = '';
   confirmPassword = '';
-  loading = false;
-  success = false;
-  error = '';
+  loading = signal(false);
+  success = signal(false);
+  error = signal('');
 
   constructor(
     private route: ActivatedRoute,
@@ -29,34 +29,35 @@ export class ResetPassword implements OnInit {
   ngOnInit(): void {
     this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
     if (!this.token) {
-      this.error = 'Invalid or missing reset token.';
+      this.error.set('Invalid or missing reset token.');
     }
   }
 
   submit() {
     if (!this.newPassword || !this.confirmPassword) {
-      this.error = 'Please fill all fields.';
+      this.error.set('Please fill all fields.');
       return;
     }
     if (this.newPassword !== this.confirmPassword) {
-      this.error = 'Passwords do not match.';
+      this.error.set('Passwords do not match.');
       return;
     }
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
 
-    this.http.post(`${environment.apiUrl}/auth/reset-password`, {
-      token: this.token,
-      newPassword: this.newPassword
-    }).subscribe({
+    this.http.post(
+      `${environment.apiUrl}/auth/reset-password`,
+      { token: this.token, newPassword: this.newPassword },
+      { responseType: 'text' }
+    ).subscribe({
       next: () => {
-        this.success = true;
-        this.loading = false;
+        this.success.set(true);
+        this.loading.set(false);
         setTimeout(() => this.router.navigate(['/auth/login']), 3000);
       },
       error: () => {
-        this.error = 'Reset failed. Token may be expired.';
-        this.loading = false;
+        this.error.set('Reset failed. Token may be expired.');
+        this.loading.set(false);
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -13,6 +13,8 @@ export class Login {
 
   email = '';
   password = '';
+  loading = signal(false);
+  error = signal('');
 
   constructor(
     private authService: AuthService,
@@ -20,24 +22,26 @@ export class Login {
   ) { }
 
   login() {
+    this.loading.set(true);
+    this.error.set('');
+
     this.authService.login({
       email: this.email,
       password: this.password
     }).subscribe({
       next: (response: any) => {
-
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
         localStorage.setItem('firstName', response.firstName);
         localStorage.setItem('lastName', response.lastName);
         localStorage.setItem('userId', response.id);
-
-
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         console.error('Login failed:', err);
+        this.error.set('Invalid email or password.');
+        this.loading.set(false);
       }
     });
   }
