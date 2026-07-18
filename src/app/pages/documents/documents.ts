@@ -32,9 +32,9 @@ export class Documents implements OnInit {
   currentUserId = localStorage.getItem('userId') ?? '';
 
   // DRIVER
-  selectedFile: File | null = null;
-  uploadTitle = '';
-  uploadType: 'DRIVER_LICENSE' | 'ID_CARD' = 'DRIVER_LICENSE';
+  selectedDriverFile: File | null = null;
+  uploadDriverTitle = '';
+  uploadDriverType: 'DRIVER_LICENSE' | 'ID_CARD' = 'DRIVER_LICENSE';
 
   // VEHICLE
   selectedVehicleFile: File | null = null;
@@ -88,16 +88,16 @@ export class Documents implements OnInit {
 
   // ================= DRIVER =================
 
-  onFileSelected(event: Event) {
+  onDriverFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
-      this.selectedFile = input.files[0];
+      this.selectedDriverFile = input.files[0];
     }
   }
 
   uploadDriverDocument() {
 
-    if (!this.selectedFile) {
+    if (!this.selectedDriverFile) {
       alert('Please select a file');
       return;
     }
@@ -105,9 +105,9 @@ export class Documents implements OnInit {
     const driverId = this.currentUserId;
 
     this.driverService.upload(
-      this.selectedFile,
-      this.uploadTitle,
-      this.uploadType,
+      this.selectedDriverFile,
+      this.uploadDriverTitle,
+      this.uploadDriverType,
       driverId
     ).subscribe({
       next: () => {
@@ -116,9 +116,14 @@ export class Documents implements OnInit {
 
         this.loadAll();
 
-        this.selectedFile = null;
-        this.uploadTitle = '';
-        this.uploadType = 'DRIVER_LICENSE';
+        this.selectedDriverFile = null;
+        this.uploadDriverTitle = '';
+        this.uploadDriverType = 'DRIVER_LICENSE';
+
+        const fileInput = document.getElementById('driverFileInput') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.value = '';
+        }
 
       },
       error: err => {

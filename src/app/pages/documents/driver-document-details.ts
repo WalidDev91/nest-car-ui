@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 export class DriverDocumentDetails implements OnInit {
 
   document = signal<DriverDocument | null>(null);
+  isDriver = localStorage.getItem('role') === 'DRIVER';
 
   constructor(
     private route: ActivatedRoute,
@@ -99,4 +100,12 @@ export class DriverDocumentDetails implements OnInit {
       }
     });
   }
+
+  canValidate =
+  ['FLEET_MANAGER', 'ADMIN', 'SUPER_ADMIN']
+    .includes(localStorage.getItem('role') ?? '');
+
+goBack() {
+  history.back();
+}
 }

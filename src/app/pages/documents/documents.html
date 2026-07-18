@@ -1,6 +1,6 @@
 <div class="container-fluid p-0">
 
- <!-- <h1 class="h3 mb-3">Documents</h1> -->
+  <!-- <h1 class="h3 mb-3">Documents</h1> -->
 
   <div class="card">
 
@@ -51,12 +51,12 @@
             <div class="row g-2">
 
               <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Title" [(ngModel)]="uploadTitle">
+                <input type="text" class="form-control" placeholder="Title" [(ngModel)]="uploadDriverTitle">
               </div>
 
 
               <div class="col-md-4">
-                <select class="form-select" [(ngModel)]="uploadType">
+                <select class="form-select" [(ngModel)]="uploadDriverType">
 
                   <option value="DRIVER_LICENSE">
                     Driver License
@@ -71,7 +71,7 @@
 
 
               <div class="col-md-4">
-                <input type="file" class="form-control" (change)="onFileSelected($event)">
+                <input id="driverFileInput" type="file" class="form-control" (change)="onDriverFileSelected($event)">
               </div>
 
 
