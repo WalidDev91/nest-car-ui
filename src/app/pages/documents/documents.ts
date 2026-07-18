@@ -136,10 +136,50 @@ export class Documents implements OnInit {
 
 
   downloadDriver(id: string) {
-    window.open(
-      `http://localhost:8080/api/driver-documents/${id}/download`,
-      '_blank'
-    );
+
+    this.driverService.download(id).subscribe({
+
+      next: (response) => {
+
+        const blob = response.body!;
+
+        const contentDisposition =
+          response.headers.get('Content-Disposition');
+
+        let filename = 'document';
+
+        if (contentDisposition) {
+
+          const match = contentDisposition.match(/filename="?([^"]+)"?/);
+
+          if (match) {
+            filename = match[1];
+          }
+
+        }
+
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+
+        a.href = url;
+        a.download = filename;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+
+      },
+
+      error: (err) => {
+        console.error(err);
+        alert('Download failed.');
+      }
+
+    });
+
   }
 
   viewDriverDetails(id: string) {

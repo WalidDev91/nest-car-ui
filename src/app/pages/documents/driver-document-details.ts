@@ -102,10 +102,10 @@ export class DriverDocumentDetails implements OnInit {
   }
 
   canValidate =
-  ['FLEET_MANAGER', 'ADMIN', 'SUPER_ADMIN']
-    .includes(localStorage.getItem('role') ?? '');
+    ['FLEET_MANAGER', 'ADMIN', 'SUPER_ADMIN']
+      .includes(localStorage.getItem('role') ?? '');
 
-goBack() {
-  history.back();
-}
+  goBack() {
+    history.back();
+  }
 }

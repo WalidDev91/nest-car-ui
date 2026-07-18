@@ -98,7 +98,7 @@
               <th>Type</th>
               <th>Status</th>
               <th>Uploaded At</th>
-              <th>Validated At</th>
+              <th>Reviewed At</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -153,15 +153,12 @@
 
 
               <td>
-
                 {{
-                doc.validatedAt
-                ? (doc.validatedAt | date:'dd/MM/yyyy HH:mm')
+                doc.updatedAt
+                ? (doc.updatedAt | date:'dd/MM/yyyy HH:mm')
                 : '—'
                 }}
-
               </td>
-
 
               <td>
 

@@ -53,5 +53,15 @@ export class DriverDocumentService {
     );
   }
 
+  download(id: string) {
+    return this.http.get(
+      `${environment.apiUrl}/driver-documents/${id}/download`,
+      {
+        observe: 'response',
+        responseType: 'blob'
+      }
+    );
+  }
+
 
 }
