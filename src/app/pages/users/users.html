@@ -1,59 +1,423 @@
 <div class="container-fluid p-0">
 
-  <!-- <h1 class="h3 mb-3">
-    Users
-  </h1> -->
+  <!-- ========================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================= -->
 
-  <div class="card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+
+    <div>
+      <!-- <h3 class="mb-0">
+        User Management
+      </h3> -->
+
+      <!--  <small class="text-muted">
+        Manage all users of the system.
+      </small> -->
+    </div>
+
+    <button class="btn btn-primary" (click)="createUser()">
+
+      <i data-feather="user-plus" class="align-middle me-1"></i>
+
+      Create User
+
+    </button>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- STATISTICS -->
+  <!-- ========================================= -->
+
+  <div class="row">
+
+    <div class="col-xl-2 col-md-4 col-sm-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>Total Users</h6>
+
+          <h2>{{ totalUsers() }}</h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>Active</h6>
+
+          <h2 class="text-success">
+
+            {{ activeUsers() }}
+
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>Inactive</h6>
+
+          <h2 class="text-danger">
+
+            {{ inactiveUsers() }}
+
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>Admins</h6>
+
+          <h2>
+
+            {{ admins() }}
+
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>Fleet Managers</h6>
+
+          <h2>
+
+            {{ fleetManagers() }}
+
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>Drivers</h6>
+
+          <h2>
+
+            {{ drivers() }}
+
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- FILTERS -->
+  <!-- ========================================= -->
+
+  <div class="card mb-3">
+
     <div class="card-body">
 
-      <table class="table table-hover">
+      <div class="row">
+
+        <div class="col-md-5">
+
+          <input class="form-control" placeholder="Search by name, email or phone..." [value]="search()"
+            (input)="onSearch($any($event.target).value)">
+
+        </div>
+
+        <div class="col-md-3">
+
+          <select class="form-select" (change)="filterRole($any($event.target).value)">
+
+            <option value="ALL">All Roles</option>
+
+            <option value="SUPER_ADMIN">Super Admin</option>
+
+            <option value="ADMIN">Admin</option>
+
+            <option value="FLEET_MANAGER">Fleet Manager</option>
+
+            <option value="DRIVER">Driver</option>
+
+          </select>
+
+        </div>
+
+        <div class="col-md-2">
+
+          <select class="form-select" (change)="filterStatus($any($event.target).value)">
+
+            <option value="ALL">
+
+              All Status
+
+            </option>
+
+            <option value="ACTIVE">
+
+              Active
+
+            </option>
+
+            <option value="INACTIVE">
+
+              Inactive
+
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="col-md-2">
+
+          <button class="btn btn-outline-secondary w-100" (click)="loadUsers()">
+
+            Refresh
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- TABLE -->
+  <!-- ========================================= -->
+
+  <div class="card">
+
+    <div class="table-responsive">
+
+      <table class="table table-hover align-middle mb-0">
 
         <thead>
+
           <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Supervisor</th>
-            <th>Actions</th>
+
+            <th (click)="sort('firstName')" style="cursor:pointer">
+
+              Name
+
+            </th>
+
+            <th (click)="sort('email')" style="cursor:pointer">
+
+              Email
+
+            </th>
+
+            <th>
+
+              Phone
+
+            </th>
+
+            <th>
+
+              Role
+
+            </th>
+
+            <th>
+
+              Status
+
+            </th>
+
+            <th>
+
+              Supervisor
+
+            </th>
+
+            <th class="text-end">
+
+              Actions
+
+            </th>
+
           </tr>
+
         </thead>
 
         <tbody>
 
-          <tr *ngFor="let user of users()">
-            <td>{{ user.firstName }}</td>
-            <td>{{ user.lastName }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.phone }}</td>
-            <td>
-              <span class="badge" [ngClass]="{
-                'bg-danger':   user.role === 'SUPER_ADMIN',
-                'bg-primary':  user.role === 'ADMIN',
-                'bg-info':     user.role === 'FLEET_MANAGER',
-                'bg-secondary': user.role === 'DRIVER'
-              }">
-                {{ user.role }}
-              </span>
-            </td>
-            <td>
-              <span class="badge" [ngClass]="{
-                'bg-success': user.isValidate,
-                'bg-danger':  !user.isValidate
-              }">
-                {{ user.isValidate ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
-            <td>{{ user.adminName }}</td>
-             <td>
-                <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDetails(user.id)">
-                  <i data-feather="eye"></i>
-                </button>
+          <tr *ngIf="loading()">
 
-              </td>
+            <td colspan="7" class="text-center py-5">
+
+              Loading users...
+
+            </td>
+
+          </tr>
+
+          <tr *ngFor="let user of paginatedUsers()">
+            <td>
+
+              <strong>
+
+                {{ user.firstName }}
+
+                {{ user.lastName }}
+
+              </strong>
+
+            </td>
+
+            <td>
+
+              {{ user.email }}
+
+            </td>
+
+            <td>
+
+              {{ user.phone }}
+
+            </td>
+
+            <td>
+
+              <span class="badge" [ngClass]="{
+
+                                'bg-danger': user.role==='SUPER_ADMIN',
+
+                                'bg-primary': user.role==='ADMIN',
+
+                                'bg-info': user.role==='FLEET_MANAGER',
+
+                                'bg-secondary': user.role==='DRIVER'
+
+                            }">
+
+                {{ user.role }}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <span class="badge" [ngClass]="{
+
+                                    'bg-success': user.isValidate,
+
+                                    'bg-danger': !user.isValidate
+
+                                }">
+
+                {{ user.isValidate ? 'Active' : 'Inactive' }}
+
+              </span>
+
+            </td>
+
+            <td>
+
+              {{ user.adminName || '—' }}
+
+            </td>
+
+            <td class="text-end">
+
+              <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDetails(user.id)" title="View">
+
+                <i data-feather="eye"></i>
+
+              </button>
+
+              <button class="btn btn-sm btn-outline-primary me-1" (click)="editUser(user)" title="Edit">
+
+                <i data-feather="edit"></i>
+
+              </button>
+
+              <button *ngIf="!user.isValidate" class="btn btn-sm btn-outline-success me-1" (click)="activateUser(user)"
+                title="Activate">
+
+                <i data-feather="check-circle"></i>
+
+              </button>
+
+              <button *ngIf="user.isValidate" class="btn btn-sm btn-outline-warning me-1" (click)="deactivateUser(user)"
+                title="Deactivate">
+
+                <i data-feather="slash"></i>
+
+              </button>
+
+              <button class="btn btn-sm btn-outline-info me-1" (click)="changeRole(user)" title="Role">
+
+                <i data-feather="shield"></i>
+
+              </button>
+
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)" title="Delete">
+
+                <i data-feather="trash-2"></i>
+
+              </button>
+
+            </td>
+
+          </tr>
+
+          <tr *ngIf="!loading() && paginatedUsers().length===0">
+
+            <td colspan="7" class="text-center py-5 text-muted">
+
+              No users found.
+
+            </td>
+
           </tr>
 
         </tbody>
@@ -61,6 +425,58 @@
       </table>
 
     </div>
+
+    <div class="card-footer">
+
+      <div class="d-flex justify-content-between align-items-center">
+
+        <small>
+
+          Showing
+
+          {{ paginatedUsers().length }}
+
+          of
+
+          {{ filteredUsers().length }}
+
+          users
+
+        </small>
+
+        <div>
+
+          <button class="btn btn-outline-secondary btn-sm me-2" [disabled]="currentPage()===1" (click)="previousPage()">
+
+            Previous
+
+          </button>
+
+          <span class="mx-2">
+
+            Page
+
+            {{ currentPage() }}
+
+            /
+
+            {{ totalPages() || 1 }}
+
+          </span>
+
+          <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage()>=totalPages()"
+            (click)="nextPage()">
+
+            Next
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
 
 </div>

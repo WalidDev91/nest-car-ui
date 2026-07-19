@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { User } from '../models/user';
+
 
 
 @Injectable({
@@ -9,23 +11,52 @@ import { User } from '../models/user';
 })
 export class UserService {
 
-  private baseUrl = `${environment.apiUrl}/users`;
+  private readonly baseUrl = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient
+  ) { }
 
-  getAll() {
+  // ==========================================================
+  // GET
+  // ==========================================================
+
+  getAll(): Observable<User[]> {
+
     return this.http.get<User[]>(this.baseUrl);
+
   }
 
-  getById(id: string) {
+  getById(id: string): Observable<User> {
+
     return this.http.get<User>(`${this.baseUrl}/${id}`);
+
   }
 
-  getByRole(role: string) {
-    return this.http.get<any[]>(`${this.baseUrl}?role=${role}`);
+  getByRole(role: string): Observable<User[]> {
+
+    return this.http.get<User[]>(`${this.baseUrl}?role=${role}`);
+
   }
 
-  activate(id: string) {
+  // ==========================================================
+  // UPDATE
+  // ==========================================================
+
+  update(id: string, user: Partial<User>): Observable<User> {
+
+    return this.http.put<User>(
+      `${this.baseUrl}/${id}`,
+      user
+    );
+
+  }
+
+  // ==========================================================
+  // ACTIVATE
+  // ==========================================================
+
+  activate(id: string): Observable<void> {
 
     return this.http.patch<void>(
       `${this.baseUrl}/${id}/activate`,
@@ -34,8 +65,11 @@ export class UserService {
 
   }
 
+  // ==========================================================
+  // DEACTIVATE
+  // ==========================================================
 
-  deactivate(id: string) {
+  deactivate(id: string): Observable<void> {
 
     return this.http.patch<void>(
       `${this.baseUrl}/${id}/deactivate`,
@@ -44,20 +78,26 @@ export class UserService {
 
   }
 
+  // ==========================================================
+  // CHANGE ROLE
+  // ==========================================================
 
-  changeRole(id: string, role: string) {
+  changeRole(id: string, role: string): Observable<void> {
 
     return this.http.patch<void>(
       `${this.baseUrl}/${id}/role`,
       {
-        role: role
+        role
       }
     );
 
   }
 
+  // ==========================================================
+  // DELETE
+  // ==========================================================
 
-  delete(id: string) {
+  delete(id: string): Observable<void> {
 
     return this.http.delete<void>(
       `${this.baseUrl}/${id}`
