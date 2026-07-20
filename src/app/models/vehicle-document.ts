@@ -4,10 +4,7 @@ export interface VehicleDocument {
   type: 'LICENSE' | 'TECHNICAL_CHECK' | 'INSURANCE';
   fileUrl: string;
   year: number;
-
   vehicleId: string;
-  vehiclePlateNumber: string;
-
   createdAt: string;
   updatedAt: string;
 }

@@ -1,214 +1,965 @@
 <div class="container-fluid p-0">
 
-   <!-- <h1 class="h3 mb-3">
-        Vehicle Details
-    </h1>   -->
+
+    <!-- BACK BUTTON -->
+
+    <button class="btn btn-outline-secondary mb-3" (click)="goBack()">
+
+        <i data-feather="arrow-left"></i>
+
+        Back to Vehicles
+
+    </button>
+
+
+
+
+    <!-- LOADING -->
+
+    <div class="text-center py-5" *ngIf="!vehicle()">
+
+        <div class="spinner-border text-primary"></div>
+
+        <p class="mt-3">
+            Loading vehicle information...
+        </p>
+
+    </div>
+
+
+
+
 
     <div class="row" *ngIf="vehicle() as vehicle">
 
-        <!-- LEFT -->
+
+
+        <!-- ================================================= -->
+        <!-- LEFT PROFILE -->
+        <!-- ================================================= -->
+
+
         <div class="col-12 col-md-4">
 
+
+
             <div class="card">
+
 
                 <div class="card-body text-center">
 
+
+
+                    <!-- VEHICLE IMAGE -->
+
+
                     <div class="mb-3">
-                        <i data-feather="truck" width="80" height="80"></i>
+
+
+                        <img *ngIf="vehicle.imageUrl" [src]="vehicle.imageUrl" (error)="vehicle.imageUrl = null"
+                            class="rounded-circle img-fluid" width="150" height="150">
+
+
+                        <div *ngIf="!vehicle.imageUrl" class="text-primary">
+
+
+                            <i data-feather="truck" width="100" height="100">
+
+                            </i>
+
+
+                        </div>
+
+
+
                     </div>
 
-                    <h4 class="card-title mb-0">
+
+
+
+
+                    <h4 class="mb-1">
+
                         {{ vehicle.plateNumber }}
+
                     </h4>
 
-                    <div class="text-muted mt-1">
-                        {{ vehicle.brand }} {{ vehicle.model }}
+
+
+
+                    <div class="text-muted">
+
+                        {{ vehicle.brand }}
+
+                        {{ vehicle.model }}
+
                     </div>
 
+
+
+
+                    <hr>
+
+
+
+
+                    <span class="badge bg-primary">
+
+                        Vehicle
+
+                    </span>
+
+
+
                 </div>
+
 
             </div>
 
-        </div>
 
-        <!-- RIGHT -->
-        <div class="col-12 col-md-8">
+
+
+
+
+            <!-- QUICK STATS -->
+
 
             <div class="card">
 
-                <!-- Tabs -->
-                <div class="card-header">
-
-                    <ul class="nav nav-tabs card-header-tabs">
-
-                        <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab() === 'info'"
-                                (click)="selectTab('info')">
-
-                                Information
-
-                            </button>
-                        </li>
-
-                        <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab() === 'documents'"
-                                (click)="selectTab('documents')">
-
-                                Documents
-
-                            </button>
-                        </li>
-
-                        <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab() === 'missions'"
-                                (click)="selectTab('missions')">
-
-                                Missions
-
-                            </button>
-                        </li>
-
-                    </ul>
-
-                </div>
 
                 <div class="card-body">
 
-                    <!-- INFORMATION -->
+
+
+                    <h5>
+                        Quick Information
+                    </h5>
+
+
+
+
+                    <div class="row text-center mt-3">
+
+
+
+                        <div class="col-4">
+
+
+                            <h4>
+
+                                {{ vehicle.year }}
+
+                            </h4>
+
+
+                            <small class="text-muted">
+
+                                Year
+
+                            </small>
+
+
+                        </div>
+
+
+
+
+
+                        <div class="col-4">
+
+
+                            <h4>
+
+                                {{ documents().length }}
+
+                            </h4>
+
+
+                            <small class="text-muted">
+
+                                Documents
+
+                            </small>
+
+
+                        </div>
+
+
+
+
+
+                        <div class="col-4">
+
+
+                            <h4>
+
+                                {{ missions().length }}
+
+                            </h4>
+
+
+                            <small class="text-muted">
+
+                                Missions
+
+                            </small>
+
+
+                        </div>
+
+
+
+
+                    </div>
+
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+
+
+            <!-- DOCUMENT STATUS -->
+
+
+            <div class="card">
+
+
+                <div class="card-body">
+
+
+
+                    <h5>
+                        Document Status
+                    </h5>
+
+
+
+
+                    <div class="row text-center mt-3">
+
+
+
+                        <div class="col">
+
+
+                            <h5 [class.text-success]="hasLicense()" [class.text-danger]="!hasLicense()">
+
+
+                                {{ hasLicense() ? '✓' : '✗' }}
+
+
+                            </h5>
+
+
+
+                            <small>
+
+                                License
+
+                            </small>
+
+
+
+                        </div>
+
+
+
+
+
+                        <div class="col">
+
+
+                            <h5 [class.text-success]="hasInsurance()" [class.text-danger]="!hasInsurance()">
+
+
+                                {{ hasInsurance() ? '✓' : '✗' }}
+
+
+                            </h5>
+
+
+
+                            <small>
+
+                                Insurance
+
+                            </small>
+
+
+
+                        </div>
+
+
+
+
+
+                        <div class="col">
+
+
+                            <h5 [class.text-success]="hasTechnicalCheck()" [class.text-danger]="!hasTechnicalCheck()">
+
+
+                                {{ hasTechnicalCheck() ? '✓' : '✗' }}
+
+
+                            </h5>
+
+
+
+                            <small>
+
+                                Technical
+
+                            </small>
+
+
+
+                        </div>
+
+
+
+
+                    </div>
+
+
+
+
+                </div>
+
+
+            </div>
+
+
+
+
+
+        </div>
+
+
+
+
+
+
+
+
+        <!-- ================================================= -->
+        <!-- RIGHT CONTENT -->
+        <!-- ================================================= -->
+
+
+        <div class="col-12 col-md-8">
+
+
+
+            <div class="card">
+
+
+
+
+
+                <!-- HEADER -->
+
+
+                <div class="card-header d-flex justify-content-between">
+
+
+
+                    <ul class="nav nav-tabs card-header-tabs">
+
+
+
+                        <li class="nav-item">
+
+
+                            <button class="nav-link" [class.active]="selectedTab() === 'info'"
+                                (click)="selectTab('info')">
+
+
+                                Information
+
+
+                            </button>
+
+
+
+                        </li>
+
+
+
+
+
+                        <li class="nav-item">
+
+
+                            <button class="nav-link" [class.active]="selectedTab() === 'documents'"
+                                (click)="selectTab('documents')">
+
+
+                                Documents
+
+
+                            </button>
+
+
+
+                        </li>
+
+
+
+
+
+                        <li class="nav-item">
+
+
+                            <button class="nav-link" [class.active]="selectedTab() === 'missions'"
+                                (click)="selectTab('missions')">
+
+
+                                Missions
+
+
+                            </button>
+
+
+
+                        </li>
+
+
+
+                    </ul>
+
+
+
+
+
+                    <button class="btn btn-sm btn-outline-secondary" (click)="refresh()">
+
+
+
+                        <i data-feather="refresh-cw"></i>
+
+
+
+                    </button>
+
+
+
+
+                </div>
+
+
+
+
+
+                <div class="card-body">
+                    <!-- ================================================= -->
+                    <!-- INFORMATION TAB -->
+                    <!-- ================================================= -->
+
+
                     <div *ngIf="selectedTab() === 'info'">
 
-                        <table class="table table-borderless">
+
+                        <table class="table table-borderless align-middle">
+
 
                             <tbody>
 
-                                <tr>
-                                    <th>Plate Number</th>
-                                    <td>{{ vehicle.plateNumber }}</td>
-                                </tr>
 
                                 <tr>
-                                    <th>Brand</th>
-                                    <td>{{ vehicle.brand }}</td>
+
+                                    <th width="30%">
+                                        Plate Number
+                                    </th>
+
+                                    <td>
+                                        {{ vehicle.plateNumber }}
+                                    </td>
+
                                 </tr>
 
-                                <tr>
-                                    <th>Model</th>
-                                    <td>{{ vehicle.model }}</td>
-                                </tr>
+
+
 
                                 <tr>
-                                    <th>Year</th>
-                                    <td>{{ vehicle.year }}</td>
+
+                                    <th>
+                                        Brand
+                                    </th>
+
+                                    <td>
+                                        {{ vehicle.brand }}
+                                    </td>
+
                                 </tr>
 
-                                <tr>
-                                    <th>Fleet Manager</th>
-                                    <td>{{ vehicle.adminName }}</td>
-                                </tr>
+
+
 
                                 <tr>
-                                    <th>Created</th>
-                                    <td>{{ vehicle.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+
+                                    <th>
+                                        Model
+                                    </th>
+
+                                    <td>
+                                        {{ vehicle.model }}
+                                    </td>
+
                                 </tr>
 
+
+
+
                                 <tr>
-                                    <th>Updated</th>
-                                    <td>{{ vehicle.updatedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+
+                                    <th>
+                                        Manufacturing Year
+                                    </th>
+
+                                    <td>
+                                        {{ vehicle.year }}
+                                    </td>
+
                                 </tr>
+
+
+
+
+                                <tr>
+
+                                    <th>
+                                        Fleet Manager
+                                    </th>
+
+                                    <td>
+                                        {{ vehicle.adminName || 'Not assigned' }}
+                                    </td>
+
+                                </tr>
+
+
+
+
+                                <tr>
+
+                                    <th>
+                                        Created At
+                                    </th>
+
+                                    <td>
+                                        {{ vehicle.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
+
+                                </tr>
+
+
+
+
+                                <tr>
+
+                                    <th>
+                                        Last Update
+                                    </th>
+
+                                    <td>
+                                        {{ vehicle.updatedAt | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
+
+                                </tr>
+
+
+
 
                             </tbody>
 
+
                         </table>
+
+
+
 
                         <hr>
 
+
+
+
+
                         <div class="d-flex justify-content-end gap-2">
+
+
 
                             <button class="btn btn-primary" (click)="editVehicle()">
 
-                                Edit Vehicle
+
+
+                                <i data-feather="edit"></i>
+
+                                Edit
+
+
 
                             </button>
+
+
+
+
 
                             <button class="btn btn-danger" (click)="deleteVehicle()">
 
-                                Delete Vehicle
+
+
+                                <i data-feather="trash-2"></i>
+
+                                Delete
+
+
 
                             </button>
 
+
+
                         </div>
+
+
 
                     </div>
 
-                    <!-- DOCUMENTS -->
+
+
+
+
+
+
+                    <!-- ================================================= -->
+                    <!-- DOCUMENTS TAB -->
+                    <!-- ================================================= -->
+
+
+
                     <div *ngIf="selectedTab() === 'documents'">
 
-                        <div class="alert alert-info">
 
-                            Manage vehicle documents.
+
+                        <div class="alert alert-info" *ngIf="documents().length === 0">
+
+
+                            No vehicle documents uploaded yet.
+
 
                         </div>
 
-                        <table class="table table-hover">
+
+
+
+
+                        <table class="table table-hover" *ngIf="documents().length > 0">
+
+
 
                             <thead>
 
+
                                 <tr>
 
-                                    <th>Title</th>
-                                    <th>Type</th>
-                                    <th>Year</th>
-                                    <th>Actions</th>
+                                    <th>
+                                        Title
+                                    </th>
+
+
+                                    <th>
+                                        Type
+                                    </th>
+
+
+                                    <th>
+                                        Year
+                                    </th>
+
+
+                                    <th>
+                                        Actions
+                                    </th>
+
 
                                 </tr>
 
+
                             </thead>
+
+
+
+
 
                             <tbody>
 
-                                <!-- vehicle documents here -->
+
+
+                                <tr *ngFor="let doc of documents()">
+
+
+
+                                    <td>
+
+                                        {{ doc.title }}
+
+                                    </td>
+
+
+
+
+                                    <td>
+
+
+
+                                        <span class="badge" [ngClass]="{
+
+                        'bg-primary': doc.type === 'LICENSE',
+
+                        'bg-warning': doc.type === 'TECHNICAL_CHECK',
+
+                        'bg-success': doc.type === 'INSURANCE'
+
+                        }">
+
+
+                                            {{ doc.type }}
+
+
+
+                                        </span>
+
+
+
+                                    </td>
+
+
+
+
+                                    <td>
+
+                                        {{ doc.year }}
+
+                                    </td>
+
+
+
+
+                                    <td>
+
+
+
+                                        <button class="btn btn-sm btn-outline-primary">
+
+
+                                            <i data-feather="eye"></i>
+
+
+                                        </button>
+
+
+
+                                    </td>
+
+
+
+
+                                </tr>
+
+
 
                             </tbody>
+
+
 
                         </table>
 
 
 
+
+
+                        <button class="btn btn-success">
+
+
+
+                            <i data-feather="upload"></i>
+
+
+                            Upload Document
+
+
+
+                        </button>
+
+
+
+
                     </div>
 
-                    <!-- MISSIONS -->
+
+
+
+
+
+
+
+                    <!-- ================================================= -->
+                    <!-- MISSIONS TAB -->
+                    <!-- ================================================= -->
+
+
+
                     <div *ngIf="selectedTab() === 'missions'">
 
-                        <div class="alert alert-secondary">
 
-                            Current mission and mission history.
+
+                        <div class="alert alert-secondary" *ngIf="missions().length === 0">
+
+
+                            No missions assigned to this vehicle.
+
 
                         </div>
 
-                        <table class="table table-hover">
+
+
+
+
+                        <table class="table table-hover" *ngIf="missions().length > 0">
+
+
 
                             <thead>
 
+
                                 <tr>
 
-                                    <th>Mission</th>
-                                    <th>Driver</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+
+                                    <th>
+                                        Mission
+                                    </th>
+
+
+                                    <th>
+                                        Driver
+                                    </th>
+
+
+                                    <th>
+                                        Status
+                                    </th>
+
+
+                                    <th>
+                                        Dates
+                                    </th>
+
+
 
                                 </tr>
 
+
                             </thead>
+
+
+
+
 
                             <tbody>
 
-                                <!-- missions here -->
+
+
+                                <tr *ngFor="let mission of missions()">
+
+
+
+                                    <td>
+
+                                        {{ mission.title }}
+
+                                    </td>
+
+
+
+
+                                    <td>
+
+                                        {{ mission.driverName }}
+
+                                    </td>
+
+
+
+
+                                    <td>
+
+
+
+                                        <span class="badge" [ngClass]="{
+
+                        'bg-success': mission.status === 'COMPLETED',
+
+                        'bg-warning': mission.status === 'PLANNED',
+
+                        'bg-danger': mission.status === 'CANCELLED',
+
+                        'bg-info': mission.status === 'ONGOING'
+
+                        }">
+
+
+                                            {{ mission.status }}
+
+
+
+                                        </span>
+
+
+
+                                    </td>
+
+
+
+
+
+                                    <td>
+
+
+                                        {{ mission.startDate | date:'dd/MM/yyyy' }}
+
+                                        -
+
+                                        {{ mission.endDate | date:'dd/MM/yyyy' }}
+
+
+
+                                    </td>
+
+
+
+
+                                </tr>
+
+
 
                             </tbody>
 
+
+
                         </table>
 
+
+
                     </div>
+
+
 
                 </div>
 
@@ -217,5 +968,6 @@
         </div>
 
     </div>
+
 
 </div>

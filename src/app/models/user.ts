@@ -10,4 +10,5 @@ export interface User {
     adminName: string;
     createdAt: string;
     updatedAt: string;
+    imageUrl?: string | null;
 }

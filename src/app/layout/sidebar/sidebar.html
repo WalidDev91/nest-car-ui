@@ -1,96 +1,221 @@
 <nav id="sidebar" class="sidebar js-sidebar">
+
   <div class="sidebar-content js-simplebar">
 
+
     <a class="sidebar-brand" routerLink="/dashboard">
-      <span class="align-middle">Nest-Car</span>
+
+      <span class="align-middle">
+        Nest-Car
+      </span>
+
     </a>
 
+
+
     <ul class="sidebar-nav">
+
+
 
       <li class="sidebar-header">
         Main Menu
       </li>
 
-      <!-- Dashboard -->
+
+
+
+      <!-- ========================= -->
+      <!-- DASHBOARD -->
+      <!-- ========================= -->
+
+
       <li class="sidebar-item">
-        <a
-          class="sidebar-link"
-          routerLink="/dashboard"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }">
+
+        <a class="sidebar-link" routerLink="/dashboard" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:true}">
+
 
           <i class="align-middle" data-feather="bar-chart-2"></i>
-          <span class="align-middle">Dashboard</span>
+
+          <span class="align-middle">
+            Dashboard
+          </span>
+
 
         </a>
+
       </li>
 
-      <!-- Users -->
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- USERS -->
+      <!-- ADMIN + SUPER ADMIN -->
+      <!-- ========================= -->
+
+
       <li class="sidebar-item" *ngIf="isAdmin || isSuperAdmin">
-        <a
-          class="sidebar-link"
-          routerLink="/users"
-          routerLinkActive="active">
 
-          <i class="align-middle" data-feather="user"></i>
-          <span class="align-middle">Users</span>
+
+        <a class="sidebar-link" routerLink="/users" routerLinkActive="active">
+
+
+          <i class="align-middle" data-feather="users"></i>
+
+
+          <span class="align-middle">
+            Users
+          </span>
+
 
         </a>
+
+
       </li>
 
-      <!-- Vehicles -->
-      <li class="sidebar-item">
-        <a
-          class="sidebar-link"
-          routerLink="/vehicles"
-          routerLinkActive="active">
+
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- VEHICLES -->
+      <!-- ========================= -->
+
+
+      <li class="sidebar-item" *ngIf="
+          isSuperAdmin ||
+          isAdmin ||
+          isFleetManager
+        ">
+
+
+        <a class="sidebar-link" routerLink="/vehicles" routerLinkActive="active">
+
 
           <i class="align-middle" data-feather="truck"></i>
-          <span class="align-middle">Vehicles</span>
+
+
+          <span class="align-middle">
+            Vehicles
+          </span>
+
 
         </a>
+
+
       </li>
 
-      <!-- Missions -->
-      <li class="sidebar-item">
-        <a
-          class="sidebar-link"
-          routerLink="/missions"
-          routerLinkActive="active">
+
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- MISSIONS -->
+      <!-- ========================= -->
+
+
+      <li class="sidebar-item" *ngIf="
+          isSuperAdmin ||
+          isAdmin ||
+          isFleetManager
+        ">
+
+
+        <a class="sidebar-link" routerLink="/missions" routerLinkActive="active">
+
 
           <i class="align-middle" data-feather="map"></i>
-          <span class="align-middle">Missions</span>
+
+
+          <span class="align-middle">
+            Missions
+          </span>
+
 
         </a>
+
+
       </li>
 
-      <!-- Documents -->
+
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- DOCUMENTS -->
+      <!-- ALL USERS -->
+      <!-- ========================= -->
+
+
       <li class="sidebar-item">
-        <a
-          class="sidebar-link"
-          routerLink="/documents"
-          routerLinkActive="active">
+
+
+        <a class="sidebar-link" routerLink="/documents" routerLinkActive="active">
+
 
           <i class="align-middle" data-feather="file-text"></i>
-          <span class="align-middle">Documents</span>
+
+
+          <span class="align-middle">
+            Documents
+          </span>
+
 
         </a>
+
+
       </li>
 
-      <!-- Administration -->
+
+
+
+
+
+
+
+      <!-- ========================= -->
+      <!-- ADMINISTRATION -->
+      <!-- SUPER ADMIN ONLY -->
+      <!-- ========================= -->
+
+
       <li class="sidebar-item" *ngIf="isSuperAdmin">
-        <a
-          class="sidebar-link"
-          routerLink="/administration"
-          routerLinkActive="active">
+
+
+        <a class="sidebar-link" routerLink="/administration" routerLinkActive="active">
+
 
           <i class="align-middle" data-feather="settings"></i>
-          <span class="align-middle">Administration</span>
+
+
+          <span class="align-middle">
+            Administration
+          </span>
+
 
         </a>
+
+
       </li>
+
+
+
+
 
     </ul>
 
+
+
   </div>
+
+
 </nav>

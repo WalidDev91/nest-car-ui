@@ -8,4 +8,5 @@ export interface Vehicle {
   adminName: string;
   createdAt: string;
   updatedAt: string;
+  imageUrl?: string | null;
 }

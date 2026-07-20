@@ -8,29 +8,74 @@ import { Mission } from '../models/mission';
 })
 export class MissionService {
 
+
   private baseUrl = `${environment.apiUrl}/missions`;
 
-  constructor(private http: HttpClient) { }
+
+  constructor(
+    private http: HttpClient
+  ) { }
+
+
 
   getById(id: string) {
-    return this.http.get<Mission>(`${this.baseUrl}/${id}`);
+
+    return this.http.get<Mission>(
+      `${this.baseUrl}/${id}`
+    );
+
   }
+
+
 
   getAll() {
-    return this.http.get<Mission[]>(this.baseUrl);
+
+    return this.http.get<Mission[]>(
+      this.baseUrl
+    );
+
   }
+
+
+
+  getByVehicleId(vehicleId: string) {
+
+    return this.http.get<Mission[]>(
+      `${this.baseUrl}/vehicle/${vehicleId}`
+    );
+
+  }
+
+
 
   create(data: any) {
-    return this.http.post<Mission>(this.baseUrl, data);
+
+    return this.http.post<Mission>(
+      this.baseUrl,
+      data
+    );
+
   }
 
+
+
   update(id: string, request: any) {
-    return this.http.put<Mission>(`${this.baseUrl}/${id}`, request);
+
+    return this.http.put<Mission>(
+      `${this.baseUrl}/${id}`,
+      request
+    );
+
   }
+
 
 
   delete(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+
+    return this.http.delete(
+      `${this.baseUrl}/${id}`
+    );
+
   }
 
 }
