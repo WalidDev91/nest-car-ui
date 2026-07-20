@@ -1,99 +1,355 @@
 <div class="container-fluid p-0">
 
-   <!-- <h1 class="h3 mb-3">
-        Mission Details
-    </h1> -->
+
+
+    <!-- LOADING -->
+
+    <div class="text-center py-5" *ngIf="loading()">
+
+
+        <div class="spinner-border text-primary"></div>
+
+
+        <p class="mt-3">
+            Loading mission details...
+        </p>
+
+
+    </div>
+
+
+
 
 
     <div class="row" *ngIf="mission() as mission">
 
 
-        <!-- LEFT -->
+
+
+
+        <!-- LEFT PROFILE -->
+
+
         <div class="col-12 col-md-4">
+
+
 
             <div class="card">
 
+
+
                 <div class="card-body text-center">
 
+
+
                     <div class="mb-3">
-                        <i data-feather="map" width="80" height="80"></i>
+
+
+                        <i data-feather="map" width="90" height="90">
+                        </i>
+
+
                     </div>
 
 
-                    <h4 class="card-title mb-0">
+
+
+
+                    <h4>
+
                         {{ mission.title }}
+
                     </h4>
 
 
-                    <div class="text-muted mt-1">
+
+
+
+                    <span class="badge" [ngClass]="getStatusClass(mission.status)">
+
+
                         {{ mission.status }}
+
+
+                    </span>
+
+
+
+
+
+                    <hr>
+
+
+
+
+
+                    <div class="text-muted">
+
+
+                        <div>
+
+                            <strong>
+                                Driver
+                            </strong>
+
+                            <br>
+
+                            {{ mission.driverName || 'Not assigned' }}
+
+
+                        </div>
+
+
+
+
+                        <hr>
+
+
+
+
+                        <div>
+
+
+                            <strong>
+                                Vehicle
+                            </strong>
+
+
+                            <br>
+
+
+                            {{ mission.vehiclePlateNumber || 'Not assigned' }}
+
+
+
+                        </div>
+
+
+
                     </div>
+
+
+
 
 
                 </div>
 
+
+
             </div>
+
+
+
+
+
+
+
+            <!-- QUICK ACTIONS -->
+
+
+            <div class="card">
+
+
+                <div class="card-body">
+
+
+                    <button class="btn btn-outline-secondary w-100 mb-2" (click)="refresh()">
+
+
+
+                        <i data-feather="refresh-cw"></i>
+
+
+                        Refresh
+
+
+
+                    </button>
+
+
+
+
+
+                    <button class="btn btn-danger w-100" (click)="deleteMission()">
+
+
+
+                        <i data-feather="trash-2"></i>
+
+
+                        Delete Mission
+
+
+
+                    </button>
+
+
+
+
+                </div>
+
+
+            </div>
+
+
+
 
 
         </div>
 
 
 
+
+
+
+
         <!-- RIGHT -->
+
+
         <div class="col-12 col-md-8">
+
+
+
 
 
             <div class="card">
 
 
-                <!-- Tabs -->
+
+
+
+
+                <!-- HEADER -->
+
+
                 <div class="card-header">
+
+
 
                     <ul class="nav nav-tabs card-header-tabs">
 
 
+
+
+
                         <li class="nav-item">
 
-                            <button class="nav-link" [class.active]="selectedTab() === 'info'"
+
+                            <button class="nav-link" [class.active]="selectedTab()==='info'"
                                 (click)="selectTab('info')">
+
 
                                 Information
 
+
                             </button>
+
+
 
                         </li>
 
 
 
+
+
+
                         <li class="nav-item">
 
-                            <button class="nav-link" [class.active]="selectedTab() === 'assignment'"
+
+                            <button class="nav-link" [class.active]="selectedTab()==='assignment'"
                                 (click)="selectTab('assignment')">
+
 
                                 Assignment
 
+
                             </button>
 
+
+
                         </li>
+
+
+
+
 
 
 
                         <li class="nav-item">
 
-                            <button class="nav-link" [class.active]="selectedTab() === 'inspection'"
-                                (click)="selectTab('inspection')">
 
-                                Inspection
+                            <button class="nav-link" [class.active]="selectedTab()==='documents'"
+                                (click)="selectTab('documents')">
+
+
+                                Documents
+
 
                             </button>
 
+
+
                         </li>
+
+
+
+
+
+
+
+                        <li class="nav-item">
+
+
+                            <button class="nav-link" [class.active]="selectedTab()==='inspection'"
+                                (click)="selectTab('inspection')">
+
+
+                                Inspection
+
+
+                            </button>
+
+
+
+                        </li>
+
+
+
+
+
+
+
+
+                        <li class="nav-item">
+
+
+                            <button class="nav-link" [class.active]="selectedTab()==='photos'"
+                                (click)="selectTab('photos')">
+
+
+                                Photos
+
+
+                            </button>
+
+
+
+                        </li>
+
+
+
+
 
 
                     </ul>
 
 
+
+
                 </div>
+
+
+
 
 
 
@@ -101,149 +357,432 @@
 
 
 
-                    <!-- INFO TAB -->
-                    <div *ngIf="selectedTab() === 'info'">
+
+
+
+                    <!-- INFORMATION TAB -->
+
+
+                    <div *ngIf="selectedTab()==='info'">
+
+
 
                         <table class="table table-borderless">
 
+
+
                             <tbody>
 
-                                <tr>
-                                    <th>Title</th>
-                                    <td>{{ mission.title }}</td>
-                                </tr>
+
 
                                 <tr>
-                                    <th>Description</th>
-                                    <td>{{ mission.description }}</td>
-                                </tr>
 
-                                <tr>
-                                    <th>Start Date</th>
-                                    <td>{{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}</td>
-                                </tr>
+                                    <th>
+                                        Title
+                                    </th>
 
-                                <tr>
-                                    <th>End Date</th>
-                                    <td>{{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}</td>
-                                </tr>
 
-                                <tr>
-                                    <th>Status</th>
                                     <td>
-                                        <span class="badge" [ngClass]="{
-                      'bg-warning': mission.status === 'PLANNED',
-                      'bg-primary': mission.status === 'ONGOING',
-                      'bg-success': mission.status === 'COMPLETED',
-                      'bg-danger': mission.status === 'CANCELLED'
-                    }">
-                                            {{ mission.status }}
-                                        </span>
+                                        {{ mission.title }}
                                     </td>
+
+
                                 </tr>
 
-                                <tr>
-                                    <th>Driver</th>
-                                    <td>{{ mission.driverName || 'Not assigned' }}</td>
-                                </tr>
+
+
+
 
                                 <tr>
-                                    <th>Vehicle</th>
-                                    <td>{{ mission.vehiclePlateNumber || 'Not assigned' }}</td>
+
+                                    <th>
+                                        Description
+                                    </th>
+
+
+                                    <td>
+                                        {{ mission.description }}
+                                    </td>
+
+
                                 </tr>
+
+
+
+
+
+                                <tr>
+
+                                    <th>
+                                        Start
+                                    </th>
+
+
+                                    <td>
+                                        {{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
+
+
+                                </tr>
+
+
+
+
+
+                                <tr>
+
+                                    <th>
+                                        End
+                                    </th>
+
+
+                                    <td>
+                                        {{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
+
+
+                                </tr>
+
+
+
+
+                                <tr>
+
+                                    <th>
+                                        Created
+                                    </th>
+
+
+                                    <td>
+                                        {{ mission.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
+
+
+                                </tr>
+
+
+
 
                             </tbody>
 
+
+
                         </table>
 
-                        <hr>
 
-                        <div class="d-flex justify-content-end">
-                            <button class="btn btn-danger" (click)="deleteMission()">
-                                Delete Mission
-                            </button>
-                        </div>
 
                     </div>
-
-
-
-
-
                     <!-- ASSIGNMENT TAB -->
-                    <div *ngIf="selectedTab() === 'assignment'">
+
+
+                    <div *ngIf="selectedTab()==='assignment'">
+
+
 
                         <div class="alert alert-info">
 
-                            {{
-                            mission.driverId || mission.vehicleId
-                            ? 'Update the current assignment.'
-                            : 'Assign a driver and/or vehicle to this mission.'
-                            }}
+
+                            Manage driver and vehicle assignment.
+
 
                         </div>
 
-                        <!-- Current Assignment -->
+
+
+
 
                         <div class="card mb-3">
 
+
                             <div class="card-header">
+
                                 Current Assignment
+
                             </div>
+
+
 
                             <div class="card-body">
 
-                                <p>
-                                    <strong>Driver:</strong>
-                                    {{ mission.driverName || 'Not assigned' }}
-                                </p>
+
 
                                 <p>
-                                    <strong>Vehicle:</strong>
-                                    {{ mission.vehiclePlateNumber || 'Not assigned' }}
+
+                                    <strong>
+                                        Driver:
+                                    </strong>
+
+
+                                    {{ mission.driverName || 'Not assigned' }}
+
+
                                 </p>
+
+
+
+
+                                <p>
+
+                                    <strong>
+                                        Vehicle:
+                                    </strong>
+
+
+                                    {{ mission.vehiclePlateNumber || 'Not assigned' }}
+
+
+                                </p>
+
+
 
                             </div>
 
+
                         </div>
 
-                        <!-- Driver -->
+
+
+
+
+
+
 
                         <div class="mb-3">
 
-                            <label class="form-label">Driver ID</label>
+
+                            <label class="form-label">
+
+                                Driver ID
+
+                            </label>
+
+
 
                             <input class="form-control" [(ngModel)]="driverId" placeholder="Driver UUID">
 
+
                         </div>
 
-                        <!-- Vehicle -->
+
+
+
+
 
                         <div class="mb-4">
 
-                            <label class="form-label">Vehicle ID</label>
+
+                            <label class="form-label">
+
+                                Vehicle ID
+
+                            </label>
+
+
 
                             <input class="form-control" [(ngModel)]="vehicleId" placeholder="Vehicle UUID">
 
-                        </div>
-
-                        <div class="d-flex gap-2">
-
-                            <button class="btn btn-primary" (click)="updateAssignment()">
-
-                                {{ mission.driverId || mission.vehicleId ? 'Update Assignment' : 'Assign' }}
-
-                            </button>
-
-                            <button class="btn btn-outline-danger" (click)="removeAssignment()">
-
-                                Remove Assignment
-
-                            </button>
 
                         </div>
+
+
+
+
+
+
+
+
+                        <button class="btn btn-primary me-2" (click)="updateAssignment()">
+
+
+
+                            <i data-feather="save"></i>
+
+
+                            Save Assignment
+
+
+
+                        </button>
+
+
+
+
+
+
+
+                        <button class="btn btn-outline-danger" (click)="removeAssignment()">
+
+
+
+                            Remove Assignment
+
+
+
+                        </button>
+
+
 
                     </div>
+
+
+
+
+
+
+
+
+
+                    <!-- DOCUMENTS TAB -->
+
+
+                    <div *ngIf="selectedTab()==='documents'">
+
+
+
+
+
+                        <div class="card mb-3">
+
+
+                            <div class="card-header">
+
+
+                                Documents Verification
+
+
+
+                            </div>
+
+
+
+
+                            <div class="card-body">
+
+
+
+                                <div *ngIf="!documentsVerified()">
+
+
+
+                                    <p class="text-muted">
+
+
+                                        Confirm that all required documents are checked before departure.
+
+
+
+                                    </p>
+
+
+
+
+
+
+                                    <button class="btn btn-success" (click)="verifyDocuments()">
+
+
+
+                                        <i data-feather="check-circle"></i>
+
+
+
+                                        Documents verified on board
+
+
+
+                                    </button>
+
+
+
+                                </div>
+
+
+
+
+
+
+
+                                <div *ngIf="documentsVerified()">
+
+
+
+                                    <div class="alert alert-success">
+
+
+
+                                        <i data-feather="check"></i>
+
+
+                                        Documents verified successfully.
+
+
+
+                                    </div>
+
+
+
+
+
+                                    <p>
+
+
+                                        <strong>
+                                            Verification date:
+                                        </strong>
+
+
+
+                                        {{ verificationDate() | date:'dd/MM/yyyy HH:mm:ss' }}
+
+
+
+                                    </p>
+
+
+
+                                </div>
+
+
+
+
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+
+
+
+                        <div class="alert alert-secondary">
+
+
+                            Mission documents list will appear here.
+
+
+
+                            <br>
+
+
+                            PDF upload / download / tracking module.
+
+
+
+                        </div>
+
+
+
+
+
+                    </div>
+
+
+
 
 
 
@@ -251,59 +790,155 @@
 
 
                     <!-- INSPECTION TAB -->
-                    <div *ngIf="selectedTab() === 'inspection'">
 
 
-                        <div class="alert alert-secondary">
+                    <div *ngIf="selectedTab()==='inspection'">
 
-                            Vehicle inspection module.
+
+
+
+
+                        <div class="card">
+
+
+                            <div class="card-header">
+
+
+                                Vehicle Inspection
+
+
+
+                            </div>
+
+
+
+
+                            <div class="card-body">
+
+
+
+
+
+                                <table class="table table-borderless">
+
+
+                                    <tbody>
+
+
+
+                                        <tr>
+
+                                            <th>
+                                                Mileage
+                                            </th>
+
+
+                                            <td>
+
+                                                {{ mission.inspection?.mileage || '-' }}
+
+                                            </td>
+
+
+                                        </tr>
+
+
+
+
+
+                                        <tr>
+
+                                            <th>
+                                                Fuel Level
+                                            </th>
+
+
+                                            <td>
+
+                                                {{ mission.inspection?.fuelLevel || '-' }}
+
+                                            </td>
+
+
+                                        </tr>
+
+
+
+
+
+                                        <tr>
+
+                                            <th>
+                                                Notes
+                                            </th>
+
+
+                                            <td>
+
+                                                {{ mission.inspection?.notes || '-' }}
+
+                                            </td>
+
+
+                                        </tr>
+
+
+
+
+                                        <tr>
+
+                                            <th>
+                                                Inspection Date
+                                            </th>
+
+
+                                            <td>
+
+                                                {{ mission.inspection?.inspectionDate
+                                                ? (mission.inspection?.inspectionDate | date:'dd/MM/yyyy HH:mm')
+                                                : '-' }}
+
+                                            </td>
+
+
+                                        </tr>
+
+
+
+                                    </tbody>
+
+
+
+                                </table>
+
+
+
+
+
+
+
+                                <button class="btn btn-outline-primary">
+
+
+                                    <i data-feather="edit"></i>
+
+
+                                    Add / Update Inspection
+
+
+                                </button>
+
+
+
+
+
+                            </div>
+
+
 
                         </div>
 
 
-
-                        <table class="table table-borderless">
-
-
-                            <tbody>
-
-
-                                <tr>
-                                    <th>Mileage</th>
-                                    <td>
-                                        {{ mission.inspection?.mileage || '-' }}
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <th>Fuel Level</th>
-                                    <td>
-                                        {{ mission.inspection?.fuelLevel || '-' }}
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <th>Notes</th>
-                                    <td>
-                                        {{ mission.inspection?.notes || '-' }}
-                                    </td>
-                                </tr>
-
-
-                            </tbody>
-
-
-                        </table>
-
-
-
-                        <div class="alert alert-warning">
-
-                            Photos upload will be added here.
-
-                        </div>
 
 
 
@@ -312,16 +947,124 @@
 
 
 
+
+
+
+
+
+                    <!-- PHOTOS TAB -->
+
+
+                    <div *ngIf="selectedTab()==='photos'">
+
+
+
+
+
+                        <div class="card">
+
+
+                            <div class="card-header">
+
+
+                                Mission Photos
+
+
+
+                            </div>
+
+
+
+
+                            <div class="card-body">
+
+
+
+
+
+                                <div class="alert alert-secondary">
+
+
+                                    Photo upload module.
+
+
+
+                                    <br>
+
+
+                                    Driver can capture documents/photos from mobile application.
+
+
+
+                                    <br>
+
+
+                                    Photos will keep timestamp and secure archive.
+
+
+
+                                </div>
+
+
+
+
+
+
+                                <button class="btn btn-primary">
+
+
+
+                                    <i data-feather="camera"></i>
+
+
+
+                                    Upload Photo
+
+
+
+                                </button>
+
+
+
+
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                    </div>
+
+
+
+
+
+
                 </div>
+
 
 
             </div>
 
 
+
+
+
         </div>
 
 
+
+
+
     </div>
+
+
+
 
 
 </div>
