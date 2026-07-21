@@ -5,6 +5,7 @@ export interface VehicleDocument {
   fileUrl: string;
   year: number;
   vehicleId: string;
+  vehiclePlateNumber: string;
   createdAt: string;
   updatedAt: string;
 }

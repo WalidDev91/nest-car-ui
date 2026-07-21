@@ -1,158 +1,353 @@
 <div class="container-fluid p-0">
 
-  <!-- Back Button -->
+
   <div class="mb-3">
-    <button
-      class="btn btn-outline-secondary"
-      (click)="goBack()">
+
+    <button class="btn btn-outline-secondary" (click)="goBack()">
 
       <i data-feather="arrow-left" class="me-1"></i>
-      Back
+
+      Back to Documents
 
     </button>
+
   </div>
+
+
+
+  <div *ngIf="loading()" class="card">
+
+    <div class="card-body text-center py-5">
+
+      Loading document...
+
+    </div>
+
+  </div>
+
+
+
+
 
   <div class="row" *ngIf="document() as doc">
 
-    <!-- LEFT -->
-    <div class="col-12 col-lg-6">
 
-      <div class="card">
 
-        <img
-          class="card-img-top"
-          [src]="'http://localhost:8080/uploads/driver-documents/' + doc.fileUrl"
-          alt="Driver document">
+    <!-- PREVIEW -->
+
+    <div class="col-lg-6 mb-3">
+
+
+      <div class="card h-100">
+
+
+        <div class="card-header">
+
+          <h5 class="mb-0">
+
+            Document Preview
+
+          </h5>
+
+        </div>
+
+
+
+        <div class="card-body text-center">
+
+
+          <ng-container *ngIf="doc.fileUrl.endsWith('.pdf'); else imagePreview">
+
+
+            <div class="py-5">
+
+              <i data-feather="file-text" style="width:80px;height:80px">
+              </i>
+
+
+              <h5 class="mt-3">
+
+                PDF Document
+
+              </h5>
+
+
+            </div>
+
+
+          </ng-container>
+
+
+
+          <ng-template #imagePreview>
+
+
+            <img class="img-fluid rounded" [src]="
+              'http://localhost:8080/uploads/driver-documents/'
+              + doc.fileUrl" alt="document">
+
+
+          </ng-template>
+
+
+
+        </div>
+
 
       </div>
 
+
     </div>
 
-    <!-- RIGHT -->
-    <div class="col-12 col-lg-6">
+
+
+
+
+    <!-- DETAILS -->
+
+
+    <div class="col-lg-6">
+
 
       <div class="card">
 
+
         <div class="card-header">
-          <h5 class="card-title mb-0">
+
+          <h5 class="mb-0">
+
             Document Information
+
           </h5>
+
         </div>
+
+
+
 
         <div class="card-body">
 
-          <table class="table table-borderless mb-0">
 
-            <tbody>
 
-              <tr>
-                <th>Type</th>
-                <td>
-                  {{ doc.type === 'DRIVER_LICENSE'
-                  ? 'Driver License'
-                  : 'ID Card' }}
-                </td>
-              </tr>
+          <table class="table table-borderless">
 
-              <tr>
-                <th>Status</th>
-                <td>
 
-                  <span
-                    class="badge"
-                    [ngClass]="{
-                      'bg-warning': doc.status==='PENDING',
-                      'bg-success': doc.status==='APPROVED',
-                      'bg-danger': doc.status==='REJECTED'
-                    }">
+            <tr>
 
-                    {{ doc.status }}
+              <th>
+                Title
+              </th>
 
-                  </span>
+              <td>
+                {{doc.title}}
+              </td>
 
-                </td>
-              </tr>
+            </tr>
 
-              <tr>
-                <th>Driver</th>
-                <td>{{ doc.driverName }}</td>
-              </tr>
 
-              <tr>
-                <th>Uploaded At</th>
-                <td>{{ doc.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</td>
-              </tr>
 
-              <tr>
-                <th>Validated At</th>
-                <td>
+            <tr>
 
-                  {{
-                  doc.validatedAt
-                  ? (doc.validatedAt | date:'dd/MM/yyyy HH:mm')
-                  : '—'
-                  }}
+              <th>
+                Type
+              </th>
 
-                </td>
-              </tr>
+              <td>
 
-            </tbody>
+                {{
+                doc.type === 'DRIVER_LICENSE'
+                ?
+                'Driver License'
+                :
+                'ID Card'
+                }}
+
+              </td>
+
+
+            </tr>
+
+
+
+
+            <tr>
+
+              <th>
+                Status
+              </th>
+
+              <td>
+
+
+                <span class="badge" [ngClass]="{
+
+                  'bg-warning':
+                  doc.status==='PENDING',
+
+                  'bg-success':
+                  doc.status==='APPROVED',
+
+                  'bg-danger':
+                  doc.status==='REJECTED'
+
+                  }">
+
+
+                  {{doc.status}}
+
+
+                </span>
+
+
+              </td>
+
+
+            </tr>
+
+
+
+
+
+            <tr>
+
+              <th>
+                Driver
+              </th>
+
+              <td>
+                {{doc.driverName}}
+              </td>
+
+
+            </tr>
+
+
+
+
+            <tr>
+
+              <th>
+                Uploaded
+              </th>
+
+              <td>
+
+                {{doc.uploadedAt |
+                date:'dd/MM/yyyy HH:mm'}}
+
+              </td>
+
+
+            </tr>
+
+
+
+
+
+            <tr>
+
+              <th>
+                Validated
+              </th>
+
+              <td>
+
+                {{
+                doc.validatedAt
+                ?
+                (doc.validatedAt |
+                date:'dd/MM/yyyy HH:mm')
+                :
+                'Not validated'
+                }}
+
+              </td>
+
+
+            </tr>
+
 
           </table>
 
+
+
           <hr>
 
-          <!-- Fleet/Admin validation -->
 
-          <div
-            *ngIf="canValidate && doc.status==='PENDING'"
-            class="mb-3">
 
-            <button
-              class="btn btn-success me-2"
-              (click)="approve()">
+
+          <div class="d-flex gap-2 flex-wrap">
+
+
+            <button class="btn btn-primary" (click)="downloadDocument()">
+
+
+              <i data-feather="download"></i>
+
+              Download
+
+
+            </button>
+
+
+
+
+
+            <button *ngIf="
+              canValidate &&
+              doc.status==='PENDING'
+              " class="btn btn-success" (click)="approve()">
+
 
               Approve
 
+
             </button>
 
-            <button
-              class="btn btn-danger"
-              (click)="reject()">
+
+
+
+
+            <button *ngIf="
+              canValidate &&
+              doc.status==='PENDING'
+              " class="btn btn-danger" (click)="reject()">
+
 
               Reject
 
-            </button>
-
-          </div>
-
-          <!-- Driver actions -->
-
-          <div *ngIf="isDriver">
-
-            <button
-              class="btn btn-outline-primary me-2">
-
-              Edit
 
             </button>
 
-            <button
-              class="btn btn-outline-danger"
-              (click)="deleteDocument()">
+
+
+
+
+            <button *ngIf="isDriver" class="btn btn-outline-danger" (click)="deleteDocument()">
+
 
               Delete
 
+
             </button>
+
 
           </div>
 
+
+
         </div>
+
 
       </div>
 
+
     </div>
 
+
+
   </div>
+
+
 
 </div>

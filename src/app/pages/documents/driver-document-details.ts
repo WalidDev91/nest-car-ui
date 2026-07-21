@@ -1,78 +1,215 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import feather from 'feather-icons';
+
 import { DriverDocumentService } from '../../services/driver-document.service';
 import { DriverDocument } from '../../models/driver-document';
-import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-driver-document-details',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [
+    CommonModule
+  ],
   templateUrl: './driver-document-details.html',
-  styleUrl: './driver-document-details.css',
+  styleUrl: './driver-document-details.css'
 })
 export class DriverDocumentDetails implements OnInit {
 
+
   document = signal<DriverDocument | null>(null);
-  isDriver = localStorage.getItem('role') === 'DRIVER';
+
+  loading = signal(false);
+
+
+  role =
+    localStorage.getItem('role') ?? '';
+
+
+
+  canValidate =
+    [
+      'FLEET_MANAGER',
+      'ADMIN',
+      'SUPER_ADMIN'
+    ]
+      .includes(this.role);
+
+
+
+  isDriver =
+    this.role === 'DRIVER';
+
+
 
   constructor(
+
     private route: ActivatedRoute,
+
     private documentService: DriverDocumentService,
-    private router: Router,
+
+    private router: Router
+
   ) { }
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
 
-    if (id) {
-      this.documentService.getById(id).subscribe({
-        next: (data) => {
-          this.document.set(data);
-        },
-        error: (err) => {
-          console.error('Failed to load document:', err);
-        }
-      });
-    }
+
+  ngOnInit(): void {
+
+    this.loadDocument();
+
   }
+
+
+
+  loadDocument() {
+
+
+    const id =
+      this.route.snapshot.paramMap.get('id');
+
+
+    if (!id) {
+      return;
+    }
+
+
+    this.loading.set(true);
+
+
+
+    this.documentService
+      .getById(id)
+      .subscribe({
+
+        next: data => {
+
+          this.document.set(data);
+
+          this.loading.set(false);
+
+
+          setTimeout(() => {
+
+            feather.replace();
+
+          }, 0);
+
+        },
+
+
+        error: err => {
+
+          console.error(err);
+
+          this.loading.set(false);
+
+        }
+
+      });
+
+
+  }
+
+
 
 
   approve() {
 
-    const doc = this.document();
 
-    if (!doc) return;
+    const doc =
+      this.document();
 
-    this.documentService.updateStatus(doc.id, 'APPROVED')
+
+
+    if (!doc) {
+      return;
+    }
+
+
+
+    this.documentService
+      .updateStatus(
+        doc.id,
+        'APPROVED'
+      )
       .subscribe({
+
         next: () => {
-          this.router.navigate(['/documents']);
+
+          this.loadDocument();
+
         },
-        error: (err) => {
+
+
+        error: err => {
+
           console.error(err);
+
+          alert(
+            'Approval failed'
+          );
+
         }
+
       });
+
+
   }
+
+
+
+
 
   reject() {
 
-    const doc = this.document();
 
-    if (!doc) return;
+    const doc =
+      this.document();
 
-    this.documentService.updateStatus(doc.id, 'REJECTED')
+
+
+    if (!doc) {
+      return;
+    }
+
+
+
+    this.documentService
+      .updateStatus(
+        doc.id,
+        'REJECTED'
+      )
       .subscribe({
+
         next: () => {
-          this.router.navigate(['/documents']);
+
+          this.loadDocument();
+
         },
-        error: (err) => {
+
+
+        error: err => {
+
           console.error(err);
+
+          alert(
+            'Rejection failed'
+          );
+
         }
+
       });
+
+
   }
 
-  deleteDocument() {
+
+
+
+  downloadDocument() {
 
     const doc = this.document();
 
@@ -80,32 +217,150 @@ export class DriverDocumentDetails implements OnInit {
       return;
     }
 
-    const confirmed = confirm(
-      'Are you sure you want to delete this document?'
-    );
 
-    if (!confirmed) {
+    this.documentService
+      .download(doc.id)
+      .subscribe({
+
+        next: response => {
+
+
+          const blob = response.body;
+
+
+          if (!blob) {
+
+            alert('File is empty');
+
+            return;
+
+          }
+
+
+
+          const url =
+            window.URL.createObjectURL(blob);
+
+
+
+          const link =
+            document.createElement('a');
+
+
+
+          link.href = url;
+
+
+
+          link.download =
+            doc.title;
+
+
+
+          document.body.appendChild(link);
+
+
+
+          link.click();
+
+
+
+          link.remove();
+
+
+
+          window.URL.revokeObjectURL(url);
+
+
+        },
+
+
+        error: err => {
+
+          console.error(err);
+
+          alert('Download failed');
+
+        }
+
+      });
+
+
+  }
+
+
+
+
+  deleteDocument() {
+
+
+    const doc =
+      this.document();
+
+
+
+    if (!doc) {
       return;
     }
 
-    this.documentService.delete(doc.id).subscribe({
-      next: () => {
-        alert('Document deleted');
 
-        this.router.navigate(['/documents']);
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Delete failed');
-      }
-    });
+
+    if (
+      !confirm(
+        'Delete this document permanently?'
+      )
+    ) {
+      return;
+    }
+
+
+
+
+    this.documentService
+      .delete(doc.id)
+      .subscribe({
+
+        next: () => {
+
+          alert(
+            'Document deleted'
+          );
+
+
+          this.router.navigate([
+            '/documents'
+          ]);
+
+        },
+
+
+        error: err => {
+
+          console.error(err);
+
+          alert(
+            'Delete failed'
+          );
+
+        }
+
+      });
+
+
   }
 
-  canValidate =
-    ['FLEET_MANAGER', 'ADMIN', 'SUPER_ADMIN']
-      .includes(localStorage.getItem('role') ?? '');
+
+
+
 
   goBack() {
-    history.back();
+
+    this.router.navigate([
+      '/documents'
+    ]);
+
   }
+
+
+
 }

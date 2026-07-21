@@ -7,25 +7,51 @@ import { DriverDocument } from '../models/driver-document';
   providedIn: 'root',
 })
 export class DriverDocumentService {
+
   private baseUrl = `${environment.apiUrl}/driver-documents`;
 
-  constructor(private http: HttpClient) { }
+
+  constructor(
+    private http: HttpClient
+  ) { }
+
+
 
   getAll() {
+
     return this.http.get<DriverDocument[]>(this.baseUrl);
+
   }
+
+
 
   getById(id: string) {
-    return this.http.get<DriverDocument>(`${this.baseUrl}/${id}`);
+
+    return this.http.get<DriverDocument>(
+      `${this.baseUrl}/${id}`
+    );
+
   }
 
+
+
   getByDriverId(driverId: string) {
+
     return this.http.get<DriverDocument[]>(
       `${this.baseUrl}/driver/${driverId}`
     );
+
   }
 
-  upload(file: File, title: string, type: string, driverId: string) {
+
+
+  upload(
+    file: File,
+    title: string,
+    type: string,
+    driverId: string
+  ) {
+
     const formData = new FormData();
 
     formData.append('file', file);
@@ -33,34 +59,50 @@ export class DriverDocumentService {
     formData.append('type', type);
     formData.append('driverId', driverId);
 
-    return this.http.post(
+
+    return this.http.post<DriverDocument>(
       `${this.baseUrl}/upload`,
       formData
     );
+
   }
 
 
-  updateStatus(id: string, status: string) {
+
+  updateStatus(
+    id: string,
+    status: string
+  ) {
+
     return this.http.patch(
       `${this.baseUrl}/${id}/status?status=${status}`,
       {}
     );
+
   }
 
+
+
   delete(id: string) {
+
     return this.http.delete(
       `${this.baseUrl}/${id}`
     );
+
   }
 
+
+
   download(id: string) {
+
     return this.http.get(
-      `${environment.apiUrl}/driver-documents/${id}/download`,
+      `${this.baseUrl}/${id}/download`,
       {
         observe: 'response',
         responseType: 'blob'
       }
     );
+
   }
 
 

@@ -3,29 +3,59 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { MissionDocument } from '../models/mission-document';
 
+
 @Injectable({
   providedIn: 'root',
 })
 export class MissionDocumentService {
+
+
   private baseUrl = `${environment.apiUrl}/mission-documents`;
 
-  constructor(private http: HttpClient) { }
+
+
+  constructor(
+    private http: HttpClient
+  ) { }
+
+
+
 
   getAll() {
-    return this.http.get<MissionDocument[]>(this.baseUrl);
+
+    return this.http.get<MissionDocument[]>(
+      this.baseUrl
+    );
+
   }
 
+
+
+
+
   getById(id: string) {
+
     return this.http.get<MissionDocument>(
       `${this.baseUrl}/${id}`
     );
+
   }
 
+
+
+
+
   getByMissionId(missionId: string) {
+
     return this.http.get<MissionDocument[]>(
       `${this.baseUrl}/mission/${missionId}`
     );
+
   }
+
+
+
+
 
   upload(
     file: File,
@@ -35,19 +65,48 @@ export class MissionDocumentService {
 
     const formData = new FormData();
 
+
     formData.append('file', file);
     formData.append('title', title);
     formData.append('missionId', missionId);
 
-    return this.http.post(
+
+
+    return this.http.post<MissionDocument>(
       `${this.baseUrl}/upload`,
       formData
     );
+
   }
 
+
+
+
+
   delete(id: string) {
+
     return this.http.delete(
       `${this.baseUrl}/${id}`
     );
+
   }
+
+
+
+
+
+  download(id: string) {
+
+  return this.http.get(
+    `${this.baseUrl}/${id}/download`,
+    {
+      observe:'response',
+      responseType:'blob'
+    }
+  );
+
+}
+
+
+
 }

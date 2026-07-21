@@ -1,75 +1,340 @@
 <div class="container-fluid p-0">
 
- <!-- <h1 class="h3 mb-3">Mission Document Details</h1> -->
+
+  <!-- BACK -->
+
+  <div class="mb-3">
+
+
+    <button class="btn btn-outline-secondary" (click)="goBack()">
+
+
+      <i data-feather="arrow-left" class="me-1">
+      </i>
+
+
+      Back to Documents
+
+
+    </button>
+
+
+  </div>
+
+
+
+
+
+  <!-- LOADING -->
+
+
+  <div *ngIf="loading()" class="card">
+
+
+    <div class="card-body text-center py-5">
+
+      Loading document...
+
+    </div>
+
+
+  </div>
+
+
+
+
+
+
 
   <div class="row" *ngIf="document() as doc">
 
-    <!-- LEFT: Document Preview -->
-    <div class="col-12 col-md-6">
-      <div class="card">
 
-        <img
-          class="card-img-top"
-          [src]="'http://localhost:8080/uploads/mission-documents/' + doc.fileUrl"
-          alt="Document preview"
-        />
+
+
+
+    <!-- PREVIEW -->
+
+
+    <div class="col-lg-6 mb-3">
+
+
+      <div class="card h-100">
+
 
         <div class="card-header">
-          <h5 class="card-title mb-0">
-            {{ doc.title }}
+
+
+          <h5 class="mb-0">
+
+            Document Preview
+
           </h5>
+
+
         </div>
+
+
+
+
+
+        <div class="card-body text-center">
+
+
+
+          <ng-container *ngIf="doc.fileUrl.endsWith('.pdf');
+          else imagePreview">
+
+
+
+            <i data-feather="file-text" style="width:80px;height:80px">
+            </i>
+
+
+
+            <h5 class="mt-3">
+
+              PDF Document
+
+            </h5>
+
+
+
+
+          </ng-container>
+
+
+
+
+
+          <ng-template #imagePreview>
+
+
+
+            <img class="img-fluid rounded" [src]="
+              'http://localhost:8080/uploads/mission-documents/'
+              + doc.fileUrl" alt="Mission document">
+
+
+
+          </ng-template>
+
+
+
+
+        </div>
+
 
       </div>
+
+
     </div>
 
-    <!-- RIGHT: Document Info -->
-    <div class="col-12 col-md-6">
+
+
+
+
+
+
+
+
+    <!-- INFORMATION -->
+
+
+    <div class="col-lg-6">
+
 
       <div class="card">
 
+
+
         <div class="card-header">
-          <h5 class="card-title mb-0">
-            Information
+
+
+          <h5 class="mb-0">
+
+            Mission Document Information
+
           </h5>
+
+
         </div>
+
+
+
+
 
         <div class="card-body">
 
-          <table class="table table-borderless mb-0">
-            <tbody>
 
-              <tr>
-                <th>Mission</th>
-                <td>{{ doc.missionId }}</td>
-              </tr>
 
-              <tr>
-                <th>Uploaded At</th>
-                <td>{{ doc.updatedAt | date:'dd/MM/yyyy HH:mm' }}</td>
-              </tr>
 
-            </tbody>
+
+          <table class="table table-borderless">
+
+
+
+            <tr>
+
+              <th>
+                Title
+              </th>
+
+
+              <td>
+                {{doc.title}}
+              </td>
+
+
+            </tr>
+
+
+
+
+
+            <tr>
+
+              <th>
+                Mission
+              </th>
+
+
+              <td>
+
+                {{doc.missionTitle || doc.missionId}}
+
+              </td>
+
+
+            </tr>
+
+
+
+
+
+            <tr>
+
+              <th>
+                Created At
+              </th>
+
+
+              <td>
+
+                {{doc.createdAt |
+                date:'dd/MM/yyyy HH:mm'}}
+
+
+              </td>
+
+
+            </tr>
+
+
+
+
+
+            <tr>
+
+              <th>
+                Updated At
+              </th>
+
+
+              <td>
+
+                {{doc.updatedAt |
+                date:'dd/MM/yyyy HH:mm'}}
+
+
+              </td>
+
+
+            </tr>
+
+
+
+
           </table>
 
-          <div class="mt-3">
 
-            <button
-              class="btn btn-outline-danger"
-              (click)="deleteDocument()">
 
-              Delete Document
+
+
+          <hr>
+
+
+
+
+
+          <div class="d-flex gap-2 flex-wrap">
+
+
+
+
+
+            <button class="btn btn-primary" (click)="downloadDocument()">
+
+
+
+              <i data-feather="download">
+              </i>
+
+
+              Download
+
+
 
             </button>
 
+
+
+
+
+
+
+            <button class="btn btn-outline-danger" (click)="deleteDocument()">
+
+
+
+              <i data-feather="trash-2">
+              </i>
+
+
+              Delete
+
+
+
+            </button>
+
+
+
+
+
           </div>
+
+
+
 
         </div>
 
+
+
       </div>
+
+
+
 
     </div>
 
+
+
+
+
+
   </div>
+
+
+
+
 
 </div>

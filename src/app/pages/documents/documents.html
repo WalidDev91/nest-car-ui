@@ -1,316 +1,1316 @@
 <div class="container-fluid p-0">
 
-  <!-- <h1 class="h3 mb-3">Documents</h1> -->
 
-  <div class="card">
+  <!-- ============================= -->
+  <!-- HEADER -->
+  <!-- ============================= -->
 
-    <!-- Tabs Header -->
-    <div class="card-header">
-      <ul class="nav nav-tabs card-header-tabs">
+  <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <li class="nav-item">
-          <button class="nav-link" [class.active]="selectedTab() === 'driver'" (click)="selectTab('driver')">
-            <i class="align-middle me-1" data-feather="user"></i>
-            Driver Documents
-            <span class="badge bg-secondary ms-1">{{ driverDocs().length }}</span>
-          </button>
-        </li>
+    <div>
+      <h3 class="mb-0">
+        Documents Management
+      </h3>
 
-        <li class="nav-item">
-          <button class="nav-link" [class.active]="selectedTab() === 'vehicle'" (click)="selectTab('vehicle')">
-            <i class="align-middle me-1" data-feather="truck"></i>
-            Vehicle Documents
-            <span class="badge bg-secondary ms-1">{{ vehicleDocs().length }}</span>
-          </button>
-        </li>
-
-        <li class="nav-item">
-          <button class="nav-link" [class.active]="selectedTab() === 'mission'" (click)="selectTab('mission')">
-            <i class="align-middle me-1" data-feather="map"></i>
-            Mission Documents
-            <span class="badge bg-secondary ms-1">{{ missionDocs().length }}</span>
-          </button>
-        </li>
-
-      </ul>
+      <small class="text-muted">
+        Manage driver, vehicle and mission documents.
+      </small>
     </div>
+
+
+    <button class="btn btn-outline-secondary" (click)="loadDocuments()">
+
+      <i data-feather="refresh-cw" class="align-middle me-1">
+      </i>
+
+      Refresh
+
+    </button>
+
+
+  </div>
+
+
+
+
+  <!-- ============================= -->
+  <!-- STATISTICS -->
+  <!-- ============================= -->
+
+
+  <div class="row">
+
+
+    <div class="col-xl-3 col-md-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>
+            Total Documents
+          </h6>
+
+          <h2>
+            {{ totalDocuments() }}
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+
+    <div class="col-xl-3 col-md-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>
+            Driver Documents
+          </h6>
+
+          <h2 class="text-primary">
+
+            {{ driverCount() }}
+
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+
+
+    <div class="col-xl-3 col-md-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>
+            Vehicle Documents
+          </h6>
+
+          <h2 class="text-success">
+
+            {{ vehicleCount() }}
+
+          </h2>
+
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+    <div class="col-xl-3 col-md-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>
+            Mission Documents
+          </h6>
+
+
+          <h2 class="text-warning">
+
+            {{ missionCount() }}
+
+          </h2>
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+  </div>
+
+
+
+
+
+  <!-- ============================= -->
+  <!-- SEARCH -->
+  <!-- ============================= -->
+
+
+  <div class="card mb-3">
+
 
     <div class="card-body">
 
-      <!-- DRIVER DOCUMENTS -->
-      <div *ngIf="selectedTab() === 'driver'">
 
-        <!-- DRIVER ONLY UPLOAD -->
+      <div class="row">
+
+
+        <div class="col-md-8">
+
+
+          <input class="form-control" placeholder="Search documents by title, type..." [value]="search()"
+            (input)="onSearch($any($event.target).value)">
+
+
+        </div>
+
+
+
+        <div class="col-md-4">
+
+
+          <select class="form-select" (change)="selectTab($any($event.target).value)">
+
+
+            <option value="driver">
+              Driver Documents
+            </option>
+
+
+            <option value="vehicle">
+              Vehicle Documents
+            </option>
+
+
+            <option value="mission">
+              Mission Documents
+            </option>
+
+
+          </select>
+
+
+        </div>
+
+
+      </div>
+
+
+
+    </div>
+
+
+  </div>
+
+
+
+
+
+  <!-- ============================= -->
+  <!-- TABS -->
+  <!-- ============================= -->
+
+
+  <div class="card">
+
+
+    <div class="card-header">
+
+
+      <ul class="nav nav-tabs card-header-tabs">
+
+
+        <li class="nav-item">
+
+
+          <button class="nav-link" [class.active]="selectedTab()==='driver'" (click)="selectTab('driver')">
+
+
+            <i data-feather="user" class="me-1">
+            </i>
+
+
+            Driver
+
+
+            <span class="badge bg-secondary ms-1">
+
+              {{driverDocs().length}}
+
+            </span>
+
+
+          </button>
+
+
+        </li>
+
+
+
+
+
+        <li class="nav-item">
+
+
+          <button class="nav-link" [class.active]="selectedTab()==='vehicle'" (click)="selectTab('vehicle')">
+
+
+            <i data-feather="truck" class="me-1">
+            </i>
+
+
+            Vehicle
+
+
+            <span class="badge bg-secondary ms-1">
+
+              {{vehicleDocs().length}}
+
+            </span>
+
+
+          </button>
+
+
+        </li>
+
+
+
+
+
+        <li class="nav-item">
+
+
+          <button class="nav-link" [class.active]="selectedTab()==='mission'" (click)="selectTab('mission')">
+
+
+            <i data-feather="map" class="me-1">
+            </i>
+
+
+            Mission
+
+
+            <span class="badge bg-secondary ms-1">
+
+              {{missionDocs().length}}
+
+            </span>
+
+
+          </button>
+
+
+        </li>
+
+
+      </ul>
+
+
+    </div>
+
+
+
+
+
+    <div class="card-body">
+
+
+
+      <!-- ============================= -->
+      <!-- LOADING -->
+      <!-- ============================= -->
+
+
+      <div *ngIf="loading()" class="text-center py-5">
+
+
+        Loading documents...
+
+
+      </div>
+
+
+
+
+
+      <!-- ============================= -->
+      <!-- DRIVER TAB -->
+      <!-- ============================= -->
+
+
+      <div *ngIf="!loading() && selectedTab()==='driver'">
+
+
+
+        <!-- DRIVER UPLOAD -->
+
         <div class="card mb-3" *ngIf="isDriver">
+
+
           <div class="card-body">
 
-            <h5 class="card-title">
+
+            <h5>
               Upload My Document
             </h5>
 
+
+
             <div class="row g-2">
 
+
               <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Title" [(ngModel)]="uploadDriverTitle">
+
+
+                <input class="form-control" placeholder="Document title" [(ngModel)]="uploadDriverTitle">
+
+
               </div>
 
 
-              <div class="col-md-4">
+
+              <div class="col-md-3">
+
+
                 <select class="form-select" [(ngModel)]="uploadDriverType">
+
 
                   <option value="DRIVER_LICENSE">
                     Driver License
                   </option>
 
+
                   <option value="ID_CARD">
                     ID Card
                   </option>
 
+
                 </select>
+
+
               </div>
 
 
-              <div class="col-md-4">
+
+              <div class="col-md-3">
+
+
                 <input id="driverFileInput" type="file" class="form-control" (change)="onDriverFileSelected($event)">
+
+
               </div>
 
 
+
+              <div class="col-md-2">
+
+
+                <button class="btn btn-primary w-100" (click)="uploadDriverDocument()">
+
+
+                  <i data-feather="upload" class="me-1">
+                  </i>
+
+
+                  Upload
+
+
+                </button>
+
+
+              </div>
+
+
+
             </div>
 
 
-            <div class="text-end mt-3">
-              <button class="btn btn-primary" (click)="uploadDriverDocument()">
-                <i class="align-middle me-1" data-feather="upload"></i>
-                Upload Document
-              </button>
-            </div>
+
           </div>
+
+
         </div>
 
 
-        <!-- DOCUMENT LIST -->
-        <table class="table table-hover">
-
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Uploaded At</th>
-              <th>Reviewed At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
 
 
-          <tbody>
 
-            <tr *ngFor="let doc of driverDocs()">
-
-              <td>
-                {{doc.title}}
-              </td>
+        <!-- DRIVER TABLE -->
 
 
-              <td>
-
-                <span class="badge bg-light text-dark">
-
-                  {{
-                  doc.type === 'DRIVER_LICENSE'
-                  ? 'Driver License'
-                  : 'ID Card'
-                  }}
-
-                </span>
-
-              </td>
+        <div class="table-responsive">
 
 
-              <td>
-
-                <span class="badge" [ngClass]="{
-
-              'bg-warning': doc.status === 'PENDING',
-
-              'bg-success': doc.status === 'APPROVED',
-
-              'bg-danger': doc.status === 'REJECTED'
-
-            }">
-
-                  {{doc.status}}
-
-                </span>
-
-              </td>
+          <table class="table table-hover align-middle">
 
 
-              <td>
-                {{doc.uploadedAt | date:'dd/MM/yyyy HH:mm'}}
-              </td>
+            <thead>
 
 
-              <td>
-                {{
-                doc.updatedAt
-                ? (doc.updatedAt | date:'dd/MM/yyyy HH:mm')
-                : '—'
-                }}
-              </td>
+              <tr>
 
-              <td>
-
-                <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDriverDetails(doc.id)">
-
-                  <i data-feather="eye"></i>
-
-                </button>
+                <th>
+                  Title
+                </th>
 
 
-                <button class="btn btn-sm btn-outline-primary" (click)="downloadDriver(doc.id)">
-
-                  <i data-feather="download"></i>
-
-                </button>
+                <th>
+                  Type
+                </th>
 
 
-              </td>
+                <th>
+                  Status
+                </th>
 
 
-            </tr>
+                <th>
+                  Uploaded
+                </th>
 
-          </tbody>
 
-        </table>
+                <th class="text-end">
+                  Actions
+                </th>
+
+
+              </tr>
+
+
+            </thead>
+
+
+
+            <tbody>
+
+
+
+              <tr *ngFor="let doc of paginatedDocuments()">
+
+
+
+                <td>
+                  {{doc.title}}
+                </td>
+
+
+
+
+                <td>
+
+
+                  <span class="badge bg-light text-dark">
+
+                    {{doc.type}}
+
+                  </span>
+
+
+                </td>
+
+
+
+
+
+                <td>
+
+
+                  <span class="badge" [ngClass]="{
+
+                    'bg-warning':doc.status==='PENDING',
+
+                    'bg-success':doc.status==='APPROVED',
+
+                    'bg-danger':doc.status==='REJECTED'
+
+                  }">
+
+
+                    {{doc.status}}
+
+
+                  </span>
+
+
+                </td>
+
+
+
+
+                <td>
+
+                  {{doc.uploadedAt | date:'dd/MM/yyyy'}}
+
+                </td>
+
+
+
+                <td class="text-end">
+
+
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDriverDetails(doc.id)">
+
+
+                    <i data-feather="eye"></i>
+
+
+                  </button>
+
+
+
+
+                  <button class="btn btn-sm btn-outline-primary" (click)="downloadDriver(doc.id)">
+
+
+                    <i data-feather="download"></i>
+
+
+                  </button>
+
+
+                </td>
+
+
+
+              </tr>
+
+
+
+            </tbody>
+
+
+
+          </table>
+
+
+        </div>
+
 
 
       </div>
+      <!-- ============================= -->
+      <!-- VEHICLE TAB -->
+      <!-- ============================= -->
 
-      <!-- VEHICLE DOCUMENTS -->
-      <div *ngIf="selectedTab() === 'vehicle'">
+
+      <div *ngIf="!loading() && selectedTab()==='vehicle'">
+
+
+        <!-- VEHICLE UPLOAD -->
+
         <div class="card mb-3" *ngIf="!isDriver">
+
+
           <div class="card-body">
-            <h5 class="card-title">Upload Vehicle Document</h5>
+
+
+            <h5>
+              Upload Vehicle Document
+            </h5>
+
+
+
             <div class="row g-2">
+
+
+
               <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Title" [(ngModel)]="uploadVehicleTitle">
+
+
+                <input class="form-control" placeholder="Document title" [(ngModel)]="uploadVehicleTitle">
+
+
               </div>
-              <div class="col-md-3">
+
+
+
+
+
+              <div class="col-md-2">
+
+
                 <select class="form-select" [(ngModel)]="uploadVehicleType">
-                  <option value="LICENSE">License</option>
-                  <option value="TECHNICAL_CHECK">Technical Check</option>
-                  <option value="INSURANCE">Insurance</option>
+
+
+                  <option value="LICENSE">
+                    License
+                  </option>
+
+
+                  <option value="TECHNICAL_CHECK">
+                    Technical Check
+                  </option>
+
+
+                  <option value="INSURANCE">
+                    Insurance
+                  </option>
+
+
                 </select>
+
+
               </div>
+
+
+
+
+
               <div class="col-md-2">
+
+
                 <input type="number" class="form-control" placeholder="Year" [(ngModel)]="uploadVehicleYear">
+
+
               </div>
-              <div class="col-md-2">
-                <input type="text" class="form-control" placeholder="Vehicle UUID" [(ngModel)]="uploadVehicleId">
+
+
+
+
+
+              <div class="col-md-3">
+
+
+                <select class="form-select" [(ngModel)]="uploadVehicleId">
+
+
+                  <option value="">
+                    Select vehicle
+                  </option>
+
+
+                  <option *ngFor="let vehicle of vehicles()" [value]="vehicle.id">
+
+
+                    {{vehicle.plateNumber}}
+
+
+                  </option>
+
+
+                </select>
+
+
               </div>
+
+
+
+
+
               <div class="col-md-2">
+
+
                 <input type="file" class="form-control" (change)="onVehicleFileSelected($event)">
+
+
+
               </div>
+
+
+
             </div>
+
+
+
+
+
             <div class="text-end mt-3">
+
+
               <button class="btn btn-primary" (click)="uploadVehicleDocument()">
-                <i class="align-middle me-1" data-feather="upload"></i>
-                Upload Document
+
+
+
+                <i data-feather="upload" class="me-1">
+                </i>
+
+
+                Upload
+
+
+
               </button>
+
+
+
             </div>
+
+
+
           </div>
+
+
         </div>
 
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Type</th>
-              <th>Vehicle</th>
-              <th>Year</th>
-              <th>Created At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let doc of vehicleDocs()">
-              <td>{{ doc.title }}</td>
-              <td>
-                <span class="badge bg-light text-dark">
-                  {{ doc.type === 'LICENSE' ? 'License' :
-                  doc.type === 'TECHNICAL_CHECK' ? 'Technical Check' : 'Insurance' }}
-                </span>
-              </td>
-            <!--   <td>{{ doc.vehiclePlateNumber }}</td> -->
-              <td>{{ doc.year }}</td>
-              <td>{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewVehicleDetails(doc.id)">
-                  <i data-feather="eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-primary" (click)="downloadVehicle(doc.id)">
-                  <i data-feather="download"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+
+
+
+        <!-- VEHICLE TABLE -->
+
+
+        <div class="table-responsive">
+
+
+          <table class="table table-hover align-middle">
+
+
+            <thead>
+
+
+              <tr>
+
+
+                <th>
+                  Title
+                </th>
+
+
+                <th>
+                  Type
+                </th>
+
+
+                <th>
+                  Vehicle
+                </th>
+
+
+                <th>
+                  Year
+                </th>
+
+
+                <th>
+                  Created
+                </th>
+
+
+                <th class="text-end">
+                  Actions
+                </th>
+
+
+              </tr>
+
+
+            </thead>
+
+
+
+
+
+            <tbody>
+
+
+
+              <tr *ngFor="let doc of vehicleDocs()">
+
+
+
+                <td>
+                  {{doc.title}}
+                </td>
+
+
+
+
+                <td>
+
+
+                  <span class="badge bg-light text-dark">
+
+                    {{doc.type}}
+
+
+                  </span>
+
+
+                </td>
+
+
+
+
+                <td>
+
+
+                  {{doc.vehiclePlateNumber || '—'}}
+
+
+                </td>
+
+
+
+
+
+                <td>
+
+
+                  {{doc.year}}
+
+
+                </td>
+
+
+
+
+
+                <td>
+
+
+                  {{doc.createdAt | date:'dd/MM/yyyy'}}
+
+
+                </td>
+
+
+
+
+
+                <td class="text-end">
+
+
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewVehicleDetails(doc.id)">
+
+
+
+                    <i data-feather="eye"></i>
+
+
+                  </button>
+
+
+
+
+
+                  <button class="btn btn-sm btn-outline-primary" (click)="downloadVehicle(doc.id)">
+
+
+
+                    <i data-feather="download"></i>
+
+
+                  </button>
+
+
+                </td>
+
+
+              </tr>
+
+
+
+            </tbody>
+
+
+
+          </table>
+
+
+        </div>
+
+
+
       </div>
 
-      <!-- MISSION DOCUMENTS -->
-      <div *ngIf="selectedTab() === 'mission'">
+
+
+
+
+
+      <!-- ============================= -->
+      <!-- MISSION TAB -->
+      <!-- ============================= -->
+
+
+      <div *ngIf="!loading() && selectedTab()==='mission'">
+
+
+
+
+
+        <!-- MISSION UPLOAD -->
+
+
         <div class="card mb-3" *ngIf="!isDriver">
+
+
           <div class="card-body">
-            <h5 class="card-title">Upload Mission Document</h5>
+
+
+            <h5>
+              Upload Mission Document
+            </h5>
+
+
+
+
             <div class="row g-2">
+
+
+
+
+
               <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Title" [(ngModel)]="uploadMissionTitle">
+
+
+                <input class="form-control" placeholder="Document title" [(ngModel)]="uploadMissionTitle">
+
+
               </div>
+
+
+
+
+
+
               <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Mission UUID" [(ngModel)]="uploadMissionId">
+
+
+                <select class="form-select" [(ngModel)]="uploadMissionId">
+
+
+                  <option value="">
+                    Select mission
+                  </option>
+
+
+                  <option *ngFor="let mission of missions()" [value]="mission.id">
+
+
+
+                    {{mission.title}}
+
+
+
+                  </option>
+
+
+
+                </select>
+
+
+
               </div>
+
+
+
+
+
               <div class="col-md-4">
+
+
                 <input type="file" class="form-control" (change)="onMissionFileSelected($event)">
+
+
+
               </div>
+
+
+
             </div>
+
+
+
+
+
             <div class="text-end mt-3">
+
+
               <button class="btn btn-primary" (click)="uploadMissionDocument()">
-                <i class="align-middle me-1" data-feather="upload"></i>
-                Upload Document
+
+
+
+                <i data-feather="upload" class="me-1">
+                </i>
+
+
+                Upload
+
+
+
               </button>
+
+
             </div>
+
+
+
           </div>
+
+
         </div>
 
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Mission</th>
-              <th>Created At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let doc of missionDocs()">
-              <td>{{ doc.title }}</td>
-              <td>{{ doc.missionTitle }}</td>
-              <td>{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewMissionDetails(doc.id)">
-                  <i data-feather="eye"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-primary" (click)="downloadMission(doc.id)">
-                  <i data-feather="download"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+
+
+
+
+        <!-- MISSION TABLE -->
+
+
+        <div class="table-responsive">
+
+
+          <table class="table table-hover align-middle">
+
+
+            <thead>
+
+
+              <tr>
+
+
+                <th>
+                  Title
+                </th>
+
+
+                <th>
+                  Mission
+                </th>
+
+
+                <th>
+                  Created
+                </th>
+
+
+                <th class="text-end">
+                  Actions
+                </th>
+
+
+              </tr>
+
+
+            </thead>
+
+
+
+
+
+            <tbody>
+
+
+
+              <tr *ngFor="let doc of missionDocs()">
+
+
+
+                <td>
+
+                  {{doc.title}}
+
+                </td>
+
+
+
+
+
+                <td>
+
+                  {{doc.missionTitle || '—'}}
+
+                </td>
+
+
+
+
+
+                <td>
+
+                  {{doc.createdAt | date:'dd/MM/yyyy'}}
+
+                </td>
+
+
+
+
+
+                <td class="text-end">
+
+
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewMissionDetails(doc.id)">
+
+
+
+                    <i data-feather="eye"></i>
+
+
+                  </button>
+
+
+
+
+
+                  <button class="btn btn-sm btn-outline-primary" (click)="downloadMission(doc.id)">
+
+
+
+                    <i data-feather="download"></i>
+
+
+                  </button>
+
+
+
+                </td>
+
+
+              </tr>
+
+
+
+            </tbody>
+
+
+
+          </table>
+
+
+        </div>
+
+
+
       </div>
+
+
+
+
+
+
+      <!-- ============================= -->
+      <!-- EMPTY STATE -->
+      <!-- ============================= -->
+
+
+      <div *ngIf="
+        !loading() &&
+        selectedTab()==='driver' &&
+        driverDocs().length===0
+        " class="text-center text-muted py-5">
+
+
+        No driver documents found.
+
+
+      </div>
+
+
+
+
+
+      <div *ngIf="
+        !loading() &&
+        selectedTab()==='vehicle' &&
+        vehicleDocs().length===0
+        " class="text-center text-muted py-5">
+
+
+        No vehicle documents found.
+
+
+      </div>
+
+
+
+
+
+      <div *ngIf="
+        !loading() &&
+        selectedTab()==='mission' &&
+        missionDocs().length===0
+        " class="text-center text-muted py-5">
+
+
+        No mission documents found.
+
+
+      </div>
+
+
 
     </div>
+
+
+
+
+
+    <!-- ============================= -->
+    <!-- FOOTER -->
+    <!-- ============================= -->
+
+
+    <div class="card-footer">
+
+
+      <div class="d-flex justify-content-between align-items-center">
+
+
+        <small class="text-muted">
+
+          Showing documents
+
+        </small>
+
+
+
+        <div>
+
+
+          <button class="btn btn-outline-secondary btn-sm me-2" (click)="previousPage()" [disabled]="currentPage()===1">
+
+
+            Previous
+
+
+          </button>
+
+
+
+
+          <span>
+
+
+            Page {{currentPage()}}
+
+
+          </span>
+
+
+
+
+          <button class="btn btn-outline-secondary btn-sm ms-2" (click)="nextPage()">
+
+
+            Next
+
+
+          </button>
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+
   </div>
+
 
 </div>
