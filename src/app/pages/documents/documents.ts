@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import feather from 'feather-icons';
+import { forkJoin } from 'rxjs';
 
 
 import { DriverDocumentService } from '../../services/driver-document.service';
@@ -337,88 +338,63 @@ export class Documents implements OnInit {
 
 
   ngOnInit(): void {
-
-    this.loadDocuments();
-
-  }
+  this.loadDocuments();
+}
 
 
+// ==========================
+// LOAD EVERYTHING
+// ==========================
 
+loadDocuments(): void {
 
-  // ==========================
-  // LOAD EVERYTHING
-  // ==========================
+  this.loading.set(true);
 
+  forkJoin({
 
-  loadDocuments() {
+    driverDocs: this.driverDocumentService.getAll(),
 
+    vehicleDocs: this.vehicleDocumentService.getAll(),
 
-    this.loading.set(true);
+    missionDocs: this.missionDocumentService.getAll(),
 
+    vehicles: this.vehicleService.getAll(),
 
+    missions: this.missionService.getAll()
 
-    this.driverDocumentService
-      .getAll()
-      .subscribe(data => {
+  }).subscribe({
 
-        this.driverDocs.set(data);
+    next: (result) => {
 
-      });
+      this.driverDocs.set(result.driverDocs);
 
+      this.vehicleDocs.set(result.vehicleDocs);
 
+      this.missionDocs.set(result.missionDocs);
 
-    this.vehicleDocumentService
-      .getAll()
-      .subscribe(data => {
+      this.vehicles.set(result.vehicles);
 
-        this.vehicleDocs.set(data);
+      this.missions.set(result.missions);
 
-      });
+      this.loading.set(false);
 
+      setTimeout(() => {
+        feather.replace();
+      }, 0);
 
+    },
 
-    this.missionDocumentService
-      .getAll()
-      .subscribe(data => {
+    error: (err) => {
 
-        this.missionDocs.set(data);
+      console.error('Error loading documents:', err);
 
-      });
+      this.loading.set(false);
 
+    }
 
+  });
 
-    this.vehicleService
-      .getAll()
-      .subscribe(data => {
-
-        this.vehicles.set(data);
-
-      });
-
-
-
-    this.missionService
-      .getAll()
-      .subscribe(data => {
-
-        this.missions.set(data);
-
-      });
-
-
-
-    this.loading.set(false);
-
-
-
-    setTimeout(() => {
-
-      feather.replace();
-
-    }, 0);
-
-
-  }
+}
 
 
 

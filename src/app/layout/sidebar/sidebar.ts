@@ -4,28 +4,32 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css',
+  styleUrl: './sidebar.css'
 })
-
 export class Sidebar {
 
-  role = localStorage.getItem('role');
+  fullName =
+    `${localStorage.getItem('firstName') ?? ''} ${localStorage.getItem('lastName') ?? ''}`;
 
-  get isDriver() {
+  role = localStorage.getItem('role') ?? '';
+
+  get isDriver(): boolean {
     return this.role === 'DRIVER';
   }
 
-  get isFleetManager() {
+  get isFleetManager(): boolean {
     return this.role === 'FLEET_MANAGER';
   }
 
-  get isAdmin() {
+  get isAdmin(): boolean {
     return this.role === 'ADMIN';
   }
 
-  get isSuperAdmin() {
+  get isSuperAdmin(): boolean {
     return this.role === 'SUPER_ADMIN';
   }
+
 }

@@ -496,39 +496,28 @@ export class Missions implements OnInit {
 
 
 
-  getStatusClass(status: string) {
+  getStatusClass(status: string): string {
 
+  switch (status) {
 
-    switch (status) {
+    case 'PLANNED':
+      return 'bg-warning';
 
+    case 'ONGOING':
+      return 'bg-primary';
 
-      case 'ONGOING':
+    case 'COMPLETED':
+      return 'bg-success';
 
-        return 'bg-success';
+    case 'CANCELLED':
+      return 'bg-danger';
 
-
-
-      case 'COMPLETED':
-
-        return 'bg-primary';
-
-
-
-      case 'CANCELLED':
-
-        return 'bg-danger';
-
-
-
-      default:
-
-        return 'bg-secondary';
-
-
-    }
-
+    default:
+      return 'bg-secondary';
 
   }
+
+}
 
 
 
