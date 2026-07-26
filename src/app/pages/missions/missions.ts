@@ -1,249 +1,363 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
+import { forkJoin } from 'rxjs';
 import feather from 'feather-icons';
 
 import { MissionService } from '../../services/mission.service';
-import { Mission } from '../../models/mission';
+import { UserService } from '../../services/user.service';
+import { VehicleService } from '../../services/vehicle.service';
 
+import { Mission } from '../../models/mission';
+import { User } from '../../models/user';
+import { Vehicle } from '../../models/vehicle';
 
 @Component({
   selector: 'app-missions',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule
   ],
   templateUrl: './missions.html',
-  styleUrl: './missions.css',
+  styleUrl: './missions.css'
 })
 export class Missions implements OnInit {
-
 
   // ==========================================================
   // DATA
   // ==========================================================
 
-
   missions = signal<Mission[]>([]);
+  users = signal<User[]>([]);
+  vehicles = signal<Vehicle[]>([]);
 
   selectedMission = signal<Mission | null>(null);
 
-
-
   loading = signal(false);
-
-
 
   // ==========================================================
   // ROLE
   // ==========================================================
 
-
-  role = localStorage.getItem('role');
-
+  role = localStorage.getItem('role') ?? '';
 
   get isDriver() {
-
     return this.role === 'DRIVER';
-
   }
-
 
   get isFleetManager() {
-
     return this.role === 'FLEET_MANAGER';
-
   }
-
 
   get isAdmin() {
-
     return this.role === 'ADMIN';
-
   }
-
 
   get isSuperAdmin() {
-
     return this.role === 'SUPER_ADMIN';
+  }
+
+  // ==========================================================
+  // SEARCH / FILTER / SORT
+  // ==========================================================
+
+  search = signal('');
+  statusFilter = signal('ALL');
+
+  sortField = signal<keyof Mission>('startDate');
+  sortDirection = signal<'asc' | 'desc'>('desc');
+
+  onSearch(value: string) {
+    this.search.set(value);
+    this.currentPage.set(1);
+    setTimeout(() => feather.replace(), 0);
+  }
+
+  filterStatus(value: string) {
+    this.statusFilter.set(value);
+    this.currentPage.set(1);
+    setTimeout(() => feather.replace(), 0);
+  }
+
+  sort(field: keyof Mission) {
+
+    if (this.sortField() === field) {
+
+      this.sortDirection.set(
+        this.sortDirection() === 'asc'
+          ? 'desc'
+          : 'asc'
+      );
+
+    } else {
+
+      this.sortField.set(field);
+      this.sortDirection.set('asc');
+
+    }
+
+    setTimeout(() => feather.replace(), 0);
 
   }
 
+  filteredMissions = computed(() => {
 
+    let data = [...this.missions()];
+
+    if (this.search().trim()) {
+
+      const s = this.search().toLowerCase();
+
+      data = data.filter(m =>
+
+        m.title.toLowerCase().includes(s) ||
+
+        m.description.toLowerCase().includes(s) ||
+
+        (m.driverName ?? '').toLowerCase().includes(s) ||
+
+        (m.vehiclePlateNumber ?? '').toLowerCase().includes(s)
+
+      );
+
+    }
+
+    if (this.statusFilter() !== 'ALL') {
+
+      data = data.filter(
+        m => m.status === this.statusFilter()
+      );
+
+    }
+
+    data.sort((a: any, b: any) => {
+
+      const field = this.sortField();
+
+      let v1 = a[field];
+      let v2 = b[field];
+
+      if (typeof v1 === 'string') v1 = v1.toLowerCase();
+      if (typeof v2 === 'string') v2 = v2.toLowerCase();
+
+      if (v1 < v2)
+        return this.sortDirection() === 'asc' ? -1 : 1;
+
+      if (v1 > v2)
+        return this.sortDirection() === 'asc' ? 1 : -1;
+
+      return 0;
+
+    });
+
+    return data;
+
+  });
 
   // ==========================================================
-  // MODAL
+  // PAGINATION
   // ==========================================================
 
+  readonly pageSize = 10;
+
+  currentPage = signal(1);
+
+  totalPages = computed(() =>
+    Math.max(
+      1,
+      Math.ceil(
+        this.filteredMissions().length / this.pageSize
+      )
+    )
+  );
+
+  paginatedMissions = computed(() => {
+
+    const start =
+      (this.currentPage() - 1) * this.pageSize;
+
+    return this.filteredMissions().slice(
+      start,
+      start + this.pageSize
+    );
+
+  });
+
+  previousPage() {
+
+    if (this.currentPage() > 1) {
+
+      this.currentPage.update(v => v - 1);
+
+      setTimeout(() => feather.replace(), 0);
+
+    }
+
+  }
+
+  nextPage() {
+
+    if (this.currentPage() < this.totalPages()) {
+
+      this.currentPage.update(v => v + 1);
+
+      setTimeout(() => feather.replace(), 0);
+
+    }
+
+  }
+
+  // ==========================================================
+  // STATISTICS
+  // ==========================================================
+
+  totalMissions = computed(() => this.missions().length);
+
+  plannedMissions = computed(() =>
+    this.missions().filter(x => x.status === 'PLANNED').length
+  );
+
+  ongoingMissions = computed(() =>
+    this.missions().filter(x => x.status === 'ONGOING').length
+  );
+
+  completedMissions = computed(() =>
+    this.missions().filter(x => x.status === 'COMPLETED').length
+  );
+
+  cancelledMissions = computed(() =>
+    this.missions().filter(x => x.status === 'CANCELLED').length
+  );
+
+  // ==========================================================
+  // MODAL + FORM
+  // ==========================================================
 
   showModal = false;
-
-
   editMode = false;
 
-
-
-  // ==========================================================
-  // FORM
-  // ==========================================================
-
-
   title = '';
-
   description = '';
-
   startDate = '';
-
   endDate = '';
 
-
   status:
-    'PLANNED'
+    | 'PLANNED'
     | 'ONGOING'
     | 'COMPLETED'
     | 'CANCELLED'
     = 'PLANNED';
 
-
-
   driverId = '';
-
   vehicleId = '';
 
-
-
-
   constructor(
-
     private missionService: MissionService,
-
+    private userService: UserService,
+    private vehicleService: VehicleService,
     private router: Router
-
   ) { }
 
-
-
-  // ==========================================================
-  // INIT
-  // ==========================================================
-
-
   ngOnInit(): void {
-
-
-    this.loadMissions();
-
-
+    this.loadData();
   }
 
-
-
-
   // ==========================================================
-  // LOAD
+  // LOAD DATA
   // ==========================================================
 
-
-  loadMissions() {
-
+  loadData() {
 
     this.loading.set(true);
 
+    forkJoin({
 
-    this.missionService.getAll()
+      missions: this.missionService.getAll(),
 
-      .subscribe({
+      users: this.userService.getAll(),
 
-        next: data => {
+      vehicles: this.vehicleService.getAll()
 
+    }).subscribe({
 
-          this.missions.set(data);
+      next: ({ missions, users, vehicles }) => {
 
+        this.missions.set(missions);
 
-          this.loading.set(false);
+        this.users.set(users);
 
+        this.vehicles.set(vehicles);
 
+        this.loading.set(false);
 
-          setTimeout(() => {
+        setTimeout(() => feather.replace());
 
-            feather.replace();
+      },
 
-          }, 0);
+      error: err => {
 
+        console.error(err);
 
+        this.loading.set(false);
 
-        },
+      }
 
-
-        error: err => {
-
-
-          console.error(err);
-
-
-          this.loading.set(false);
-
-
-        }
-
-
-      });
-
+    });
 
   }
-
-
-
-
-  // ==========================================================
-  // REFRESH
-  // ==========================================================
-
 
   refresh() {
 
-
-    this.loadMissions();
-
+    this.loadData();
 
   }
 
-
-
-
   // ==========================================================
-  // CREATE / UPDATE MODAL
+  // DROPDOWNS
   // ==========================================================
 
+  drivers() {
+
+    return this.users().filter(
+
+      u =>
+        u.role === 'DRIVER' &&
+        u.isValidate
+
+    );
+
+  }
+
+  availableVehicles() {
+
+    return this.vehicles();
+
+  }
+
+  // ==========================================================
+  // CREATE / EDIT
+  // ==========================================================
 
   openCreateModal() {
 
-
     this.editMode = false;
 
+    this.selectedMission.set(null);
 
     this.resetForm();
 
-
     this.showModal = true;
-
 
   }
 
-
-
-
   openEditModal(mission: Mission) {
-
 
     this.editMode = true;
 
-
     this.selectedMission.set(mission);
-
-
 
     this.title = mission.title;
 
@@ -255,159 +369,100 @@ export class Missions implements OnInit {
 
     this.status = mission.status;
 
+    this.driverId = mission.driverId ?? '';
 
-    this.driverId = mission.driverId;
-
-    this.vehicleId = mission.vehicleId;
-
-
+    this.vehicleId = mission.vehicleId ?? '';
 
     this.showModal = true;
 
-
   }
-
-
-
 
   closeModal() {
 
-
     this.showModal = false;
-
 
     this.selectedMission.set(null);
 
-
     this.resetForm();
 
-
   }
-
-
-
-
 
   // ==========================================================
   // SAVE
   // ==========================================================
 
-
   saveMission() {
-
 
     const request = {
 
-
       title: this.title,
-
 
       description: this.description,
 
-
       startDate: this.startDate,
-
 
       endDate: this.endDate,
 
-
       status: this.status,
-
 
       driverId: this.driverId || null,
 
-
       vehicleId: this.vehicleId || null
-
 
     };
 
-
-
-
-    // UPDATE
-
     if (this.editMode && this.selectedMission()) {
 
+      this.missionService
 
-      this.missionService.update(
-
-        this.selectedMission()!.id,
-
-        request
-
-      )
+        .update(
+          this.selectedMission()!.id,
+          request
+        )
 
         .subscribe({
 
           next: () => {
 
-
-            this.loadMissions();
-
+            this.loadData();
 
             this.closeModal();
 
-
           },
-
 
           error: err => console.error(err)
 
-
         });
-
-
 
       return;
 
-
     }
 
+    this.missionService
 
-
-
-    // CREATE
-
-
-    this.missionService.create(request)
+      .create(request)
 
       .subscribe({
 
         next: () => {
 
-
-          this.loadMissions();
-
+          this.loadData();
 
           this.closeModal();
 
-
-
         },
-
 
         error: err => console.error(err)
 
-
       });
 
-
-
   }
-
-
-
-
 
   // ==========================================================
   // DELETE
   // ==========================================================
 
-
   deleteMission(id: string) {
-
-
 
     if (!confirm('Delete this mission ?')) {
 
@@ -415,64 +470,42 @@ export class Missions implements OnInit {
 
     }
 
+    this.missionService
 
-
-    this.missionService.delete(id)
+      .delete(id)
 
       .subscribe({
 
         next: () => {
 
-
-          this.loadMissions();
-
+          this.loadData();
 
         },
 
-
         error: err => console.error(err)
-
 
       });
 
-
-
   }
-
-
-
-
 
   // ==========================================================
   // DETAILS
   // ==========================================================
 
-
   viewMissionDetails(id: string) {
 
-
     this.router.navigate([
-
       '/missions',
-
       id
-
     ]);
-
 
   }
 
-
-
-
-
   // ==========================================================
-  // HELPERS
+  // RESET FORM
   // ==========================================================
-
 
   resetForm() {
-
 
     this.title = '';
 
@@ -482,43 +515,80 @@ export class Missions implements OnInit {
 
     this.endDate = '';
 
-
     this.status = 'PLANNED';
-
 
     this.driverId = '';
 
     this.vehicleId = '';
 
-
   }
 
-
-
+  // ==========================================================
+  // STATUS BADGES
+  // ==========================================================
 
   getStatusClass(status: string): string {
 
-  switch (status) {
+    switch (status) {
 
-    case 'PLANNED':
-      return 'bg-warning';
+      case 'PLANNED':
+        return 'bg-warning';
 
-    case 'ONGOING':
-      return 'bg-primary';
+      case 'ONGOING':
+        return 'bg-primary';
 
-    case 'COMPLETED':
-      return 'bg-success';
+      case 'COMPLETED':
+        return 'bg-success';
 
-    case 'CANCELLED':
-      return 'bg-danger';
+      case 'CANCELLED':
+        return 'bg-danger';
 
-    default:
-      return 'bg-secondary';
+      default:
+        return 'bg-secondary';
+
+    }
 
   }
 
-}
+  // ==========================================================
+  // HELPERS
+  // ==========================================================
 
+  trackByMission(index: number, mission: Mission) {
 
+    return mission.id;
 
+  }
+
+  driverName(id: string | null | undefined): string {
+
+    if (!id) {
+
+      return '';
+
+    }
+
+    const driver = this.users().find(u => u.id === id);
+
+    return driver
+      ? `${driver.firstName} ${driver.lastName}`
+      : '';
+
+  }
+
+  vehicleName(id: string | null | undefined): string {
+
+    if (!id) {
+
+      return '';
+
+    }
+
+    const vehicle = this.vehicles().find(v => v.id === id);
+
+    return vehicle
+      ? `${vehicle.plateNumber} • ${vehicle.brand}`
+      : '';
+
+  }
 }

@@ -1,24 +1,45 @@
 <div class="container-fluid p-0">
 
-  <!-- ===================================================== -->
-  <!-- CARDS -->
-  <!-- ===================================================== -->
+  <!-- ========================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================= -->
 
-  <div class="row mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <div class="col-md-4">
+    <div>
+      <!--
+      <h3 class="mb-0">Vehicle Management</h3>
+      <small class="text-muted">
+        Manage the company's fleet.
+      </small>
+      -->
+    </div>
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
+
+      <i data-feather="plus" class="align-middle me-1"></i>
+
+      Create Vehicle
+
+    </button>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- STATISTICS -->
+  <!-- ========================================= -->
+
+  <div class="row">
+
+    <div class="col-xl-3 col-md-6">
 
       <div class="card">
 
         <div class="card-body">
 
-          <h6 class="text-muted mb-2">
-            Total Vehicles
-          </h6>
+          <h6>Total Vehicles</h6>
 
-          <h3 class="mb-0">
-            {{ totalVehicles() }}
-          </h3>
+          <h2>{{ totalVehicles() }}</h2>
 
         </div>
 
@@ -26,19 +47,19 @@
 
     </div>
 
-    <div class="col-md-4">
+    <div class="col-xl-3 col-md-6">
 
       <div class="card">
 
         <div class="card-body">
 
-          <h6 class="text-muted mb-2">
-            Brands
-          </h6>
+          <h6>Brands</h6>
 
-          <h3 class="mb-0">
+          <h2 class="text-primary">
+
             {{ brandsCount() }}
-          </h3>
+
+          </h2>
 
         </div>
 
@@ -46,19 +67,39 @@
 
     </div>
 
-    <div class="col-md-4">
+    <div class="col-xl-3 col-md-6">
 
       <div class="card">
 
         <div class="card-body">
 
-          <h6 class="text-muted mb-2">
-            Newest Year
-          </h6>
+          <h6>Newest Vehicle</h6>
 
-          <h3 class="mb-0">
+          <h2 class="text-success">
+
             {{ newestVehicle() }}
-          </h3>
+
+          </h2>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+
+      <div class="card">
+
+        <div class="card-body">
+
+          <h6>Displayed</h6>
+
+          <h2 class="text-info">
+
+            {{ paginatedVehicles().length }}
+
+          </h2>
 
         </div>
 
@@ -68,38 +109,31 @@
 
   </div>
 
-  <!-- ===================================================== -->
-  <!-- TOOLBAR -->
-  <!-- ===================================================== -->
+  <!-- ========================================= -->
+  <!-- FILTERS -->
+  <!-- ========================================= -->
 
   <div class="card mb-3">
 
     <div class="card-body">
 
-      <div class="row g-2 align-items-center">
+      <div class="row">
 
-        <div class="col-md-6">
+        <div class="col-md-8">
 
-          <input class="form-control" placeholder="Search by plate, brand, model or admin..." [value]="search()"
-            (input)="onSearch($any($event.target).value)">
+          <input class="form-control" placeholder="Search vehicles..."
+            [value]="search()" (input)="onSearch($any($event.target).value)">
 
         </div>
 
-        <div class="col-md-6 text-end">
+        <div class="col-md-4">
 
-          <button class="btn btn-outline-secondary me-2" (click)="refresh()">
+          <button class="btn btn-outline-secondary w-100" (click)="refresh()">
 
-            <i data-feather="refresh-cw"></i>
+            <i data-feather="refresh-cw" class="align-middle me-1">
+            </i>
 
             Refresh
-
-          </button>
-
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
-
-            <i data-feather="plus"></i>
-
-            Create Vehicle
 
           </button>
 
@@ -111,23 +145,15 @@
 
   </div>
 
-  <!-- ===================================================== -->
+  <!-- ========================================= -->
   <!-- TABLE -->
-  <!-- ===================================================== -->
+  <!-- ========================================= -->
 
   <div class="card">
 
-    <div class="card-body">
+    <div class="table-responsive">
 
-      <div class="text-center py-5" *ngIf="loading()">
-
-        <div class="spinner-border text-primary">
-
-        </div>
-
-      </div>
-
-      <table class="table table-hover align-middle" *ngIf="!loading()">
+      <table class="table table-hover align-middle mb-0">
 
         <thead>
 
@@ -159,7 +185,7 @@
 
             <th role="button" (click)="sort('adminName')">
 
-              Admin
+              Administrator
 
             </th>
 
@@ -174,6 +200,16 @@
         </thead>
 
         <tbody>
+
+          <tr *ngIf="loading()">
+
+            <td colspan="6" class="text-center py-5">
+
+              Loading vehicles...
+
+            </td>
+
+          </tr>
 
           <tr *ngFor="let vehicle of paginatedVehicles()">
 
@@ -207,25 +243,26 @@
 
             <td>
 
-              {{ vehicle.adminName || '-' }}
+              {{ vehicle.adminName || '—' }}
 
             </td>
 
             <td class="text-end">
 
-              <button class="btn btn-outline-secondary btn-sm me-2" (click)="viewVehicleDetails(vehicle.id)">
+              <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewVehicleDetails(vehicle.id)"
+                title="View">
 
                 <i data-feather="eye"></i>
 
               </button>
 
-              <button class="btn btn-outline-primary btn-sm me-2" (click)="editVehicle(vehicle.id)">
+              <button class="btn btn-sm btn-outline-primary me-1" (click)="editVehicle(vehicle.id)" title="Edit">
 
                 <i data-feather="edit"></i>
 
               </button>
 
-              <button class="btn btn-outline-danger btn-sm" (click)="deleteVehicle(vehicle.id)">
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteVehicle(vehicle.id)" title="Delete">
 
                 <i data-feather="trash-2"></i>
 
@@ -235,9 +272,9 @@
 
           </tr>
 
-          <tr *ngIf="paginatedVehicles().length === 0">
+          <tr *ngIf="!loading() && paginatedVehicles().length===0">
 
-            <td colspan="6" class="text-center py-5">
+            <td colspan="6" class="text-center py-5 text-muted">
 
               No vehicles found.
 
@@ -249,27 +286,48 @@
 
       </table>
 
-      <!-- PAGINATION -->
+    </div>
 
-      <div class="d-flex justify-content-between align-items-center mt-3">
+    <div class="card-footer">
 
-        <span class="text-muted">
+      <div class="d-flex justify-content-between align-items-center">
 
-          Page {{ currentPage() }} / {{ totalPages() }}
+        <small>
 
-        </span>
+          Displaying
+
+          {{ paginatedVehicles().length }}
+
+          of
+
+          {{ filteredVehicles().length }}
+
+          vehicles
+
+        </small>
 
         <div>
 
-          <button class="btn btn-outline-secondary btn-sm me-2" (click)="previousPage()"
-            [disabled]="currentPage() === 1">
+          <button class="btn btn-outline-secondary btn-sm me-2" [disabled]="currentPage()===1" (click)="previousPage()">
 
             Previous
 
           </button>
 
-          <button class="btn btn-outline-secondary btn-sm" (click)="nextPage()"
-            [disabled]="currentPage() === totalPages()">
+          <span class="mx-2">
+
+            Page
+
+            {{ currentPage() }}
+
+            /
+
+            {{ totalPages() || 1 }}
+
+          </span>
+
+          <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage()>=totalPages()"
+            (click)="nextPage()">
 
             Next
 
@@ -294,6 +352,8 @@
 
     <div class="modal-content">
 
+      <!-- HEADER -->
+
       <div class="modal-header">
 
         <h5 class="modal-title">
@@ -307,6 +367,8 @@
         </button>
 
       </div>
+
+      <!-- BODY -->
 
       <div class="modal-body">
 
@@ -356,13 +418,11 @@
 
             </label>
 
-            <input type="number" class="form-control" [(ngModel)]="year">
+            <input type="number" class="form-control" placeholder="2026" [(ngModel)]="year">
 
           </div>
 
-          <!-- ================================================= -->
-          <!-- Vehicle Picture -->
-          <!-- ================================================= -->
+          <!-- IMAGE -->
 
           <div class="col-12">
 
@@ -378,13 +438,15 @@
 
           <div class="col-12 text-center" *ngIf="imagePreview">
 
-            <img [src]="imagePreview" class="img-thumbnail mt-2" style="max-height:220px;">
+            <img [src]="imagePreview" class="img-thumbnail mt-2 rounded shadow-sm" style="max-height:220px;">
 
           </div>
 
         </div>
 
       </div>
+
+      <!-- FOOTER -->
 
       <div class="modal-footer">
 
@@ -396,7 +458,8 @@
 
         <button class="btn btn-primary" (click)="createVehicle()">
 
-          <i data-feather="plus"></i>
+          <i data-feather="plus" class="align-middle me-1">
+          </i>
 
           Create Vehicle
 

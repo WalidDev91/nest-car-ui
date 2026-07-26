@@ -328,19 +328,64 @@ export class Users implements OnInit {
 
   activateUser(user: User) {
 
-    console.log(user);
+    this.userService.activate(user.id).subscribe({
+
+      next: () => {
+        alert('User activated');
+        this.loadUsers();
+      },
+
+      error: (err) => {
+        console.error(err);
+        alert('Activate failed');
+      }
+
+    });
 
   }
 
   deactivateUser(user: User) {
 
-    console.log(user);
+    this.userService.deactivate(user.id).subscribe({
+
+      next: () => {
+        alert('User deactivated');
+        this.loadUsers(); // or however you refresh the list — reuse whatever method populates users()
+      },
+
+      error: (err) => {
+        console.error(err);
+        alert('Deactivate failed');
+      }
+
+    });
 
   }
 
   changeRole(user: User) {
 
-    console.log(user);
+    const newRole = prompt(
+      'New role (SUPER_ADMIN / ADMIN / FLEET_MANAGER / DRIVER):',
+      user.role
+    );
+
+    if (!newRole) {
+      return;
+    }
+
+    this.userService.changeRole(user.id, newRole).subscribe({
+
+      next: () => {
+        alert('Role updated');
+        this.loadUsers();
+      },
+
+      error: (err) => {
+        console.error(err);
+        alert('Role update failed');
+      }
+
+    });
 
   }
 
@@ -352,7 +397,19 @@ export class Users implements OnInit {
       return;
     }
 
-    console.log(user);
+    this.userService.delete(user.id).subscribe({
+
+      next: () => {
+        alert('User deleted');
+        this.loadUsers();
+      },
+
+      error: (err) => {
+        console.error(err);
+        alert('Delete failed');
+      }
+
+    });
 
   }
 }

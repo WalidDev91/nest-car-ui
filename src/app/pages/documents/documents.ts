@@ -338,84 +338,75 @@ export class Documents implements OnInit {
 
 
   ngOnInit(): void {
-  this.loadDocuments();
-}
+    this.loadDocuments();
+  }
 
 
-// ==========================
-// LOAD EVERYTHING
-// ==========================
+  // ==========================
+  // LOAD EVERYTHING
+  // ==========================
 
-loadDocuments(): void {
+  loadDocuments(): void {
 
-  this.loading.set(true);
+    this.loading.set(true);
 
-  forkJoin({
+    forkJoin({
 
-    driverDocs: this.driverDocumentService.getAll(),
+      driverDocs: this.driverDocumentService.getAll(),
 
-    vehicleDocs: this.vehicleDocumentService.getAll(),
+      vehicleDocs: this.vehicleDocumentService.getAll(),
 
-    missionDocs: this.missionDocumentService.getAll(),
+      missionDocs: this.missionDocumentService.getAll(),
 
-    vehicles: this.vehicleService.getAll(),
+      vehicles: this.vehicleService.getAll(),
 
-    missions: this.missionService.getAll()
+      missions: this.missionService.getAll()
 
-  }).subscribe({
+    }).subscribe({
 
-    next: (result) => {
+      next: (result) => {
 
-      this.driverDocs.set(result.driverDocs);
+        this.driverDocs.set(result.driverDocs);
 
-      this.vehicleDocs.set(result.vehicleDocs);
+        this.vehicleDocs.set(result.vehicleDocs);
 
-      this.missionDocs.set(result.missionDocs);
+        this.missionDocs.set(result.missionDocs);
 
-      this.vehicles.set(result.vehicles);
+        this.vehicles.set(result.vehicles);
 
-      this.missions.set(result.missions);
+        this.missions.set(result.missions);
 
-      this.loading.set(false);
+        this.loading.set(false);
 
-      setTimeout(() => {
-        feather.replace();
-      }, 0);
+        setTimeout(() => {
+          feather.replace();
+        }, 0);
 
-    },
+      },
 
-    error: (err) => {
+      error: (err) => {
 
-      console.error('Error loading documents:', err);
+        console.error('Error loading documents:', err);
 
-      this.loading.set(false);
+        this.loading.set(false);
 
-    }
+      }
 
-  });
+    });
 
-}
-
-
+  }
 
 
 
-  selectTab(
-    tab: 'driver' | 'vehicle' | 'mission'
-  ) {
 
+
+  selectTab(tab: 'driver' | 'vehicle' | 'mission') {
 
     this.selectedTab.set(tab);
 
     this.currentPage.set(1);
 
-
-    setTimeout(() => {
-
-      feather.replace();
-
-    }, 0);
-
+    setTimeout(() => feather.replace(), 0);
 
   }
 
@@ -429,6 +420,8 @@ loadDocuments(): void {
     this.search.set(value);
 
     this.currentPage.set(1);
+
+    setTimeout(() => feather.replace());
 
 
   }
@@ -449,6 +442,8 @@ loadDocuments(): void {
         p => p + 1
       );
 
+      setTimeout(() => feather.replace());
+
     }
 
   }
@@ -463,6 +458,8 @@ loadDocuments(): void {
       this.currentPage.update(
         p => p - 1
       );
+
+      setTimeout(() => feather.replace());
 
     }
 
@@ -586,17 +583,21 @@ loadDocuments(): void {
 
   }
 
-  downloadFile(response: any, defaultName: string) {
+  downloadFile(response: any, fallbackName: string) {
 
     const blob = response.body;
+
+    // Pull the real filename (with correct extension) from the backend header
+    const disposition = response.headers.get('Content-Disposition') ?? '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : fallbackName;
 
     const url = window.URL.createObjectURL(blob);
 
     const a = document.createElement('a');
 
     a.href = url;
-
-    a.download = defaultName;
+    a.download = filename;   // <-- was defaultName, now the real filename
 
     document.body.appendChild(a);
 
@@ -668,7 +669,6 @@ loadDocuments(): void {
 
   downloadDriver(id: string) {
 
-
     this.driverDocumentService.download(id)
       .subscribe({
 
@@ -676,11 +676,10 @@ loadDocuments(): void {
 
           this.downloadFile(
             response,
-            'driver-document'
+            'driver-document'   // now only used if the header is ever missing
           );
 
         },
-
 
         error: err => {
 
@@ -691,7 +690,6 @@ loadDocuments(): void {
         }
 
       });
-
 
   }
 
