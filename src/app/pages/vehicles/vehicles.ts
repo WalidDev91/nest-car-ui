@@ -6,6 +6,9 @@ import feather from 'feather-icons';
 
 import { VehicleService } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle';
+import { VehicleDocumentService } from '../../services/vehicle-document.service';
+import { MissionService } from '../../services/mission.service';
+import { forkJoin } from 'rxjs';
 
 declare var bootstrap: any;
 
@@ -22,6 +25,8 @@ export class Vehicles implements OnInit {
   // ==========================================================
 
   vehicles = signal<Vehicle[]>([]);
+  missions = signal<any[]>([]);
+  vehicleDocuments = signal<any[]>([]);
   loading = signal(false);
 
   // ==========================================================
@@ -48,6 +53,10 @@ export class Vehicles implements OnInit {
   // CREATE FORM
   // ==========================================================
 
+  editMode = false;
+
+  editingVehicleId: string | null = null;
+
   plateNumber = '';
   brand = '';
   model = '';
@@ -57,6 +66,15 @@ export class Vehicles implements OnInit {
   selectedImage: File | null = null;
   imagePreview: string | null = null;
 
+  role = localStorage.getItem('role') ?? '';
+
+  get isDriver() {
+    return this.role === 'DRIVER';
+  }
+
+  vehicleToDeleteId: string | null = null;
+
+
   // ==========================================================
   // CARDS
   // ==========================================================
@@ -65,15 +83,57 @@ export class Vehicles implements OnInit {
     this.vehicles().length
   );
 
-  brandsCount = computed(() =>
-    new Set(this.vehicles().map(v => v.brand)).size
+  vehiclesInMission = computed(() => {
+
+    const activeVehicleIds = new Set(
+      this.missions()
+        .filter(m => m.status === 'ONGOING')
+        .map(m => m.vehicleId)
+    );
+
+    return this.vehicles()
+      .filter(v => activeVehicleIds.has(v.id))
+      .length;
+
+  });
+
+  availableVehicles = computed(() =>
+    this.totalVehicles() - this.vehiclesInMission()
   );
 
-  newestVehicle = computed(() => {
+  averageVehicleAge = computed(() => {
 
     if (!this.vehicles().length) return '-';
 
-    return Math.max(...this.vehicles().map(v => v.year));
+    const currentYear = new Date().getFullYear();
+
+    const totalAge = this.vehicles()
+      .reduce((sum, v) => sum + (currentYear - v.year), 0);
+
+    const avg = totalAge / this.vehicles().length;
+
+    return avg.toFixed(1);
+
+  });
+
+  vehicleStatusMap = computed(() => {
+
+    const ongoingVehicleIds = new Set(
+      this.missions()
+        .filter(m => m.status === 'ONGOING')
+        .map(m => m.vehicleId)
+    );
+
+    const map = new Map<string, 'IN_MISSION' | 'AVAILABLE'>();
+
+    this.vehicles().forEach(v => {
+      map.set(
+        v.id,
+        ongoingVehicleIds.has(v.id) ? 'IN_MISSION' : 'AVAILABLE'
+      );
+    });
+
+    return map;
 
   });
 
@@ -160,6 +220,8 @@ export class Vehicles implements OnInit {
 
   constructor(
     private vehicleService: VehicleService,
+    private missionService: MissionService,
+    private vehicleDocumentService: VehicleDocumentService,
     private router: Router
   ) { }
 
@@ -177,15 +239,21 @@ export class Vehicles implements OnInit {
   // LOAD
   // ==========================================================
 
-  loadVehicles() {
+  loadVehicles(): void {
 
     this.loading.set(true);
 
-    this.vehicleService.getAll().subscribe({
+    forkJoin({
+      vehicles: this.vehicleService.getAll(),
+      missions: this.missionService.getAll(),
+      vehicleDocuments: this.vehicleDocumentService.getAll()
+    }).subscribe({
 
-      next: data => {
+      next: (result) => {
 
-        this.vehicles.set(data);
+        this.vehicles.set(result.vehicles);
+        this.missions.set(result.missions);
+        this.vehicleDocuments.set(result.vehicleDocuments);
 
         this.loading.set(false);
 
@@ -193,12 +261,9 @@ export class Vehicles implements OnInit {
 
       },
 
-      error: err => {
-
+      error: (err) => {
         console.error(err);
-
         this.loading.set(false);
-
       }
 
     });
@@ -305,6 +370,7 @@ export class Vehicles implements OnInit {
     ) {
 
       alert('Please fill all required fields.');
+
       return;
 
     }
@@ -321,34 +387,65 @@ export class Vehicles implements OnInit {
 
     };
 
-    // Image upload will be added in backend.
-    // For now we create the vehicle normally.
+    if (!this.editMode) {
 
-    this.vehicleService.create(vehicle).subscribe({
+      this.vehicleService.create(vehicle).subscribe({
 
-      next: () => {
+        next: () => {
 
-        this.loadVehicles();
+          this.loadVehicles();
 
-        this.resetForm();
+          this.resetForm();
 
-        bootstrap.Modal
-          .getInstance(
-            document.getElementById('createVehicleModal')
-          )
-          ?.hide();
+          bootstrap.Modal
+            .getInstance(document.getElementById('vehicleModal'))
+            ?.hide();
 
-      },
+        },
 
-      error: err => {
+        error: err => {
 
-        console.error(err);
+          console.error(err);
 
-        alert('Vehicle creation failed.');
+          alert('Vehicle creation failed.');
 
-      }
+        }
 
-    });
+      });
+
+    }
+
+    else {
+
+      this.vehicleService.update(this.editingVehicleId!, vehicle).subscribe({
+
+        next: () => {
+
+          this.loadVehicles();
+
+          this.resetForm();
+
+          this.editMode = false;
+
+          this.editingVehicleId = null;
+
+          bootstrap.Modal
+            .getInstance(document.getElementById('vehicleModal'))
+            ?.hide();
+
+        },
+
+        error: err => {
+
+          console.error(err);
+
+          alert('Vehicle update failed.');
+
+        }
+
+      });
+
+    }
 
   }
 
@@ -370,6 +467,10 @@ export class Vehicles implements OnInit {
 
     this.imagePreview = null;
 
+    this.editMode = false;
+
+    this.editingVehicleId = null;
+
   }
 
   // ==========================================================
@@ -388,9 +489,27 @@ export class Vehicles implements OnInit {
 
   editVehicle(id: string) {
 
-    console.log('Edit vehicle:', id);
+    const vehicle = this.vehicles().find(v => v.id === id);
 
-    // Backend next
+    if (!vehicle) return;
+
+    this.editMode = true;
+
+    this.editingVehicleId = id;
+
+    this.plateNumber = vehicle.plateNumber;
+
+    this.brand = vehicle.brand;
+
+    this.model = vehicle.model;
+
+    this.year = vehicle.year;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('vehicleModal')
+    );
+
+    modal.show();
 
   }
 
@@ -400,11 +519,49 @@ export class Vehicles implements OnInit {
 
   deleteVehicle(id: string) {
 
-    if (!confirm('Delete this vehicle?')) return;
+    this.vehicleToDeleteId = id;
 
-    console.log('Delete vehicle:', id);
+    const modal = new bootstrap.Modal(
+      document.getElementById('deleteVehicleModal')
+    );
 
-    // Backend next
+    modal.show();
+
+  }
+
+  confirmDeleteVehicle() {
+
+    if (!this.vehicleToDeleteId) return;
+
+    this.vehicleService.delete(this.vehicleToDeleteId).subscribe({
+
+      next: () => {
+
+        this.loadVehicles();
+
+        this.vehicleToDeleteId = null;
+
+        bootstrap.Modal
+          .getInstance(document.getElementById('deleteVehicleModal'))
+          ?.hide();
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.vehicleToDeleteId = null;
+
+        bootstrap.Modal
+          .getInstance(document.getElementById('deleteVehicleModal'))
+          ?.hide();
+
+        alert('Delete failed.');
+
+      }
+
+    });
 
   }
 
@@ -415,6 +572,22 @@ export class Vehicles implements OnInit {
   refresh() {
 
     this.loadVehicles();
+
+  }
+
+  openCreateModal() {
+
+    this.editMode = false;
+
+    this.editingVehicleId = null;
+
+    this.resetForm();
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('vehicleModal')
+    );
+
+    modal.show();
 
   }
 

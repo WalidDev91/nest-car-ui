@@ -18,7 +18,7 @@ import { DriverDocument } from '../../models/driver-document';
 import { VehicleDocument } from '../../models/vehicle-document';
 import { MissionDocument } from '../../models/mission-document';
 
-
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-documents',
@@ -249,12 +249,11 @@ export class Documents implements OnInit {
 
   uploadDriverTitle = '';
 
-  uploadDriverType:
-    'DRIVER_LICENSE'
-    |
-    'ID_CARD'
-    =
-    'DRIVER_LICENSE';
+  uploadDriverType = '';
+
+  driverTitleError = false;
+  driverTypeError = false;
+  driverFileError = false;
 
 
 
@@ -269,15 +268,14 @@ export class Documents implements OnInit {
 
   uploadVehicleTitle = '';
 
+  vehicleTitleError = false;
+  vehicleTypeError = false;
+  vehicleYearError = false;
+  vehicleIdError = false;
+  vehicleFileError = false;
 
-  uploadVehicleType:
-    'LICENSE'
-    |
-    'TECHNICAL_CHECK'
-    |
-    'INSURANCE'
-    =
-    'LICENSE';
+
+  uploadVehicleType = '';
 
 
 
@@ -303,6 +301,10 @@ export class Documents implements OnInit {
 
 
   uploadMissionId = '';
+
+  missionTitleError = false;
+  missionIdError = false;
+  missionFileError = false;
 
 
 
@@ -695,84 +697,94 @@ export class Documents implements OnInit {
 
   uploadMissionDocument() {
 
+    this.missionTitleError = !this.uploadMissionTitle.trim();
+    this.missionIdError = !this.uploadMissionId;
+    this.missionFileError = !this.selectedMissionFile;
 
-    if (!this.selectedMissionFile) {
-
-      alert('Please select a file');
-      return;
-
-    }
-
-
-
-    if (!this.validateFile(this.selectedMissionFile)) {
+    if (
+      this.missionTitleError ||
+      this.missionIdError ||
+      this.missionFileError
+    ) {
       return;
     }
 
-
+    if (!this.validateFile(this.selectedMissionFile!)) {
+      return;
+    }
 
     this.missionDocumentService.upload(
 
-      this.selectedMissionFile,
+      this.selectedMissionFile!,
 
       this.uploadMissionTitle,
 
       this.uploadMissionId
 
-    )
-      .subscribe({
+    ).subscribe({
 
-        next: () => {
+      next: () => {
 
+        this.loadDocuments();
 
-          alert('Mission document uploaded');
+        bootstrap.Modal.getInstance(
+          document.getElementById('uploadMissionDocumentModal')
+        )?.hide();
 
+        this.selectedMissionFile = null;
+        this.uploadMissionTitle = '';
+        this.uploadMissionId = '';
 
-          this.loadDocuments();
+        this.missionTitleError = false;
+        this.missionIdError = false;
+        this.missionFileError = false;
 
+        const input = document.getElementById('missionFileInput') as HTMLInputElement;
 
-          this.selectedMissionFile = null;
-          this.uploadMissionTitle = '';
-          this.uploadMissionId = '';
-
-        },
-
-
-        error: err => {
-
-          console.error(err);
-
-          alert('Mission upload failed');
-
+        if (input) {
+          input.value = '';
         }
 
+        setTimeout(() => feather.replace(), 0);
 
-      });
+      },
 
+      error: err => {
+
+        console.error(err);
+        alert('Mission document upload failed');
+
+      }
+
+    });
 
   }
 
   uploadVehicleDocument() {
 
+    this.vehicleTitleError = !this.uploadVehicleTitle.trim();
+    this.vehicleTypeError = !this.uploadVehicleType;
+    this.vehicleYearError = !this.uploadVehicleYear;
+    this.vehicleIdError = !this.uploadVehicleId;
+    this.vehicleFileError = !this.selectedVehicleFile;
 
-    if (!this.selectedVehicleFile) {
-
-      alert('Please select a file');
+    if (
+      this.vehicleTitleError ||
+      this.vehicleTypeError ||
+      this.vehicleYearError ||
+      this.vehicleIdError ||
+      this.vehicleFileError
+    ) {
       return;
-
     }
 
-
-
-    if (!this.validateFile(this.selectedVehicleFile)) {
+    if (!this.validateFile(this.selectedVehicleFile!)) {
       return;
     }
-
-
 
     this.vehicleDocumentService.upload(
 
-      this.selectedVehicleFile,
+      this.selectedVehicleFile!,
 
       this.uploadVehicleTitle,
 
@@ -782,87 +794,108 @@ export class Documents implements OnInit {
 
       this.uploadVehicleId
 
-    )
-      .subscribe({
+    ).subscribe({
 
-        next: () => {
+      next: () => {
 
+        this.loadDocuments();
 
-          alert('Vehicle document uploaded');
+        bootstrap.Modal.getInstance(
+          document.getElementById('uploadVehicleDocumentModal')
+        )?.hide();
 
+        this.selectedVehicleFile = null;
+        this.uploadVehicleTitle = '';
+        this.uploadVehicleType = '';
+        this.uploadVehicleYear = new Date().getFullYear();
+        this.uploadVehicleId = '';
 
-          this.loadDocuments();
+        this.vehicleTitleError = false;
+        this.vehicleTypeError = false;
+        this.vehicleYearError = false;
+        this.vehicleIdError = false;
+        this.vehicleFileError = false;
 
+        const input = document.getElementById('vehicleFileInput') as HTMLInputElement;
 
-          this.selectedVehicleFile = null;
-          this.uploadVehicleTitle = '';
-          this.uploadVehicleId = '';
-          this.uploadVehicleYear = new Date().getFullYear();
-
-
-        },
-
-
-        error: err => {
-
-          console.error(err);
-
-          alert('Vehicle upload failed');
-
+        if (input) {
+          input.value = '';
         }
 
+        setTimeout(() => feather.replace(), 0);
 
-      });
+      },
 
+      error: err => {
+
+        console.error(err);
+        alert('Vehicle document upload failed');
+
+      }
+
+    });
 
   }
 
   uploadDriverDocument() {
 
-    if (!this.selectedDriverFile) {
+    this.driverTitleError = !this.uploadDriverTitle.trim();
+    this.driverTypeError = !this.uploadDriverType;
+    this.driverFileError = !this.selectedDriverFile;
 
-      alert('Please select a file');
+    if (
+      this.driverTitleError ||
+      this.driverTypeError ||
+      this.driverFileError
+    ) {
       return;
-
     }
 
-
-    if (!this.validateFile(this.selectedDriverFile)) {
+    if (!this.validateFile(this.selectedDriverFile!)) {
       return;
     }
-
 
     this.driverDocumentService.upload(
-      this.selectedDriverFile,
+      this.selectedDriverFile!,
       this.uploadDriverTitle,
       this.uploadDriverType,
       this.currentUserId
-    )
-      .subscribe({
+    ).subscribe({
 
-        next: () => {
+      next: () => {
 
-          alert('Driver document uploaded');
+        this.loadDocuments();
 
-          this.loadDocuments();
+        bootstrap.Modal.getInstance(
+          document.getElementById('uploadDriverDocumentModal')
+        )?.hide();
 
-          this.selectedDriverFile = null;
-          this.uploadDriverTitle = '';
-          this.uploadDriverType = 'DRIVER_LICENSE';
+        this.selectedDriverFile = null;
+        this.uploadDriverTitle = '';
+        this.uploadDriverType = '';
 
-        },
+        this.driverTitleError = false;
+        this.driverTypeError = false;
+        this.driverFileError = false;
 
+        const input = document.getElementById('driverFileInput') as HTMLInputElement;
 
-        error: err => {
-
-          console.error(err);
-
-          alert('Driver document upload failed');
-
+        if (input) {
+          input.value = '';
         }
 
-      });
+        setTimeout(() => feather.replace(), 0);
 
+      },
+
+      error: err => {
+
+        console.error(err);
+        alert('Driver document upload failed');
+
+      }
+
+    });
 
   }
 

@@ -376,16 +376,17 @@
 
               <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDetails(user.id)" title="View">
 
-                <i data-feather="eye"></i>
+                <i data-feather="file-text"></i>
 
               </button>
 
+              <!-- 
               <button class="btn btn-sm btn-outline-primary me-1" (click)="editUser(user)" title="Edit">
 
                 <i data-feather="edit"></i>
 
               </button>
-
+              -->
               <button *ngIf="!user.isValidate" class="btn btn-sm btn-outline-success me-1" (click)="activateUser(user)"
                 title="Activate">
 
@@ -405,13 +406,13 @@
                 <i data-feather="shield"></i>
 
               </button>
-
+              <!-- 
               <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)" title="Delete">
 
                 <i data-feather="trash-2"></i>
 
               </button>
-
+              -->
             </td>
 
           </tr>

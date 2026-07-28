@@ -15,7 +15,7 @@
       -->
     </div>
 
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
+    <button *ngIf="!isDriver" class="btn btn-primary" (click)="openCreateModal()">
 
       <i data-feather="plus" class="align-middle me-1"></i>
 
@@ -32,79 +32,45 @@
   <div class="row">
 
     <div class="col-xl-3 col-md-6">
-
       <div class="card">
-
         <div class="card-body">
-
           <h6>Total Vehicles</h6>
-
           <h2>{{ totalVehicles() }}</h2>
-
         </div>
-
       </div>
-
     </div>
 
     <div class="col-xl-3 col-md-6">
-
       <div class="card">
-
         <div class="card-body">
-
-          <h6>Brands</h6>
-
+          <h6>In Mission</h6>
           <h2 class="text-primary">
-
-            {{ brandsCount() }}
-
+            {{ vehiclesInMission() }}
           </h2>
-
         </div>
-
       </div>
-
     </div>
 
     <div class="col-xl-3 col-md-6">
-
       <div class="card">
-
         <div class="card-body">
-
-          <h6>Newest Vehicle</h6>
-
+          <h6>Available Now</h6>
           <h2 class="text-success">
-
-            {{ newestVehicle() }}
-
+            {{ availableVehicles() }}
           </h2>
-
         </div>
-
       </div>
-
     </div>
 
     <div class="col-xl-3 col-md-6">
-
       <div class="card">
-
         <div class="card-body">
-
-          <h6>Displayed</h6>
-
+          <h6>Average Age</h6>
           <h2 class="text-info">
-
-            {{ paginatedVehicles().length }}
-
+            {{ averageVehicleAge() }} yrs
           </h2>
-
         </div>
-
       </div>
-
     </div>
 
   </div>
@@ -121,8 +87,8 @@
 
         <div class="col-md-8">
 
-          <input class="form-control" placeholder="Search vehicles..."
-            [value]="search()" (input)="onSearch($any($event.target).value)">
+          <input class="form-control" placeholder="Search vehicles..." [value]="search()"
+            (input)="onSearch($any($event.target).value)">
 
         </div>
 
@@ -183,9 +149,9 @@
 
             </th>
 
-            <th role="button" (click)="sort('adminName')">
+            <th>
 
-              Administrator
+              Availability
 
             </th>
 
@@ -242,9 +208,12 @@
             </td>
 
             <td>
-
-              {{ vehicle.adminName || '—' }}
-
+              <span class="badge" [ngClass]="{
+          'bg-warning': vehicleStatusMap().get(vehicle.id) === 'IN_MISSION',
+          'bg-success': vehicleStatusMap().get(vehicle.id) === 'AVAILABLE'
+        }">
+                {{ vehicleStatusMap().get(vehicle.id) === 'IN_MISSION' ? 'In Mission' : 'Available' }}
+              </span>
             </td>
 
             <td class="text-end">
@@ -252,7 +221,7 @@
               <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewVehicleDetails(vehicle.id)"
                 title="View">
 
-                <i data-feather="eye"></i>
+                <i data-feather="file-text"></i>
 
               </button>
 
@@ -343,12 +312,13 @@
 
 </div>
 <!-- ========================================================= -->
-<!-- CREATE VEHICLE MODAL -->
+<!-- CREATE / EDIT VEHICLE MODAL -->
 <!-- ========================================================= -->
 
-<div class="modal fade" id="createVehicleModal" tabindex="-1">
+<div class="modal fade" id="vehicleModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+  data-bs-keyboard="false">
 
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
 
     <div class="modal-content">
 
@@ -358,12 +328,11 @@
 
         <h5 class="modal-title">
 
-          Create Vehicle
+          {{ editMode ? 'Edit Vehicle' : 'Create Vehicle' }}
 
         </h5>
 
         <button type="button" class="btn-close" data-bs-dismiss="modal">
-
         </button>
 
       </div>
@@ -418,11 +387,9 @@
 
             </label>
 
-            <input type="number" class="form-control" placeholder="2026" [(ngModel)]="year">
+            <input type="number" class="form-control" [(ngModel)]="year">
 
           </div>
-
-          <!-- IMAGE -->
 
           <div class="col-12">
 
@@ -438,7 +405,7 @@
 
           <div class="col-12 text-center" *ngIf="imagePreview">
 
-            <img [src]="imagePreview" class="img-thumbnail mt-2 rounded shadow-sm" style="max-height:220px;">
+            <img [src]="imagePreview" class="img-thumbnail rounded shadow-sm" style="max-height:220px">
 
           </div>
 
@@ -458,10 +425,82 @@
 
         <button class="btn btn-primary" (click)="createVehicle()">
 
-          <i data-feather="plus" class="align-middle me-1">
+          <i data-feather="save" class="align-middle me-1"></i>
+
+          {{ editMode ? 'Update Vehicle' : 'Create Vehicle' }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- ========================================================= -->
+<!-- DELETE VEHICLE MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade" id="deleteVehicleModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+  data-bs-keyboard="false">
+
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content">
+
+      <!-- HEADER -->
+
+      <div class="modal-header">
+
+        <h5 class="modal-title text-danger">
+
+          Confirm Vehicle Deletion
+
+        </h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <!-- BODY -->
+
+      <div class="modal-body text-center">
+
+        <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;">
+        </i>
+
+        <h5 class="mb-3">
+
+          Delete this vehicle?
+
+        </h5>
+
+        <p class="text-muted mb-0">
+
+          This action cannot be undone.
+
+        </p>
+
+      </div>
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer justify-content-center">
+
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+          Cancel
+
+        </button>
+
+        <button class="btn btn-danger" (click)="confirmDeleteVehicle()">
+
+          <i data-feather="trash-2" class="align-middle me-1">
           </i>
 
-          Create Vehicle
+          Delete Vehicle
 
         </button>
 

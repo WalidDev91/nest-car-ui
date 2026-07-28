@@ -253,7 +253,7 @@
                             <button class="btn btn-sm btn-outline-secondary me-1"
                                 (click)="viewMissionDetails(mission.id)">
 
-                                <i data-feather="eye"></i>
+                                <i data-feather="file-text"></i>
 
                             </button>
 
@@ -350,10 +350,8 @@
 <!-- CREATE / EDIT MISSION MODAL -->
 <!-- ========================================================= -->
 
-<div class="modal-backdrop fade show" *ngIf="showModal" (click)="closeModal()">
-</div>
-
-<div class="modal d-block" tabindex="-1" *ngIf="showModal">
+<div class="modal fade" id="missionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    data-bs-keyboard="false">
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
 
@@ -369,8 +367,7 @@
 
                 </h5>
 
-                <button type="button" class="btn-close" (click)="closeModal()">
-
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
                 </button>
 
             </div>
@@ -391,7 +388,7 @@
 
                         </label>
 
-                        <input class="form-control" placeholder="Mission title" [(ngModel)]="title">
+                        <input class="form-control" [(ngModel)]="title">
 
                     </div>
 
@@ -407,29 +404,10 @@
 
                         <select class="form-select" [(ngModel)]="status">
 
-                            <option value="PLANNED">
-
-                                Planned
-
-                            </option>
-
-                            <option value="ONGOING">
-
-                                Ongoing
-
-                            </option>
-
-                            <option value="COMPLETED">
-
-                                Completed
-
-                            </option>
-
-                            <option value="CANCELLED">
-
-                                Cancelled
-
-                            </option>
+                            <option value="PLANNED">Planned</option>
+                            <option value="ONGOING">Ongoing</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
 
                         </select>
 
@@ -445,14 +423,13 @@
 
                         </label>
 
-                        <textarea rows="4" class="form-control" placeholder="Mission description..."
-                            [(ngModel)]="description">
+                        <textarea rows="4" class="form-control" [(ngModel)]="description">
 
-            </textarea>
+                        </textarea>
 
                     </div>
 
-                    <!-- START DATE -->
+                    <!-- START -->
 
                     <div class="col-md-6">
 
@@ -466,7 +443,7 @@
 
                     </div>
 
-                    <!-- END DATE -->
+                    <!-- END -->
 
                     <div class="col-md-6">
 
@@ -490,7 +467,19 @@
 
                         </label>
 
-                        <input class="form-control" placeholder="Driver UUID" [(ngModel)]="driverId">
+                        <select class="form-select" [(ngModel)]="driverId">
+
+                            <option [ngValue]="null">
+
+                                -- No Driver Assigned --
+
+                            </option>
+
+                            <option *ngFor="let driver of driversList()" [ngValue]="driver.id">
+                                {{ driver.firstName }} {{ driver.lastName }}
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -504,7 +493,19 @@
 
                         </label>
 
-                        <input class="form-control" placeholder="Vehicle UUID" [(ngModel)]="vehicleId">
+                        <select class="form-select" [(ngModel)]="vehicleId">
+
+                            <option [ngValue]="null">
+
+                                -- No Vehicle Assigned --
+
+                            </option>
+
+                            <option *ngFor="let vehicle of vehiclesList()" [ngValue]="vehicle.id">
+                                {{ vehicle.plateNumber }} — {{ vehicle.brand }} {{ vehicle.model }}
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -516,16 +517,15 @@
 
             <div class="modal-footer">
 
-                <button class="btn btn-secondary" (click)="closeModal()">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
 
                     Cancel
 
                 </button>
 
-                <button class="btn btn-primary" (click)="saveMission()">
+                <button class="btn btn-primary" (click)="createMission()">
 
-                    <i data-feather="save" class="align-middle me-1">
-                    </i>
+                    <i data-feather="save" class="align-middle me-1"></i>
 
                     {{ editMode ? 'Update Mission' : 'Create Mission' }}
 
@@ -536,5 +536,95 @@
         </div>
 
     </div>
+
+</div>
+<!-- ========================================================= -->
+<!-- DELETE MISSION MODAL -->
+<!-- ========================================================= -->
+
+<div
+  class="modal fade"
+  id="deleteMissionModal"
+  tabindex="-1"
+  aria-hidden="true"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false">
+
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content">
+
+      <!-- HEADER -->
+
+      <div class="modal-header">
+
+        <h5 class="modal-title text-danger">
+
+          Confirm Mission Deletion
+
+        </h5>
+
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <!-- BODY -->
+
+      <div class="modal-body text-center">
+
+        <i
+          data-feather="alert-triangle"
+          class="text-danger mb-3"
+          style="width:48px;height:48px;">
+        </i>
+
+        <h5 class="mb-3">
+
+          Delete this mission?
+
+        </h5>
+
+        <p class="text-muted mb-0">
+
+          This action cannot be undone.
+
+        </p>
+
+      </div>
+
+      <!-- FOOTER -->
+
+      <div class="modal-footer justify-content-center">
+
+        <button
+          class="btn btn-secondary"
+          data-bs-dismiss="modal">
+
+          Cancel
+
+        </button>
+
+        <button
+          class="btn btn-danger"
+          (click)="confirmDeleteMission()">
+
+          <i
+            data-feather="trash-2"
+            class="align-middle me-1">
+          </i>
+
+          Delete Mission
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </div>

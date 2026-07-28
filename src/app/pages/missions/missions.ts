@@ -14,6 +14,8 @@ import { Mission } from '../../models/mission';
 import { User } from '../../models/user';
 import { Vehicle } from '../../models/vehicle';
 
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-missions',
   standalone: true,
@@ -59,6 +61,8 @@ export class Missions implements OnInit {
   get isSuperAdmin() {
     return this.role === 'SUPER_ADMIN';
   }
+
+  missionToDeleteId: string | null = null;
 
   // ==========================================================
   // SEARCH / FILTER / SORT
@@ -319,22 +323,14 @@ export class Missions implements OnInit {
   // DROPDOWNS
   // ==========================================================
 
-  drivers() {
-
+  driversList() {
     return this.users().filter(
-
-      u =>
-        u.role === 'DRIVER' &&
-        u.isValidate
-
+      u => u.role === 'DRIVER'
     );
-
   }
 
-  availableVehicles() {
-
+  vehiclesList() {
     return this.vehicles();
-
   }
 
   // ==========================================================
@@ -349,7 +345,11 @@ export class Missions implements OnInit {
 
     this.resetForm();
 
-    this.showModal = true;
+    const modal = new bootstrap.Modal(
+      document.getElementById('missionModal')
+    );
+
+    modal.show();
 
   }
 
@@ -373,25 +373,33 @@ export class Missions implements OnInit {
 
     this.vehicleId = mission.vehicleId ?? '';
 
-    this.showModal = true;
+    const modal = new bootstrap.Modal(
+      document.getElementById('missionModal')
+    );
+
+    modal.show();
 
   }
 
   closeModal() {
 
-    this.showModal = false;
-
     this.selectedMission.set(null);
 
     this.resetForm();
 
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById('missionModal')
+    );
+
+    modal?.hide();
+
   }
 
   // ==========================================================
-  // SAVE
+  // CREATE
   // ==========================================================
 
-  saveMission() {
+  createMission() {
 
     const request = {
 
@@ -464,27 +472,47 @@ export class Missions implements OnInit {
 
   deleteMission(id: string) {
 
-    if (!confirm('Delete this mission ?')) {
+    this.missionToDeleteId = id;
 
-      return;
+    const modal = new bootstrap.Modal(
+      document.getElementById('deleteMissionModal')
+    );
 
-    }
+    modal.show();
 
-    this.missionService
+  }
 
-      .delete(id)
+  confirmDeleteMission() {
 
-      .subscribe({
+    if (!this.missionToDeleteId) return;
 
-        next: () => {
+    this.missionService.delete(this.missionToDeleteId).subscribe({
 
-          this.loadData();
+      next: () => {
 
-        },
+        this.loadData();
 
-        error: err => console.error(err)
+        this.missionToDeleteId = null;
 
-      });
+        bootstrap.Modal
+          .getInstance(document.getElementById('deleteMissionModal'))
+          ?.hide();
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.missionToDeleteId = null;
+
+        bootstrap.Modal
+          .getInstance(document.getElementById('deleteMissionModal'))
+          ?.hide();
+
+      }
+
+    });
 
   }
 
