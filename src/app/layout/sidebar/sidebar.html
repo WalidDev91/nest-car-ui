@@ -1,6 +1,6 @@
 <nav id="sidebar" class="sidebar js-sidebar">
 
-  <div class="sidebar-content js-simplebar" position="sticky">
+  <div class="sidebar-content js-simplebar">
 
     <!-- BRAND -->
 
@@ -24,13 +24,9 @@
         Main
       </li>
 
-      <li class="sidebar-item">
+      <li class="sidebar-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
 
-        <a
-          class="sidebar-link"
-          routerLink="/dashboard"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact:true}">
+        <a class="sidebar-link" routerLink="/dashboard">
 
           <i data-feather="bar-chart-2"></i>
 
@@ -48,12 +44,9 @@
         Operations
       </li>
 
-      <li class="sidebar-item">
+      <li class="sidebar-item" routerLinkActive="active">
 
-        <a
-          class="sidebar-link"
-          routerLink="/documents"
-          routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/documents">
 
           <i data-feather="file-text"></i>
 
@@ -63,14 +56,9 @@
 
       </li>
 
-      <li
-        class="sidebar-item"
-        *ngIf="isSuperAdmin || isAdmin || isFleetManager">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
 
-        <a
-          class="sidebar-link"
-          routerLink="/missions"
-          routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/missions">
 
           <i data-feather="map"></i>
 
@@ -80,14 +68,9 @@
 
       </li>
 
-      <li
-        class="sidebar-item"
-        *ngIf="isSuperAdmin || isAdmin || isFleetManager">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
 
-        <a
-          class="sidebar-link"
-          routerLink="/vehicles"
-          routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/vehicles">
 
           <i data-feather="truck"></i>
 
@@ -101,22 +84,15 @@
 
       <!-- MANAGEMENT -->
 
-      <li
-        class="sidebar-header"
-        *ngIf="isSuperAdmin || isAdmin">
+      <li class="sidebar-header" *ngIf="isSuperAdmin || isAdmin">
 
         Management
 
       </li>
 
-      <li
-        class="sidebar-item"
-        *ngIf="isSuperAdmin || isAdmin">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin">
 
-        <a
-          class="sidebar-link"
-          routerLink="/users"
-          routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/users">
 
           <i data-feather="users"></i>
 
@@ -126,14 +102,9 @@
 
       </li>
 
-      <li
-        class="sidebar-item"
-        *ngIf="isSuperAdmin">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin">
 
-        <a
-          class="sidebar-link"
-          routerLink="/administration"
-          routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/administration">
 
           <i data-feather="settings"></i>
 

@@ -1,13 +1,15 @@
 <nav class="navbar navbar-expand navbar-light navbar-bg">
 
 	<!-- Sidebar Toggle -->
+	<!--
 	<a class="sidebar-toggle js-sidebar-toggle">
 		<i class="hamburger align-self-center"></i>
 	</a>
+	-->
 
 	<div class="navbar-collapse collapse">
 
-		<ul class="navbar-nav navbar-align ms-auto">
+		<ul class="navbar-nav navbar-align">
 
 			<!-- ========================= -->
 			<!-- NOTIFICATIONS -->
@@ -135,37 +137,145 @@
 			</li>
 
 			<!-- ========================= -->
+			<!-- MESSAGES (preview — comment out below if not wanted) -->
+			<!-- ========================= -->
+
+			<!--
+			<li class="nav-item dropdown">
+
+				<a class="nav-icon dropdown-toggle" href="#" id="messagesDropdown" data-bs-toggle="dropdown">
+
+					<div class="position-relative">
+
+						<i class="align-middle" data-feather="message-square"></i>
+
+						<span class="indicator">
+							4
+						</span>
+
+					</div>
+
+				</a>
+
+				<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0">
+
+					<div class="dropdown-menu-header">
+
+						<div class="position-relative">
+							4 New Messages
+						</div>
+
+					</div>
+
+					<div class="list-group">
+
+							-->
+
+			<!-- temporary static messages -->
+
+			<!--
+						<a class="list-group-item">
+
+							<div class="row g-0 align-items-center">
+
+								<div class="col-2">
+
+									<div
+										class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center">
+										LD
+									</div>
+
+								</div>
+
+								<div class="col-10 ps-2">
+
+									<div class="text-dark">
+										Leon Driver
+									</div>
+
+									<div class="text-muted small mt-1">
+										Can I get the mission details for tomorrow?
+									</div>
+
+									<div class="text-muted small mt-1">
+										15m ago
+									</div>
+
+								</div>
+
+							</div>
+
+						</a>
+
+						<a class="list-group-item">
+
+							<div class="row g-0 align-items-center">
+
+								<div class="col-2">
+
+									<div
+										class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center">
+										CD
+									</div>
+
+								</div>
+
+								<div class="col-10 ps-2">
+
+									<div class="text-dark">
+										Charlie Driver
+									</div>
+
+									<div class="text-muted small mt-1">
+										Vehicle needs fuel before departure.
+									</div>
+
+									<div class="text-muted small mt-1">
+										2h ago
+									</div>
+
+								</div>
+
+							</div>
+
+						</a>
+
+					</div>
+
+					<div class="dropdown-menu-footer">
+
+						<a class="text-muted">
+							View all messages
+						</a>
+
+					</div>
+
+				</div>
+
+			</li>
+
+			-->
+
+			<!-- ========================= -->
 			<!-- USER -->
 			<!-- ========================= -->
 
 			<li class="nav-item dropdown">
 
-				<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+				<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
 
-					<!-- Initials instead of template avatar -->
-
-					<div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2"
-						style="width:38px;height:38px;font-weight:600;">
+					<div
+						class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center me-1">
 
 						{{ firstName.charAt(0) }}{{ lastName.charAt(0) }}
 
 					</div>
 
-					<div class="text-start">
+					<span class="text-dark">
 
-						<div class="fw-semibold text-dark">
+						{{ firstName }} {{ lastName }}
 
-							{{ firstName }} {{ lastName }}
-
-						</div>
-
-						<small class="text-muted">
-
-							{{ role }}
-
-						</small>
-
-					</div>
+					</span>
 
 				</a>
 
