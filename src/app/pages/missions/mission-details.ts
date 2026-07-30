@@ -486,5 +486,13 @@ export class MissionDetails implements OnInit {
   }
 
 
+  goBack(): void {
+
+
+    this.router.navigate(['/missions']);
+
+
+  }
+
 
 }

@@ -292,5 +292,14 @@ export class UserDetails implements OnInit {
   }
 
 
+  viewDriverDocument(id: string) {
+
+    this.router.navigate([
+      '/documents/driver',
+      id
+    ]);
+
+  }
+
 
 }

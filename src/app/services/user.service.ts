@@ -105,4 +105,48 @@ export class UserService {
 
   }
 
+  // ==========================================================
+  // ASSIGN SUPERVISOR
+  // ==========================================================
+
+  assignSupervisor(
+    userId: string,
+    supervisorId: string
+  ) {
+
+    return this.http.put(
+      `${this.baseUrl}/${userId}/supervisor`,
+      {
+        adminId: supervisorId
+      }
+    );
+
+  }
+
+
+  // ==========================================================
+  // IMAGE MANAGEMENT
+  // ==========================================================
+
+  uploadImage(id: string, file: File): Observable<User> {
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    return this.http.post<User>(
+      `${this.baseUrl}/${id}/image`,
+      formData
+    );
+
+  }
+
+
+  deleteImage(id: string): Observable<User> {
+
+    return this.http.delete<User>(
+      `${this.baseUrl}/${id}/image`
+    );
+
+  }
 }

@@ -380,6 +380,13 @@
 
               </button>
 
+              <button *ngIf="user.role !== 'SUPER_ADMIN'" class="btn btn-sm btn-outline-dark me-1"
+                (click)="editSupervisorModal(user)" title="Assign Supervisor">
+
+                <i data-feather="user-check"></i>
+
+              </button>
+
               <!-- 
               <button class="btn btn-sm btn-outline-primary me-1" (click)="editUser(user)" title="Edit">
 
@@ -479,6 +486,78 @@
           </button>
 
         </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ========================================= -->
+<!-- ASSIGN SUPERVISOR MODAL -->
+<!-- ========================================= -->
+
+<div class="modal fade" id="supervisorModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 class="modal-title">
+
+          Assign Supervisor
+
+        </h5>
+
+        <button class="btn-close" data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <label class="form-label">
+
+          Supervisor
+
+        </label>
+
+        <select class="form-select" [(ngModel)]="selectedSupervisorId">
+
+          <option value="">
+
+            Select supervisor
+
+          </option>
+
+          <option *ngFor="let admin of supervisors()" [value]="admin.id">
+
+            {{ admin.firstName }}
+            {{ admin.lastName }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+          Cancel
+
+        </button>
+
+        <button class="btn btn-primary" (click)="saveSupervisor()">
+
+          Save
+
+        </button>
 
       </div>
 

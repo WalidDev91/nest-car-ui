@@ -3,25 +3,11 @@
 
   <!-- HEADER ACTIONS -->
   <div class="d-flex justify-content-between align-items-center mb-3">
-
     <button class="btn btn-outline-secondary" (click)="goBack()">
-
       <i data-feather="arrow-left"></i>
       Back to Users
-
     </button>
-
-
-    <button class="btn btn-outline-primary" (click)="refresh()">
-
-      <i data-feather="refresh-cw"></i>
-      Refresh
-
-    </button>
-
   </div>
-
-
 
 
   <!-- LOADING -->
@@ -37,9 +23,6 @@
   </div>
 
 
-
-
-
   <!-- ERROR -->
 
   <div *ngIf="error()" class="alert alert-danger">
@@ -50,14 +33,9 @@
 
 
 
-
-
-
   <!-- CONTENT -->
 
   <div class="row" *ngIf="user() as user">
-
-
 
 
 
@@ -79,11 +57,10 @@
 
           <div class="mb-3">
 
-            <img src="assets/img/avatars/avatar.jpg" class="rounded-circle" width="120" height="120" alt="User avatar">
-
+            <img
+              [src]="user.imageUrl ? 'http://localhost:8080/uploads/users/' + user.imageUrl : 'assets/adminkit/img/avatars/avatar.jpg'"
+              class="rounded-circle border shadow-sm" width="120" height="120" alt="User photo">
           </div>
-
-
 
 
 
@@ -95,9 +72,6 @@
             {{ user.lastName }}
 
           </h4>
-
-
-
 
           <!-- Role -->
 
@@ -130,9 +104,6 @@
           </div>
 
 
-
-
-
           <!-- Account status -->
 
           <div>
@@ -163,8 +134,6 @@
 
 
       </div>
-
-
 
 
 
@@ -241,9 +210,6 @@
     </div>
 
 
-
-
-
     <!-- ==========================
           DETAILS CARD
     =========================== -->
@@ -285,8 +251,6 @@
 
 
 
-
-
             <li class="nav-item" *ngIf="isDriver()">
 
 
@@ -318,9 +282,6 @@
         <div class="card-body">
 
 
-
-
-
           <!-- ==========================
                 INFORMATION TAB
           =========================== -->
@@ -348,9 +309,6 @@
 
                 </tr>
 
-
-
-
                 <tr>
 
                   <th>
@@ -363,10 +321,6 @@
 
                 </tr>
 
-
-
-
-
                 <tr>
 
                   <th>
@@ -378,10 +332,6 @@
                   </td>
 
                 </tr>
-
-
-
-
 
                 <tr>
 
@@ -403,10 +353,6 @@
 
 
                 </tr>
-
-
-
-
 
 
                 <tr>
@@ -441,10 +387,6 @@
                 </tr>
 
 
-
-
-
-
                 <tr>
 
                   <th>
@@ -460,9 +402,6 @@
 
 
                 </tr>
-
-
-
 
 
                 <tr>
@@ -485,9 +424,6 @@
 
 
                 </tr>
-
-
-
 
 
 
@@ -524,11 +460,6 @@
           </div>
 
 
-
-
-
-
-
           <!-- ==========================
                 DRIVER DOCUMENTS TAB
           =========================== -->
@@ -540,11 +471,7 @@
 
 
 
-
-
             <div class="row g-3">
-
-
 
 
 
@@ -578,7 +505,7 @@
 
                       {{
                       hasLicense()
-                      ? 'Available'
+                      ? 'Uploaded'
                       : 'Missing'
                       }}
 
@@ -594,11 +521,6 @@
 
 
               </div>
-
-
-
-
-
 
 
               <!-- ID CARD -->
@@ -632,7 +554,7 @@
 
                       {{
                       hasIdCard()
-                      ? 'Available'
+                      ? 'Uploaded'
                       : 'Missing'
                       }}
 
@@ -649,14 +571,7 @@
 
               </div>
 
-
-
-
             </div>
-
-
-
-
 
 
 
@@ -678,8 +593,7 @@
 
               <span *ngIf="hasCompleteDocuments()">
 
-                All required driver documents are available.
-
+                All required driver documents are Uploaded.
               </span>
 
 
@@ -687,17 +601,11 @@
               <span *ngIf="!hasCompleteDocuments()">
 
                 Driver documents are incomplete.
-
               </span>
 
 
 
             </div>
-
-
-
-
-
 
 
             <!-- DOCUMENT LIST FUTURE READY -->
@@ -707,10 +615,11 @@
 
 
 
+              <!-- 
               <h5>
                 Uploaded Documents
               </h5>
-
+              -->
 
 
               <table class="table table-hover">
@@ -735,12 +644,17 @@
                       Status
                     </th>
 
+                    <th class="text-end">
+
+                      Actions
+
+                    </th>
+
 
                   </tr>
 
 
                 </thead>
-
 
 
                 <tbody>
@@ -755,7 +669,6 @@
                     </td>
 
 
-
                     <td>
 
                       {{
@@ -765,8 +678,6 @@
                       }}
 
                     </td>
-
-
 
 
                     <td>
@@ -793,6 +704,17 @@
 
                     </td>
 
+                    <td class="text-end">
+
+                      <button class="btn btn-sm btn-outline-secondary" (click)="viewDriverDocument(doc.id)"
+                        title="View">
+
+                        <i data-feather="file-text"></i>
+
+                      </button>
+
+                    </td>
+
 
 
                   </tr>
@@ -805,10 +727,6 @@
 
 
             </div>
-
-
-
-
 
 
 
@@ -832,16 +750,7 @@
             </div>
 
 
-
-
-
-
           </div>
-
-
-
-
-
 
 
         </div>
@@ -853,9 +762,6 @@
     </div>
 
 
-
-
   </div>
-
 
 </div>

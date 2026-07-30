@@ -358,7 +358,7 @@ export class Vehicles implements OnInit {
 
   }
   // ==========================================================
-  // CREATE
+  // SAVE VEHICLE (CREATE / UPDATE)
   // ==========================================================
 
   createVehicle() {
@@ -391,15 +391,49 @@ export class Vehicles implements OnInit {
 
       this.vehicleService.create(vehicle).subscribe({
 
-        next: () => {
+        next: (createdVehicle) => {
 
-          this.loadVehicles();
+
+          if (this.selectedImage) {
+
+            this.vehicleService.uploadImage(
+              createdVehicle.id,
+              this.selectedImage
+            )
+              .subscribe({
+
+                next: () => {
+
+                  this.loadVehicles();
+
+                },
+
+                error: err => {
+
+                  console.error(err);
+
+                  alert('Image upload failed');
+
+                }
+
+              });
+
+          }
+          else {
+
+            this.loadVehicles();
+
+          }
+
 
           this.resetForm();
+
+
 
           bootstrap.Modal
             .getInstance(document.getElementById('vehicleModal'))
             ?.hide();
+
 
         },
 
@@ -419,19 +453,53 @@ export class Vehicles implements OnInit {
 
       this.vehicleService.update(this.editingVehicleId!, vehicle).subscribe({
 
-        next: () => {
+        next: (updatedVehicle) => {
 
-          this.loadVehicles();
+
+          if (this.selectedImage) {
+
+            this.vehicleService.uploadImage(
+              updatedVehicle.id,
+              this.selectedImage
+            )
+              .subscribe({
+
+                next: () => {
+
+                  this.loadVehicles();
+
+                },
+
+                error: err => {
+
+                  console.error(err);
+
+                  alert('Image upload failed');
+
+                }
+
+              });
+
+          }
+          else {
+
+            this.loadVehicles();
+
+          }
+
 
           this.resetForm();
+
 
           this.editMode = false;
 
           this.editingVehicleId = null;
 
+
           bootstrap.Modal
             .getInstance(document.getElementById('vehicleModal'))
             ?.hide();
+
 
         },
 
@@ -471,6 +539,14 @@ export class Vehicles implements OnInit {
 
     this.editingVehicleId = null;
 
+    const input = document.getElementById(
+      'vehicleImageInput'
+    ) as HTMLInputElement;
+
+    if (input) {
+      input.value = '';
+    }
+
   }
 
   // ==========================================================
@@ -504,6 +580,12 @@ export class Vehicles implements OnInit {
     this.model = vehicle.model;
 
     this.year = vehicle.year;
+
+    this.imagePreview = vehicle.imageUrl
+      ? 'http://localhost:8080/uploads/vehicles/' + vehicle.imageUrl
+      : null;
+
+    this.selectedImage = null;
 
     const modal = new bootstrap.Modal(
       document.getElementById('vehicleModal')

@@ -1,6 +1,6 @@
 <main class="d-flex w-100">
   <div class="container d-flex flex-column">
-    <div class="row vh-100">
+    <div class="row min-vh-100 py-4">
       <div class="col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto d-table h-100">
         <div class="d-table-cell align-middle">
 
@@ -15,70 +15,69 @@
             <div class="card-body">
               <div class="m-sm-3">
 
+                <div class="alert alert-danger" *ngIf="error()">
+                  {{ error() }}
+                </div>
+
                 <form (ngSubmit)="register()">
 
-                  <div class="mb-3">
-                    <label class="form-label">First Name</label>
-                    <input
-                      class="form-control form-control-lg"
-                      type="text"
-                      name="firstName"
-                      placeholder="Enter your first name"
-                      [(ngModel)]="firstName"
-                      required
-                    />
-                  </div>
+                  <div class="row">
 
-                  <div class="mb-3">
-                    <label class="form-label">Last Name</label>
-                    <input
-                      class="form-control form-control-lg"
-                      type="text"
-                      name="lastName"
-                      placeholder="Enter your last name"
-                      [(ngModel)]="lastName"
-                      required
-                    />
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">First Name</label>
+                      <input class="form-control form-control-lg" type="text" name="firstName"
+                        placeholder="Enter your first name" [(ngModel)]="firstName" required />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Last Name</label>
+                      <input class="form-control form-control-lg" type="text" name="lastName"
+                        placeholder="Enter your last name" [(ngModel)]="lastName" required />
+                    </div>
+
                   </div>
 
                   <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input
-                      class="form-control form-control-lg"
-                      type="email"
-                      name="email"
-                      placeholder="Enter your email"
-                      [(ngModel)]="email"
-                      required
-                    />
+                    <input class="form-control form-control-lg" type="email" name="email" placeholder="Enter your email"
+                      [(ngModel)]="email" required />
                   </div>
 
                   <div class="mb-3">
                     <label class="form-label">Phone</label>
-                    <input
-                      class="form-control form-control-lg"
-                      type="text"
-                      name="phone"
-                      placeholder="Enter your phone number"
-                      [(ngModel)]="phone"
-                    />
+                    <input class="form-control form-control-lg" type="text" name="phone"
+                      placeholder="Enter your phone number" [(ngModel)]="phone" />
+                  </div>
+
+                  <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Password</label>
+                      <input class="form-control form-control-lg" type="password" name="password"
+                        placeholder="Enter your password" [(ngModel)]="password" required />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Confirm Password</label>
+                      <input class="form-control form-control-lg" type="password" name="confirmPassword"
+                        placeholder="Confirm your password" [(ngModel)]="confirmPassword" required />
+                    </div>
+
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input
-                      class="form-control form-control-lg"
-                      type="password"
-                      name="password"
-                      placeholder="Enter your password"
-                      [(ngModel)]="password"
-                      required
-                    />
+                    <label class="form-label">Profile Picture</label>
+                    <input class="form-control" type="file" accept="image/png, image/jpeg"
+                      (change)="onImageSelected($event)" />
+                  </div>
+
+                  <div class="text-center mb-3" *ngIf="imagePreview">
+                    <img [src]="imagePreview" class="rounded shadow-sm" style="max-height: 120px;" />
                   </div>
 
                   <div class="d-grid gap-2 mt-3">
-                    <button type="submit" class="btn btn-lg btn-primary">
-                      Sign Up
+                    <button type="submit" class="btn btn-lg btn-primary" [disabled]="loading()">
+                      {{ loading() ? 'Creating account...' : 'Sign Up' }}
                     </button>
                   </div>
 

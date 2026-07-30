@@ -62,4 +62,30 @@ export class VehicleService {
 
   }
 
+  // ==========================================================
+  // IMAGE MANAGEMENT
+  // ==========================================================
+
+  uploadImage(id: string, file: File) {
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    return this.http.post<Vehicle>(
+      `${this.baseUrl}/${id}/image`,
+      formData
+    );
+
+  }
+
+
+  deleteImage(id: string) {
+
+    return this.http.delete<Vehicle>(
+      `${this.baseUrl}/${id}/image`
+    );
+
+  }
+
 }

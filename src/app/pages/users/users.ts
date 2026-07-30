@@ -6,6 +6,7 @@ import feather from 'feather-icons';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user';
 
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-users',
@@ -42,6 +43,10 @@ export class Users implements OnInit {
 
   pageSize = 10;
 
+  selectedUser: User | null = null;
+
+  selectedSupervisorId = '';
+
   // ==========================================================
   // STATISTICS
   // ==========================================================
@@ -60,8 +65,7 @@ export class Users implements OnInit {
 
   admins = computed(() =>
     this.users().filter(u =>
-      u.role === 'ADMIN' ||
-      u.role === 'SUPER_ADMIN'
+      u.role === 'ADMIN'
     ).length
   );
 
@@ -75,6 +79,14 @@ export class Users implements OnInit {
     this.users().filter(u =>
       u.role === 'FLEET_MANAGER'
     ).length
+  );
+
+  supervisors = computed(() =>
+    this.users().filter(u =>
+      u.role === 'SUPER_ADMIN' ||
+      u.role === 'ADMIN' ||
+      u.role === 'FLEET_MANAGER'
+    )
   );
 
   // ==========================================================
@@ -407,6 +419,63 @@ export class Users implements OnInit {
       error: (err) => {
         console.error(err);
         alert('Delete failed');
+      }
+
+    });
+
+  }
+
+
+
+  editSupervisorModal(user: any) {
+
+    this.selectedUser = user;
+
+    this.selectedSupervisorId = user.adminId ?? '';
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('supervisorModal')
+    );
+
+    modal.show();
+  }
+
+  saveSupervisor() {
+
+    if (!this.selectedUser) {
+      alert('No user selected');
+      return;
+    }
+
+    if (!this.selectedSupervisorId) {
+      alert('Please select a supervisor');
+      return;
+    }
+
+    this.userService.assignSupervisor(
+      this.selectedUser.id,
+      this.selectedSupervisorId
+    ).subscribe({
+
+      next: () => {
+
+        bootstrap.Modal.getInstance(
+          document.getElementById('supervisorModal')
+        )?.hide();
+
+        this.loadUsers();
+
+        this.selectedUser = null;
+        this.selectedSupervisorId = '';
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        alert('Failed to update supervisor');
+
       }
 
     });
