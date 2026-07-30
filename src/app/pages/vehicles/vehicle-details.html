@@ -1,12 +1,22 @@
 <div class="container-fluid p-0">
 
+
     <!-- HEADER ACTIONS -->
+
     <div class="d-flex justify-content-between align-items-center mb-3">
+
         <button class="btn btn-outline-secondary" (click)="goBack()">
-            <i data-feather="arrow-left"></i>
+
+            <i data-feather="arrow-left" class="me-1"></i>
+
             Back to Vehicles
+
         </button>
+
     </div>
+
+
+
 
     <!-- LOADING -->
 
@@ -14,7 +24,7 @@
 
         <div class="spinner-border text-primary"></div>
 
-        <p class="mt-3">
+        <p class="mt-3 text-muted">
             Loading vehicle information...
         </p>
 
@@ -24,34 +34,114 @@
 
 
 
+
     <!-- CONTENT -->
 
     <div class="row" *ngIf="vehicle() as vehicle">
 
-        <!-- ==========================
-         VEHICLE CARD
-        =========================== -->
+
+
+        <!-- ================================================= -->
+        <!-- LEFT SIDE -->
+        <!-- ================================================= -->
+
 
         <div class="col-12 col-md-4">
 
+
+
+
+
+            <!-- VEHICLE PROFILE CARD -->
+
+
             <div class="card">
+
 
                 <div class="card-body text-center">
 
-                    <!-- Vehicle Image -->
+
+
+                    <!-- IMAGE AREA -->
 
                     <div class="mb-3">
 
+
                         <img [src]="vehicle.imageUrl
-            ? 'http://localhost:8080/uploads/vehicles/' + vehicle.imageUrl
-            : 'assets/adminkit/img/vehicle-placeholder.png'" class="img-fluid rounded border shadow-sm" style="
-            width: 100%;
-            max-width: 320px;
-            height: 200px;
-            object-fit: cover;
-        " alt="Vehicle image">
+                        ? 'http://localhost:8080/uploads/vehicles/' + vehicle.imageUrl
+                        : 'assets/adminkit/img/vehicle-placeholder.png'" class="img-fluid rounded border shadow-sm"
+                            style="
+                        width:100%;
+                        height:220px;
+                        object-fit:cover;
+                        " alt="Vehicle image">
+
 
                     </div>
+
+
+
+
+                    <!-- FUTURE MULTIPLE PHOTOS READY -->
+
+                    <div class="row g-2 mb-3">
+
+
+                        <div class="col-4" *ngFor="let photo of vehicle.photos">
+
+                            <img [src]="'http://localhost:8080/uploads/vehicles/' + photo"
+                                class="img-fluid rounded border" style="
+                                height:60px;
+                                width:100%;
+                                object-fit:cover;
+                                " alt="Vehicle photo">
+
+                        </div>
+
+
+
+
+                        <div class="col-4">
+
+
+                            <div class="border rounded d-flex align-items-center justify-content-center" style="
+                            height:60px;
+                            background:#f8f9fa;
+                            ">
+
+
+                                <i data-feather="plus"></i>
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+
+                        <div class="col-4">
+
+
+                            <div class="border rounded d-flex align-items-center justify-content-center" style="
+                            height:60px;
+                            background:#f8f9fa;
+                            ">
+
+
+                                <i data-feather="plus"></i>
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+                    </div>
+
 
 
 
@@ -66,27 +156,13 @@
 
 
 
-                    <div class="text-muted">
+                    <p class="text-muted mb-3">
 
                         {{ vehicle.brand }}
 
                         {{ vehicle.model }}
 
-                    </div>
-
-
-
-
-                    <hr>
-
-
-
-
-                    <span class="badge bg-primary">
-
-                        Vehicle
-
-                    </span>
+                    </p>
 
 
 
@@ -100,31 +176,42 @@
 
 
 
-            <!-- QUICK STATS -->
 
 
-            <div class="card">
+            <!-- QUICK INFORMATION -->
+
+
+            <div class="card mt-3">
+
+
+                <div class="card-header">
+
+
+                    <h5 class="card-title mb-0">
+
+                        <i data-feather="info" class="me-1"></i>
+
+                        Quick Information
+
+                    </h5>
+
+
+                </div>
+
+
 
 
                 <div class="card-body">
 
 
-
-                    <h5>
-                        Quick Information
-                    </h5>
-
-
-
-
-                    <div class="row text-center mt-3">
+                    <div class="row text-center">
 
 
 
                         <div class="col-4">
 
 
-                            <h4>
+                            <h4 class="mb-1">
 
                                 {{ vehicle.year }}
 
@@ -147,7 +234,7 @@
                         <div class="col-4">
 
 
-                            <h4>
+                            <h4 class="mb-1">
 
                                 {{ documents().length }}
 
@@ -170,7 +257,7 @@
                         <div class="col-4">
 
 
-                            <h4>
+                            <h4 class="mb-1">
 
                                 {{ missions().length }}
 
@@ -188,9 +275,7 @@
 
 
 
-
                     </div>
-
 
 
                 </div>
@@ -207,106 +292,110 @@
             <!-- DOCUMENT STATUS -->
 
 
-            <div class="card">
+            <div class="card mt-3">
+
+
+                <div class="card-header">
+
+
+                    <h5 class="card-title mb-0">
+
+
+                        <i data-feather="file-text" class="me-1"></i>
+
+
+                        Document Status
+
+
+                    </h5>
+
+
+                </div>
+
+
+
 
 
                 <div class="card-body">
 
 
 
-                    <h5>
-                        Document Status
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
 
 
+                        <span>
+
+                            License
+
+                        </span>
 
 
-                    <div class="row text-center mt-3">
+                        <span class="badge" [ngClass]="hasLicense()
+                        ? 'bg-success'
+                        : 'bg-danger'">
 
 
-
-                        <div class="col">
-
-
-                            <h5 [class.text-success]="hasLicense()" [class.text-danger]="!hasLicense()">
+                            {{ hasLicense() ? 'Uploaded' : 'Missing' }}
 
 
-                                {{ hasLicense() ? '✓' : '✗' }}
-
-
-                            </h5>
-
-
-
-                            <small>
-
-                                License
-
-                            </small>
-
-
-
-                        </div>
-
-
-
-
-
-                        <div class="col">
-
-
-                            <h5 [class.text-success]="hasInsurance()" [class.text-danger]="!hasInsurance()">
-
-
-                                {{ hasInsurance() ? '✓' : '✗' }}
-
-
-                            </h5>
-
-
-
-                            <small>
-
-                                Insurance
-
-                            </small>
-
-
-
-                        </div>
-
-
-
-
-
-                        <div class="col">
-
-
-                            <h5 [class.text-success]="hasTechnicalCheck()" [class.text-danger]="!hasTechnicalCheck()">
-
-
-                                {{ hasTechnicalCheck() ? '✓' : '✗' }}
-
-
-                            </h5>
-
-
-
-                            <small>
-
-                                Technical
-
-                            </small>
-
-
-
-                        </div>
-
-
+                        </span>
 
 
                     </div>
 
+
+
+
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+
+                        <span>
+
+                            Insurance
+
+                        </span>
+
+
+                        <span class="badge" [ngClass]="hasInsurance()
+                        ? 'bg-success'
+                        : 'bg-danger'">
+
+
+                            {{ hasInsurance() ? 'Uploaded' : 'Missing' }}
+
+
+                        </span>
+
+
+                    </div>
+
+
+
+
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+
+                        <span>
+
+                            Technical Check
+
+                        </span>
+
+
+                        <span class="badge" [ngClass]="hasTechnicalCheck()
+                        ? 'bg-success'
+                        : 'bg-danger'">
+
+
+                            {{ hasTechnicalCheck() ? 'Uploaded' : 'Missing' }}
+
+
+                        </span>
+
+
+                    </div>
 
 
 
@@ -329,7 +418,7 @@
 
 
         <!-- ================================================= -->
-        <!-- RIGHT CONTENT -->
+        <!-- RIGHT SIDE -->
         <!-- ================================================= -->
 
 
@@ -341,13 +430,10 @@
 
 
 
+                <!-- TABS HEADER -->
 
 
-                <!-- HEADER -->
-
-
-                <div class="card-header d-flex justify-content-between">
-
+                <div class="card-header">
 
 
                     <ul class="nav nav-tabs card-header-tabs">
@@ -361,11 +447,12 @@
                                 (click)="selectTab('info')">
 
 
+                                <i data-feather="info" class="me-1"></i>
+
                                 Information
 
 
                             </button>
-
 
 
                         </li>
@@ -381,11 +468,12 @@
                                 (click)="selectTab('documents')">
 
 
+                                <i data-feather="file-text" class="me-1"></i>
+
                                 Documents
 
 
                             </button>
-
 
 
                         </li>
@@ -401,11 +489,12 @@
                                 (click)="selectTab('missions')">
 
 
+                                <i data-feather="map" class="me-1"></i>
+
                                 Missions
 
 
                             </button>
-
 
 
                         </li>
@@ -421,12 +510,11 @@
 
 
 
-
                 <div class="card-body">
+
                     <!-- ================================================= -->
                     <!-- INFORMATION TAB -->
                     <!-- ================================================= -->
-
 
                     <div *ngIf="selectedTab() === 'info'">
 
@@ -451,7 +539,6 @@
 
 
 
-
                                 <tr>
 
                                     <th>
@@ -463,7 +550,6 @@
                                     </td>
 
                                 </tr>
-
 
 
 
@@ -481,7 +567,6 @@
 
 
 
-
                                 <tr>
 
                                     <th>
@@ -493,7 +578,6 @@
                                     </td>
 
                                 </tr>
-
 
 
 
@@ -511,7 +595,6 @@
 
 
 
-
                                 <tr>
 
                                     <th>
@@ -519,11 +602,14 @@
                                     </th>
 
                                     <td>
-                                        {{ vehicle.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                                        {{
+                                        vehicle.createdAt
+                                        ? (vehicle.createdAt | date:'dd/MM/yyyy HH:mm')
+                                        : '—'
+                                        }}
                                     </td>
 
                                 </tr>
-
 
 
 
@@ -534,12 +620,14 @@
                                     </th>
 
                                     <td>
-                                        {{ vehicle.updatedAt | date:'dd/MM/yyyy HH:mm' }}
+                                        {{
+                                        vehicle.updatedAt
+                                        ? (vehicle.updatedAt | date:'dd/MM/yyyy HH:mm')
+                                        : '—'
+                                        }}
                                     </td>
 
                                 </tr>
-
-
 
 
                             </tbody>
@@ -554,8 +642,6 @@
 
 
 
-
-
                         <div class="d-flex justify-content-end gap-2">
 
 
@@ -563,11 +649,9 @@
                             <button class="btn btn-primary" (click)="editVehicle()">
 
 
-
-                                <i data-feather="edit"></i>
+                                <i data-feather="edit" class="me-1"></i>
 
                                 Edit
-
 
 
                             </button>
@@ -580,7 +664,7 @@
 
 
 
-                                <i data-feather="trash-2"></i>
+                                <i data-feather="trash-2" class="me-1"></i>
 
                                 Delete
 
@@ -600,16 +684,12 @@
 
 
 
-
-
                     <!-- ================================================= -->
                     <!-- DOCUMENTS TAB -->
                     <!-- ================================================= -->
 
 
-
                     <div *ngIf="selectedTab() === 'documents'">
-
 
 
                         <div class="alert alert-info" *ngIf="documents().length === 0">
@@ -623,13 +703,10 @@
 
 
 
-
                         <table class="table table-hover" *ngIf="documents().length > 0">
 
 
-
                             <thead>
-
 
                                 <tr>
 
@@ -648,22 +725,20 @@
                                     </th>
 
 
-                                    <th>
+                                    <th class="text-end">
+
                                         Actions
+
                                     </th>
 
 
                                 </tr>
 
-
                             </thead>
 
 
 
-
-
                             <tbody>
-
 
 
                                 <tr *ngFor="let doc of documents()">
@@ -671,39 +746,34 @@
 
 
                                     <td>
-
                                         {{ doc.title }}
-
                                     </td>
-
 
 
 
                                     <td>
 
-
-
                                         <span class="badge" [ngClass]="{
 
-                        'bg-primary': doc.type === 'LICENSE',
+                                        'bg-primary':
+                                        doc.type === 'LICENSE',
 
-                        'bg-warning': doc.type === 'TECHNICAL_CHECK',
+                                        'bg-warning':
+                                        doc.type === 'TECHNICAL_CHECK',
 
-                        'bg-success': doc.type === 'INSURANCE'
+                                        'bg-success':
+                                        doc.type === 'INSURANCE'
 
-                        }">
+                                        }">
 
 
                                             {{ doc.type }}
 
 
-
                                         </span>
 
 
-
                                     </td>
-
 
 
 
@@ -713,54 +783,27 @@
 
                                     </td>
 
+                                    <td class="text-end">
 
-
-
-                                    <td>
-
-
-
-                                        <button class="btn btn-sm btn-outline-primary">
-
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            (click)="viewVehicleDocument(doc.id)" title="View">
 
                                             <i data-feather="file-text"></i>
 
-
                                         </button>
 
-
-
                                     </td>
-
 
 
 
                                 </tr>
 
 
-
                             </tbody>
-
 
 
                         </table>
 
-
-
-
-
-                        <button class="btn btn-success">
-
-
-
-                            <i data-feather="upload"></i>
-
-
-                            Upload Document
-
-
-
-                        </button>
 
 
 
@@ -773,21 +816,18 @@
 
 
 
-
                     <!-- ================================================= -->
                     <!-- MISSIONS TAB -->
                     <!-- ================================================= -->
 
 
-
                     <div *ngIf="selectedTab() === 'missions'">
-
 
 
                         <div class="alert alert-secondary" *ngIf="missions().length === 0">
 
 
-                            No missions assigned to this vehicle.
+                            No missions assigned to this vehicle yet.
 
 
                         </div>
@@ -799,12 +839,9 @@
                         <table class="table table-hover" *ngIf="missions().length > 0">
 
 
-
                             <thead>
 
-
                                 <tr>
-
 
                                     <th>
                                         Mission
@@ -822,9 +859,18 @@
 
 
                                     <th>
-                                        Dates
+                                        Start Date
                                     </th>
 
+                                    <th>
+                                        End Date
+                                    </th>
+
+                                    <th class="text-end">
+
+                                        Actions
+
+                                    </th>
 
 
                                 </tr>
@@ -837,7 +883,6 @@
 
 
                             <tbody>
-
 
 
                                 <tr *ngFor="let mission of missions()">
@@ -865,26 +910,32 @@
                                     <td>
 
 
-
                                         <span class="badge" [ngClass]="{
 
-                        'bg-success': mission.status === 'COMPLETED',
 
-                        'bg-warning': mission.status === 'PLANNED',
+                                        'bg-success':
+                                        mission.status === 'COMPLETED',
 
-                        'bg-danger': mission.status === 'CANCELLED',
 
-                        'bg-info': mission.status === 'ONGOING'
+                                        'bg-warning':
+                                        mission.status === 'PLANNED',
 
-                        }">
+
+                                        'bg-danger':
+                                        mission.status === 'CANCELLED',
+
+
+                                        'bg-info':
+                                        mission.status === 'ONGOING'
+
+
+                                        }">
 
 
                                             {{ mission.status }}
 
 
-
                                         </span>
-
 
 
                                     </td>
@@ -892,17 +943,22 @@
 
 
 
+                                    <td>
+                                        {{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
 
                                     <td>
+                                        {{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}
+                                    </td>
 
+                                    <td class="text-end">
 
-                                        {{ mission.startDate | date:'dd/MM/yyyy' }}
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            (click)="viewMissionDetails(mission.id)" title="View">
 
-                                        -
+                                            <i data-feather="eye"></i>
 
-                                        {{ mission.endDate | date:'dd/MM/yyyy' }}
-
-
+                                        </button>
 
                                     </td>
 
@@ -912,16 +968,16 @@
                                 </tr>
 
 
-
                             </tbody>
-
 
 
                         </table>
 
 
-
                     </div>
+
+
+
 
 
 

@@ -38,7 +38,11 @@ export class VehicleDetails implements OnInit {
   hasLicense = signal(false);
   hasTechnicalCheck = signal(false);
 
+  // ==========================================================
+  // MULTIPLE IMAGE UPLOAD
+  // ==========================================================
 
+  // photos: string[] = [];
 
 
 
@@ -194,11 +198,11 @@ export class VehicleDetails implements OnInit {
 
   }
 
-  goBack(){
+  goBack() {
 
-  this.router.navigate(['/vehicles']);
+    this.router.navigate(['/vehicles']);
 
-}
+  }
 
   editVehicle() {
 
@@ -231,6 +235,24 @@ export class VehicleDetails implements OnInit {
       error: err => console.error(err)
 
     });
+
+  }
+
+  viewVehicleDocument(id: string) {
+
+    this.router.navigate([
+      '/documents/vehicle',
+      id
+    ]);
+
+  }
+
+  viewMissionDetails(id: string): void {
+
+    this.router.navigate([
+      '/missions',
+      id
+    ]);
 
   }
 
