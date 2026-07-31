@@ -204,37 +204,37 @@ export class VehicleDetails implements OnInit {
 
   }
 
-  editVehicle() {
+  editVehicle(): void {
 
     const vehicle = this.vehicle();
 
     if (!vehicle) return;
 
-    console.log('Edit vehicle', vehicle.id);
-
-    // backend later
+    this.router.navigate(
+      ['/vehicles'],
+      {
+        queryParams: {
+          edit: vehicle.id
+        }
+      }
+    );
 
   }
 
-  deleteVehicle() {
+  deleteVehicle(): void {
 
     const vehicle = this.vehicle();
 
     if (!vehicle) return;
 
-    if (!confirm('Delete this vehicle ?')) return;
-
-    this.vehicleService.delete(vehicle.id).subscribe({
-
-      next: () => {
-
-        this.router.navigate(['/vehicles']);
-
-      },
-
-      error: err => console.error(err)
-
-    });
+    this.router.navigate(
+      ['/vehicles'],
+      {
+        queryParams: {
+          delete: vehicle.id
+        }
+      }
+    );
 
   }
 

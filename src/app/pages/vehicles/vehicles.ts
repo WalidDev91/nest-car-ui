@@ -9,6 +9,7 @@ import { Vehicle } from '../../models/vehicle';
 import { VehicleDocumentService } from '../../services/vehicle-document.service';
 import { MissionService } from '../../services/mission.service';
 import { forkJoin } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 declare var bootstrap: any;
 
@@ -222,7 +223,8 @@ export class Vehicles implements OnInit {
     private vehicleService: VehicleService,
     private missionService: MissionService,
     private vehicleDocumentService: VehicleDocumentService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   // ==========================================================
@@ -257,13 +259,69 @@ export class Vehicles implements OnInit {
 
         this.loading.set(false);
 
+        this.route.queryParams.subscribe(params => {
+
+          // =========================
+          // EDIT
+          // =========================
+
+          const editId = params['edit'];
+
+          if (editId) {
+
+            const vehicle = this.vehicles().find(v => v.id === editId);
+
+            if (vehicle) {
+
+              this.editVehicle(vehicle.id);
+
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: {},
+                replaceUrl: true
+              });
+
+            }
+
+            return;
+          }
+
+          // =========================
+          // DELETE
+          // =========================
+
+          const deleteId = params['delete'];
+
+          if (deleteId) {
+
+            const vehicle = this.vehicles().find(v => v.id === deleteId);
+
+            if (vehicle) {
+
+              this.deleteVehicle(vehicle.id);
+
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: {},
+                replaceUrl: true
+              });
+
+            }
+
+          }
+
+        });
+
         setTimeout(() => feather.replace(), 0);
 
       },
 
       error: (err) => {
+
         console.error(err);
+
         this.loading.set(false);
+
       }
 
     });

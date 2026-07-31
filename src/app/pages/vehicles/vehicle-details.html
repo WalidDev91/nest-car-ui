@@ -16,8 +16,6 @@
     </div>
 
 
-
-
     <!-- LOADING -->
 
     <div class="text-center py-5" *ngIf="!vehicle()">
@@ -33,12 +31,9 @@
 
 
 
-
-
     <!-- CONTENT -->
 
     <div class="row" *ngIf="vehicle() as vehicle">
-
 
 
         <!-- ================================================= -->
@@ -47,8 +42,6 @@
 
 
         <div class="col-12 col-md-4">
-
-
 
 
 
@@ -81,7 +74,6 @@
 
 
 
-
                     <!-- FUTURE MULTIPLE PHOTOS READY -->
 
                     <div class="row g-2 mb-3">
@@ -97,8 +89,6 @@
                                 " alt="Vehicle photo">
 
                         </div>
-
-
 
 
                         <div class="col-4">
@@ -117,8 +107,6 @@
 
 
                         </div>
-
-
 
 
                         <div class="col-4">
@@ -141,10 +129,6 @@
 
 
                     </div>
-
-
-
-
 
 
                     <h4 class="mb-1">
@@ -170,10 +154,6 @@
 
 
             </div>
-
-
-
-
 
 
 
@@ -285,135 +265,7 @@
 
 
 
-
-
-
-
-            <!-- DOCUMENT STATUS -->
-
-
-            <div class="card mt-3">
-
-
-                <div class="card-header">
-
-
-                    <h5 class="card-title mb-0">
-
-
-                        <i data-feather="file-text" class="me-1"></i>
-
-
-                        Document Status
-
-
-                    </h5>
-
-
-                </div>
-
-
-
-
-
-                <div class="card-body">
-
-
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-
-
-                        <span>
-
-                            License
-
-                        </span>
-
-
-                        <span class="badge" [ngClass]="hasLicense()
-                        ? 'bg-success'
-                        : 'bg-danger'">
-
-
-                            {{ hasLicense() ? 'Uploaded' : 'Missing' }}
-
-
-                        </span>
-
-
-                    </div>
-
-
-
-
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-
-
-                        <span>
-
-                            Insurance
-
-                        </span>
-
-
-                        <span class="badge" [ngClass]="hasInsurance()
-                        ? 'bg-success'
-                        : 'bg-danger'">
-
-
-                            {{ hasInsurance() ? 'Uploaded' : 'Missing' }}
-
-
-                        </span>
-
-
-                    </div>
-
-
-
-
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-
-                        <span>
-
-                            Technical Check
-
-                        </span>
-
-
-                        <span class="badge" [ngClass]="hasTechnicalCheck()
-                        ? 'bg-success'
-                        : 'bg-danger'">
-
-
-                            {{ hasTechnicalCheck() ? 'Uploaded' : 'Missing' }}
-
-
-                        </span>
-
-
-                    </div>
-
-
-
-                </div>
-
-
-            </div>
-
-
-
-
-
         </div>
-
-
-
-
-
 
 
 
@@ -527,7 +379,7 @@
 
                                 <tr>
 
-                                    <th width="30%">
+                                    <th width="35%">
                                         Plate Number
                                     </th>
 
@@ -638,196 +490,37 @@
 
 
 
-                        <hr>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
 
 
 
-                        <div class="d-flex justify-content-end gap-2">
+                            <div class="d-flex justify-content-end gap-2 mt-4">
 
 
 
-                            <button class="btn btn-primary" (click)="editVehicle()">
+                                <button class="btn btn-outline-primary" (click)="editVehicle()">
 
+                                    <i data-feather="edit" class="me-1"></i>
 
-                                <i data-feather="edit" class="me-1"></i>
+                                    Edit
 
-                                Edit
+                                </button>
 
 
-                            </button>
 
 
+                                <button class="btn btn-outline-danger" (click)="deleteVehicle()">
 
+                                    <i data-feather="trash-2" class="me-1"></i>
 
+                                    Delete
 
-                            <button class="btn btn-danger" (click)="deleteVehicle()">
+                                </button>
 
 
 
-                                <i data-feather="trash-2" class="me-1"></i>
+                            </div>
 
-                                Delete
-
-
-
-                            </button>
-
-
-
-                        </div>
-
-
-
-                    </div>
-
-
-
-
-
-                    <!-- ================================================= -->
-                    <!-- DOCUMENTS TAB -->
-                    <!-- ================================================= -->
-
-
-                    <div *ngIf="selectedTab() === 'documents'">
-
-
-                        <div class="alert alert-info" *ngIf="documents().length === 0">
-
-
-                            No vehicle documents uploaded yet.
-
-
-                        </div>
-
-
-
-
-                        <table class="table table-hover" *ngIf="documents().length > 0">
-
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Title
-                                    </th>
-
-
-                                    <th>
-                                        Type
-                                    </th>
-
-
-                                    <th>
-                                        Year
-                                    </th>
-
-
-                                    <th class="text-end">
-
-                                        Actions
-
-                                    </th>
-
-
-                                </tr>
-
-                            </thead>
-
-
-
-                            <tbody>
-
-
-                                <tr *ngFor="let doc of documents()">
-
-
-
-                                    <td>
-                                        {{ doc.title }}
-                                    </td>
-
-
-
-                                    <td>
-
-                                        <span class="badge" [ngClass]="{
-
-                                        'bg-primary':
-                                        doc.type === 'LICENSE',
-
-                                        'bg-warning':
-                                        doc.type === 'TECHNICAL_CHECK',
-
-                                        'bg-success':
-                                        doc.type === 'INSURANCE'
-
-                                        }">
-
-
-                                            {{ doc.type }}
-
-
-                                        </span>
-
-
-                                    </td>
-
-
-
-                                    <td>
-
-                                        {{ doc.year }}
-
-                                    </td>
-
-                                    <td class="text-end">
-
-                                        <button class="btn btn-sm btn-outline-secondary"
-                                            (click)="viewVehicleDocument(doc.id)" title="View">
-
-                                            <i data-feather="info"></i>
-
-                                        </button>
-
-                                    </td>
-
-
-
-                                </tr>
-
-
-                            </tbody>
-
-
-                        </table>
-
-
-
-
-
-                    </div>
-
-
-
-
-
-
-
-                    <!-- ================================================= -->
-                    <!-- MISSIONS TAB -->
-                    <!-- ================================================= -->
-
-
-                    <div *ngIf="selectedTab() === 'missions'">
-
-
-                        <div class="alert alert-secondary" *ngIf="missions().length === 0">
-
-
-                            No missions assigned to this vehicle yet.
 
 
                         </div>
@@ -836,81 +529,289 @@
 
 
 
-                        <table class="table table-hover" *ngIf="missions().length > 0">
+                        <!-- ================================================= -->
+                        <!-- DOCUMENTS TAB -->
+                        <!-- ================================================= -->
+
+                        <div *ngIf="selectedTab() === 'documents'">
+
+                            <!-- DOCUMENT STATUS -->
+
+                            <div class="row g-3 mb-4">
+
+                                <div class="col-md-4">
+
+                                    <div class="card border">
+
+                                        <div class="card-body text-center">
+
+                                            <i data-feather="file-text" class="text-primary mb-3"
+                                                style="width:40px;height:40px;">
+                                            </i>
+
+                                            <h6>License</h6>
+
+                                            <span class="badge" [ngClass]="hasLicense() ? 'bg-success' : 'bg-danger'">
+
+                                                {{ hasLicense() ? 'Uploaded' : 'Missing' }}
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <div class="card border">
+
+                                        <div class="card-body text-center">
+
+                                            <i data-feather="shield" class="text-primary mb-3"
+                                                style="width:40px;height:40px;">
+                                            </i>
+
+                                            <h6>Insurance</h6>
+
+                                            <span class="badge" [ngClass]="hasInsurance() ? 'bg-success' : 'bg-danger'">
+
+                                                {{ hasInsurance() ? 'Uploaded' : 'Missing' }}
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <div class="card border">
+
+                                        <div class="card-body text-center">
+
+                                            <i data-feather="check-circle" class="text-primary mb-3"
+                                                style="width:40px;height:40px;">
+                                            </i>
+
+                                            <h6>Technical Check</h6>
+
+                                            <span class="badge"
+                                                [ngClass]="hasTechnicalCheck() ? 'bg-success' : 'bg-danger'">
+
+                                                {{ hasTechnicalCheck() ? 'Uploaded' : 'Missing' }}
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- GLOBAL STATUS -->
+
+                            <div class="alert" [ngClass]="
+            hasLicense() &&
+            hasInsurance() &&
+            hasTechnicalCheck()
+            ? 'alert-success'
+            : 'alert-warning'
+         ">
+
+                                <i data-feather="info" class="me-1"></i>
+
+                                <span *ngIf="
+            hasLicense() &&
+            hasInsurance() &&
+            hasTechnicalCheck()
+        ">
+                                    All required vehicle documents are uploaded.
+                                </span>
+
+                                <span *ngIf="
+            !(hasLicense() &&
+              hasInsurance() &&
+              hasTechnicalCheck())
+        ">
+                                    Vehicle documents are incomplete.
+                                </span>
+
+                            </div>
+
+                            <!-- DOCUMENT LIST -->
+
+                            <div class="mt-4">
+
+                                <div class="alert alert-info" *ngIf="documents().length === 0">
+
+                                    No vehicle documents uploaded yet.
+
+                                </div>
+
+                                <table class="table table-hover" *ngIf="documents().length > 0">
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>Title</th>
+
+                                            <th>Type</th>
+
+                                            <th>Year</th>
+
+                                            <th class="text-end">Actions</th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        <tr *ngFor="let doc of documents()">
+
+                                            <td>{{ doc.title }}</td>
+
+                                            <td>
+
+                                                <span class="badge" [ngClass]="{
+
+                              'bg-primary': doc.type === 'LICENSE',
+
+                              'bg-warning': doc.type === 'TECHNICAL_CHECK',
+
+                              'bg-success': doc.type === 'INSURANCE'
+
+                              }">
+
+                                                    {{ doc.type }}
+
+                                                </span>
+
+                                            </td>
+
+                                            <td>{{ doc.year }}</td>
+
+                                            <td class="text-end">
+
+                                                <button class="btn btn-sm btn-outline-secondary"
+                                                    (click)="viewVehicleDocument(doc.id)" title="View">
+
+                                                    <i data-feather="info"></i>
+
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
 
 
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Mission
-                                    </th>
 
 
-                                    <th>
-                                        Driver
-                                    </th>
 
 
-                                    <th>
-                                        Status
-                                    </th>
+                        <!-- ================================================= -->
+                        <!-- MISSIONS TAB -->
+                        <!-- ================================================= -->
 
 
-                                    <th>
-                                        Start Date
-                                    </th>
-
-                                    <th>
-                                        End Date
-                                    </th>
-
-                                    <th class="text-end">
-
-                                        Actions
-
-                                    </th>
+                        <div *ngIf="selectedTab() === 'missions'">
 
 
-                                </tr>
+                            <div class="alert alert-secondary" *ngIf="missions().length === 0">
 
 
-                            </thead>
+                                No missions assigned to this vehicle yet.
+
+
+                            </div>
 
 
 
 
 
-                            <tbody>
+                            <table class="table table-hover" *ngIf="missions().length > 0">
 
 
-                                <tr *ngFor="let mission of missions()">
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Mission
+                                        </th>
+
+
+                                        <th>
+                                            Driver
+                                        </th>
+
+
+                                        <th>
+                                            Status
+                                        </th>
+
+
+                                        <th>
+                                            Start Date
+                                        </th>
+
+                                        <th>
+                                            End Date
+                                        </th>
+
+                                        <th class="text-end">
+
+                                            Actions
+
+                                        </th>
+
+
+                                    </tr>
+
+
+                                </thead>
+
+
+                                <tbody>
+
+
+                                    <tr *ngFor="let mission of missions()">
 
 
 
-                                    <td>
+                                        <td>
 
-                                        {{ mission.title }}
+                                            {{ mission.title }}
 
-                                    </td>
-
-
+                                        </td>
 
 
-                                    <td>
+                                        <td>
 
-                                        {{ mission.driverName }}
+                                            {{ mission.driverName }}
 
-                                    </td>
-
-
+                                        </td>
 
 
-                                    <td>
+                                        <td>
 
 
-                                        <span class="badge" [ngClass]="{
+                                            <span class="badge" [ngClass]="{
 
 
                                         'bg-success':
@@ -932,54 +833,47 @@
                                         }">
 
 
-                                            {{ mission.status }}
+                                                {{ mission.status }}
 
 
-                                        </span>
+                                            </span>
 
 
-                                    </td>
+                                        </td>
 
 
+                                        <td>
+                                            {{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}
+                                        </td>
 
+                                        <td>
+                                            {{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}
+                                        </td>
 
-                                    <td>
-                                        {{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}
-                                    </td>
+                                        <td class="text-end">
 
-                                    <td>
-                                        {{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}
-                                    </td>
+                                            <button class="btn btn-sm btn-outline-secondary"
+                                                (click)="viewMissionDetails(mission.id)" title="View">
 
-                                    <td class="text-end">
+                                                <i data-feather="info"></i>
 
-                                        <button class="btn btn-sm btn-outline-secondary"
-                                            (click)="viewMissionDetails(mission.id)" title="View">
+                                            </button>
 
-                                            <i data-feather="info"></i>
-
-                                        </button>
-
-                                    </td>
-
+                                        </td>
 
 
 
-                                </tr>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
 
 
-                            </tbody>
-
-
-                        </table>
+                        </div>
 
 
                     </div>
-
-
-
-
-
 
                 </div>
 
@@ -988,6 +882,3 @@
         </div>
 
     </div>
-
-
-</div>
