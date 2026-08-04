@@ -4,7 +4,7 @@
   <!-- HEADER ACTIONS -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <button class="btn btn-outline-secondary" (click)="goBack()">
-      <i data-feather="arrow-left"></i>
+      <i data-feather="arrow-left" class="me-1"></i>
       Back to Users
     </button>
   </div>
@@ -145,11 +145,15 @@
 
         <div class="card-header">
 
+
           <h5 class="card-title mb-0">
+
+            <i data-feather="info" class="me-1"></i>
 
             Quick Information
 
           </h5>
+
 
         </div>
 
@@ -457,6 +461,9 @@
 
 
 
+
+
+
           </div>
 
 
@@ -611,18 +618,11 @@
             <!-- DOCUMENT LIST FUTURE READY -->
 
 
-            <div class="mt-4" *ngIf="driverDocs().length > 0">
+            <div class="mt-4">
 
 
 
-              <!-- 
-              <h5>
-                Uploaded Documents
-              </h5>
-              -->
-
-
-              <table class="table table-hover">
+              <table class="table table-hover" *ngIf="driverDocs().length > 0">
 
 
                 <thead>
@@ -726,25 +726,25 @@
               </table>
 
 
-            </div>
+
+              <!-- EMPTY STATE -->
 
 
-
-            <!-- EMPTY STATE -->
-
-
-            <div *ngIf="driverDocs().length === 0" class="text-center text-muted py-4">
+              <div *ngIf="driverDocs().length === 0" class="text-center text-muted py-4">
 
 
-              <i data-feather="file" style="width:40px;height:40px;">
-              </i>
+                <i data-feather="file" style="width:40px;height:40px;">
+                </i>
 
 
-              <p class="mt-2">
+                <p class="mt-2">
 
-                No documents uploaded yet.
+                  No documents uploaded yet.
 
-              </p>
+                </p>
+
+
+              </div>
 
 
             </div>

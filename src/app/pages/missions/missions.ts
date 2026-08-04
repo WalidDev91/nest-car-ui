@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { forkJoin } from 'rxjs';
 import feather from 'feather-icons';
@@ -255,25 +256,28 @@ export class Missions implements OnInit {
     | 'CANCELLED'
     = 'PLANNED';
 
-  driverId = '';
-  vehicleId = '';
+  driverId: string | null = null;
+  vehicleId: string | null = null;
 
   constructor(
     private missionService: MissionService,
     private userService: UserService,
     private vehicleService: VehicleService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    this.loadData();
+
+    this.loadMissions();
+
   }
 
   // ==========================================================
   // LOAD DATA
   // ==========================================================
 
-  loadData() {
+  loadMissions(): void {
 
     this.loading.set(true);
 
@@ -297,7 +301,61 @@ export class Missions implements OnInit {
 
         this.loading.set(false);
 
-        setTimeout(() => feather.replace());
+        this.route.queryParams.subscribe(params => {
+
+          // =========================
+          // EDIT
+          // =========================
+
+          const editId = params['edit'];
+
+          if (editId) {
+
+            const mission = this.missions().find(m => m.id === editId);
+
+            if (mission) {
+
+              this.openEditModal(mission);
+
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: {},
+                replaceUrl: true
+              });
+
+            }
+
+            return;
+
+          }
+
+          // =========================
+          // DELETE
+          // =========================
+
+          const deleteId = params['delete'];
+
+          if (deleteId) {
+
+            const mission = this.missions().find(m => m.id === deleteId);
+
+            if (mission) {
+
+              this.deleteMission(mission.id);
+
+              this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: {},
+                replaceUrl: true
+              });
+
+            }
+
+          }
+
+        });
+
+        setTimeout(() => feather.replace(), 0);
 
       },
 
@@ -315,7 +373,7 @@ export class Missions implements OnInit {
 
   refresh() {
 
-    this.loadData();
+    this.loadMissions();
 
   }
 
@@ -432,7 +490,7 @@ export class Missions implements OnInit {
 
           next: () => {
 
-            this.loadData();
+            this.loadMissions();
 
             this.closeModal();
 
@@ -454,7 +512,7 @@ export class Missions implements OnInit {
 
         next: () => {
 
-          this.loadData();
+          this.loadMissions();
 
           this.closeModal();
 
@@ -490,7 +548,7 @@ export class Missions implements OnInit {
 
       next: () => {
 
-        this.loadData();
+        this.loadMissions();
 
         this.missionToDeleteId = null;
 

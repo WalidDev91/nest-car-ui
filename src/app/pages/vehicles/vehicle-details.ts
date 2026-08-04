@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import feather from 'feather-icons';
@@ -30,6 +30,8 @@ export class VehicleDetails implements OnInit {
 
   loading = signal(false);
 
+  error = signal('');
+
   // ==========================================================
   // STATUS
   // ==========================================================
@@ -38,13 +40,10 @@ export class VehicleDetails implements OnInit {
   hasLicense = signal(false);
   hasTechnicalCheck = signal(false);
 
-  // ==========================================================
-  // MULTIPLE IMAGE UPLOAD
-  // ==========================================================
-
-  // photos: string[] = [];
-
-
+  // Availability — mirrors the same logic used on the vehicles list page
+  isInMission = computed(() =>
+    this.missions().some(m => m.status === 'ONGOING')
+  );
 
   // ==========================================================
   // TABS
@@ -68,7 +67,10 @@ export class VehicleDetails implements OnInit {
 
     const id = this.route.snapshot.paramMap.get('id');
 
-    if (!id) return;
+    if (!id) {
+      this.error.set('Invalid vehicle id');
+      return;
+    }
 
     this.loadVehicle(id);
 
@@ -81,6 +83,7 @@ export class VehicleDetails implements OnInit {
   loadVehicle(id: string) {
 
     this.loading.set(true);
+    this.error.set('');
 
     this.vehicleService.getById(id).subscribe({
 
@@ -102,6 +105,8 @@ export class VehicleDetails implements OnInit {
 
         console.error(err);
 
+        this.error.set('Unable to load vehicle information.');
+
         this.loading.set(false);
 
       }
@@ -122,27 +127,17 @@ export class VehicleDetails implements OnInit {
 
         this.documents.set(docs);
 
-
         this.hasLicense.set(
-
           docs.some(d => d.type === 'LICENSE')
-
         );
-
 
         this.hasInsurance.set(
-
           docs.some(d => d.type === 'INSURANCE')
-
         );
-
 
         this.hasTechnicalCheck.set(
-
           docs.some(d => d.type === 'TECHNICAL_CHECK')
-
         );
-
 
       },
 
@@ -161,9 +156,7 @@ export class VehicleDetails implements OnInit {
     this.missionService.getByVehicleId(vehicleId).subscribe({
 
       next: missions => {
-
         this.missions.set(missions);
-
       },
 
       error: err => console.error(err)
@@ -255,6 +248,5 @@ export class VehicleDetails implements OnInit {
     ]);
 
   }
-
 
 }

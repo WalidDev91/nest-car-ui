@@ -302,4 +302,85 @@ export class UserDetails implements OnInit {
   }
 
 
+  // ==========================
+  // ACTIONS
+  // ==========================
+
+  editUser(): void {
+
+    const user = this.user();
+
+    if (!user) return;
+
+    this.router.navigate(
+      ['/users'],
+      {
+        queryParams: {
+          edit: user.id
+        }
+      }
+    );
+
+  }
+
+  deleteUser(): void {
+
+    const user = this.user();
+
+    if (!user) return;
+
+    this.router.navigate(
+      ['/users'],
+      {
+        queryParams: {
+          delete: user.id
+        }
+      }
+    );
+
+  }
+
+  activateUser(): void {
+
+    const user = this.user();
+
+    if (!user) return;
+
+    this.userService.activate(user.id).subscribe({
+
+      next: () => {
+        this.refresh();
+      },
+
+      error: err => {
+        console.error(err);
+        alert('Activate failed');
+      }
+
+    });
+
+  }
+
+  deactivateUser(): void {
+
+    const user = this.user();
+
+    if (!user) return;
+
+    this.userService.deactivate(user.id).subscribe({
+
+      next: () => {
+        this.refresh();
+      },
+
+      error: err => {
+        console.error(err);
+        alert('Deactivate failed');
+      }
+
+    });
+
+  }
+
+
 }

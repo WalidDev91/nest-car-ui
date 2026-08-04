@@ -47,6 +47,10 @@ export class Users implements OnInit {
 
   selectedSupervisorId = '';
 
+  selectedRoleValue = '';
+
+  actionType: 'ACTIVATE' | 'DEACTIVATE' | null = null;
+
   // ==========================================================
   // STATISTICS
   // ==========================================================
@@ -338,66 +342,148 @@ export class Users implements OnInit {
 
   }
 
-  activateUser(user: User) {
+  openStatusModal(user: User) {
 
-    this.userService.activate(user.id).subscribe({
+    this.selectedUser = user;
 
-      next: () => {
-        alert('User activated');
-        this.loadUsers();
-      },
+    this.actionType = user.isValidate
+      ? 'DEACTIVATE'
+      : 'ACTIVATE';
 
-      error: (err) => {
-        console.error(err);
-        alert('Activate failed');
-      }
 
-    });
+    const modalElement =
+      document.getElementById('statusModal');
+
+
+    if (!modalElement) {
+      return;
+    }
+
+
+    const modal = new bootstrap.Modal(
+      modalElement
+    );
+
+
+    modal.show();
 
   }
 
-  deactivateUser(user: User) {
+  confirmStatusChange() {
 
-    this.userService.deactivate(user.id).subscribe({
+
+    if (!this.selectedUser || !this.actionType) {
+      return;
+    }
+
+
+    const request =
+      this.actionType === 'ACTIVATE'
+        ? this.userService.activate(this.selectedUser.id)
+        : this.userService.deactivate(this.selectedUser.id);
+
+
+
+    request.subscribe({
+
 
       next: () => {
-        alert('User deactivated');
-        this.loadUsers(); // or however you refresh the list — reuse whatever method populates users()
+
+
+        const modalElement =
+          document.getElementById('statusModal');
+
+
+        if (modalElement) {
+
+          bootstrap.Modal
+            .getInstance(modalElement)
+            ?.hide();
+
+        }
+
+
+
+        this.loadUsers();
+
+
+
+        this.selectedUser = null;
+
+        this.actionType = null;
+
+
       },
 
-      error: (err) => {
+
+
+      error: err => {
+
         console.error(err);
-        alert('Deactivate failed');
+
       }
 
+
     });
+
 
   }
 
   changeRole(user: User) {
 
-    const newRole = prompt(
-      'New role (SUPER_ADMIN / ADMIN / FLEET_MANAGER / DRIVER):',
-      user.role
+    this.selectedUser = user;
+
+    this.selectedRoleValue = user.role;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('roleModal')
     );
 
-    if (!newRole) {
+    modal.show();
+
+  }
+
+  saveRoleChange() {
+
+    if (!this.selectedUser) {
       return;
     }
 
-    this.userService.changeRole(user.id, newRole).subscribe({
 
-      next: () => {
-        alert('Role updated');
-        this.loadUsers();
-      },
+    this.userService.changeRole(
+      this.selectedUser.id,
+      this.selectedRoleValue
+    )
+      .subscribe({
 
-      error: (err) => {
-        console.error(err);
-        alert('Role update failed');
-      }
+        next: () => {
 
-    });
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('roleModal')
+            )
+            ?.hide();
+
+
+          this.loadUsers();
+
+
+          this.selectedUser = null;
+
+          this.selectedRoleValue = '';
+
+        },
+
+
+        error: err => {
+
+          console.error(err);
+
+          alert('Role update failed');
+
+        }
+
+      });
 
   }
 

@@ -18,13 +18,22 @@
 
     <!-- LOADING -->
 
-    <div class="text-center py-5" *ngIf="!vehicle()">
+    <div class="text-center py-5" *ngIf="loading()">
 
         <div class="spinner-border text-primary"></div>
 
         <p class="mt-3 text-muted">
             Loading vehicle information...
         </p>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div *ngIf="error()" class="alert alert-danger">
+
+        {{ error() }}
 
     </div>
 
@@ -149,6 +158,26 @@
                     </p>
 
 
+                    <!-- AVAILABILITY -->
+
+                    <div>
+
+                        <span class="badge" [ngClass]="
+                            isInMission()
+                            ? 'bg-warning'
+                            : 'bg-success'">
+
+                            {{
+                            isInMission()
+                            ? 'In Mission'
+                            : 'Available'
+                            }}
+
+                        </span>
+
+                    </div>
+
+
 
                 </div>
 
@@ -160,12 +189,9 @@
 
             <!-- QUICK INFORMATION -->
 
-
             <div class="card mt-3">
 
-
                 <div class="card-header">
-
 
                     <h5 class="card-title mb-0">
 
@@ -175,91 +201,31 @@
 
                     </h5>
 
-
                 </div>
-
-
-
 
                 <div class="card-body">
 
+                    <div class="mb-2">
 
-                    <div class="row text-center">
+                        <strong>Manufacturing Year:</strong>
 
+                        <br>
 
-
-                        <div class="col-4">
-
-
-                            <h4 class="mb-1">
-
-                                {{ vehicle.year }}
-
-                            </h4>
-
-
-                            <small class="text-muted">
-
-                                Year
-
-                            </small>
-
-
-                        </div>
-
-
-
-
-
-                        <div class="col-4">
-
-
-                            <h4 class="mb-1">
-
-                                {{ documents().length }}
-
-                            </h4>
-
-
-                            <small class="text-muted">
-
-                                Documents
-
-                            </small>
-
-
-                        </div>
-
-
-
-
-
-                        <div class="col-4">
-
-
-                            <h4 class="mb-1">
-
-                                {{ missions().length }}
-
-                            </h4>
-
-
-                            <small class="text-muted">
-
-                                Missions
-
-                            </small>
-
-
-                        </div>
-
-
+                        {{ vehicle.year }}
 
                     </div>
 
+                    <div>
+
+                        <strong>Missions:</strong>
+
+                        <br>
+
+                        {{ missions().length }}
+
+                    </div>
 
                 </div>
-
 
             </div>
 
@@ -427,6 +393,33 @@
 
                                     <td>
                                         {{ vehicle.year }}
+                                    </td>
+
+                                </tr>
+
+
+
+                                <tr>
+
+                                    <th>
+                                        Availability
+                                    </th>
+
+                                    <td>
+
+                                        <span class="badge" [ngClass]="
+                                            isInMission()
+                                            ? 'bg-warning'
+                                            : 'bg-success'">
+
+                                            {{
+                                            isInMission()
+                                            ? 'In Mission'
+                                            : 'Available'
+                                            }}
+
+                                        </span>
+
                                     </td>
 
                                 </tr>
@@ -636,12 +629,6 @@
 
                         <div class="mt-4">
 
-                            <div class="alert alert-info" *ngIf="documents().length === 0">
-
-                                No documents uploaded yet.
-
-                            </div>
-
                             <table class="table table-hover" *ngIf="documents().length > 0">
 
                                 <thead>
@@ -709,6 +696,22 @@
 
                             </table>
 
+
+                            <!-- EMPTY STATE -->
+
+                            <div *ngIf="documents().length === 0" class="text-center text-muted py-4">
+
+                                <i data-feather="file" style="width:40px;height:40px;">
+                                </i>
+
+                                <p class="mt-2">
+
+                                    No documents uploaded yet.
+
+                                </p>
+
+                            </div>
+
                         </div>
 
                     </div>
@@ -726,11 +729,16 @@
                     <div *ngIf="selectedTab() === 'missions'">
 
 
-                        <div class="alert alert-secondary" *ngIf="missions().length === 0">
+                        <div *ngIf="missions().length === 0" class="text-center text-muted py-4">
 
+                            <i data-feather="map" style="width:40px;height:40px;">
+                            </i>
 
-                            No missions assigned to this vehicle yet.
+                            <p class="mt-2">
 
+                                No missions assigned to this vehicle yet.
+
+                            </p>
 
                         </div>
 

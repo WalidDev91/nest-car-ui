@@ -36,6 +36,7 @@ export class Login {
         localStorage.setItem('firstName', response.firstName);
         localStorage.setItem('lastName', response.lastName);
         localStorage.setItem('userId', response.id);
+        localStorage.setItem('imageUrl', response.imageUrl ?? '');
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {

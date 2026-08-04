@@ -83,7 +83,7 @@ export class MissionDocumentService {
 
 
 
-  delete(id: string) {
+  deleteDocument(id: string) {
 
     return this.http.delete(
       `${this.baseUrl}/${id}`
@@ -97,15 +97,15 @@ export class MissionDocumentService {
 
   download(id: string) {
 
-  return this.http.get(
-    `${this.baseUrl}/${id}/download`,
-    {
-      observe:'response',
-      responseType:'blob'
-    }
-  );
+    return this.http.get(
+      `${this.baseUrl}/${id}/download`,
+      {
+        observe: 'response',
+        responseType: 'blob'
+      }
+    );
 
-}
+  }
 
 
 

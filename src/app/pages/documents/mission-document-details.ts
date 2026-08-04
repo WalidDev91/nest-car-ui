@@ -252,7 +252,7 @@ export class MissionDocumentDetails implements OnInit {
 
 
     this.documentService
-      .delete(doc.id)
+      .deleteDocument(doc.id)
       .subscribe({
 
         next: () => {
