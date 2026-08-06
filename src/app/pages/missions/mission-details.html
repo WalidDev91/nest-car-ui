@@ -472,146 +472,101 @@
 
                     <div *ngIf="selectedTab() === 'documents'">
 
-                        <!-- Verification — plain section, no nested card -->
+                        <div *ngIf="mission.documents?.length" class="table-responsive">
 
-                        <div class="mb-4">
+                            <table class="table table-hover align-middle">
 
-                            <!--
-                            <h6 class="mb-3">
+                                <thead>
 
-                                <i data-feather="shield" class="me-1"></i>
+                                    <tr>
 
-                                Document Verification
+                                        <th>Document</th>
 
-                            </h6>
-                             -->
+                                        <th>Created</th>
 
-                            <div *ngIf="documentsVerified()" class="alert alert-success d-flex align-items-center mb-0">
+                                        <th>Status</th>
 
-                                <i data-feather="check-circle" class="me-2"></i>
+                                        <th class="text-end">Actions</th>
 
-                                <div>
+                                    </tr>
 
-                                    Documents verified
+                                </thead>
 
-                                    <div class="small text-muted">
+                                <tbody>
 
-                                        {{ verificationDate() | date:'dd/MM/yyyy HH:mm' }}
+                                    <tr *ngFor="let doc of mission.documents">
 
-                                    </div>
+                                        <td>
 
-                                </div>
+                                            <strong>{{ doc.title }}</strong>
 
-                            </div>
+                                        </td>
 
-                            <div *ngIf="!documentsVerified()">
+                                        <td>
 
-                                <p class="text-muted mb-3">
+                                            {{ doc.createdAt | date:'dd/MM/yyyy' }}
 
-                                    Verify the required mission documents before departure.
+                                        </td>
 
-                                </p>
+                                        <td>
 
-                                <button class="btn btn-success" [disabled]="!mission.documents?.length"
-                                    (click)="verifyDocuments()">
+                                            <span class="badge" [ngClass]="mission.documentsVerified
+                                ? 'bg-success'
+                                : 'bg-warning text-dark'">
 
-                                    <i data-feather="check" class="me-1"></i>
+                                                {{ mission.documentsVerified ? 'Verified' : 'Pending' }}
 
-                                    Verify Documents
+                                            </span>
 
-                                </button>
+                                        </td>
 
-                                <div *ngIf="!mission.documents?.length" class="small text-danger mt-2">
+                                        <td class="text-end">
 
-                                    No mission documents available.
+                                            <!-- Preview -->
 
-                                </div>
+                                            <button class="btn btn-sm btn-outline-secondary me-1"
+                                                (click)="previewMissionDocument(doc.id)" title="Preview">
 
-                            </div>
+                                                <i data-feather="eye"></i>
+
+                                            </button>
+
+                                            <!-- Verify -->
+
+                                            <button *ngIf="!mission.documentsVerified"
+                                                class="btn btn-sm btn-success me-1" (click)="verifyDocuments()">
+
+                                                <i data-feather="check"></i>
+
+                                            </button>
+
+                                            <!-- Edit Verification -->
+
+                                            <button *ngIf="mission.documentsVerified"
+                                                class="btn btn-sm btn-outline-warning"
+                                                (click)="editDocumentsVerification()">
+
+                                                <i data-feather="edit"></i>
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
 
                         </div>
 
-                        <!-- Documents list -->
-                        <!-- 
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-
-                            <h6 class="mb-0">
-
-                                Mission Documents
-
-                            </h6>
-
-                           
-
-                            <span class="badge bg-light text-dark">
-
-                                {{ mission.documents?.length || 0 }}
-
-                            </span>
-                            
-
-                        </div>
-                        -->
-                        <table *ngIf="mission.documents?.length" class="table table-hover align-middle">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>Document</th>
-
-                                    <th>Date</th>
-
-                                    <th class="text-end">Actions</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody>
-
-                                <tr *ngFor="let doc of mission.documents">
-
-                                    <td>
-
-                                        <strong>
-
-                                            {{ doc.title }}
-
-                                        </strong>
-
-                                    </td>
-
-                                    <td>
-
-                                        {{ doc.createdAt | date:'dd/MM/yyyy' }}
-
-                                    </td>
-
-                                    <td class="text-end">
-
-                                        <button class="btn btn-sm btn-outline-secondary"
-                                            (click)="viewMissionDocument(doc.id)" title="View">
-
-                                            <i data-feather="info"></i>
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                        <div *ngIf="!mission.documents?.length" class="text-center text-muted py-4">
+                        <div *ngIf="!mission.documents?.length" class="text-center text-muted py-5">
 
                             <i data-feather="file-text" style="width:40px;height:40px;"></i>
 
                             <p class="mt-2 mb-0">
 
-                                No documents uploaded yet.
+                                No mission documents uploaded yet.
 
                             </p>
 
