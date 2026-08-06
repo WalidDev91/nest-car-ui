@@ -255,6 +255,28 @@ export class Documents implements OnInit {
   driverTypeError = false;
   driverFileError = false;
 
+  selectedDriverDocument = signal<any | null>(null);
+
+  selectedValidationStatus:
+    'PENDING' | 'APPROVED' | 'REJECTED' = 'PENDING';
+
+
+  // DRIVER — edit/delete state
+  editDriverMode = false;
+  editingDriverDocumentId: string | null = null;
+  driverDocumentToDeleteId: string | null = null;
+
+
+  // VEHICLE — edit/delete state
+  editVehicleMode = false;
+  editingVehicleDocumentId: string | null = null;
+  vehicleDocumentToDeleteId: string | null = null;
+
+  // MISSION — edit/delete state
+  editMissionMode = false;
+  editingMissionDocumentId: string | null = null;
+  missionDocumentToDeleteId: string | null = null;
+
 
 
 
@@ -697,6 +719,50 @@ export class Documents implements OnInit {
 
   uploadMissionDocument() {
 
+    // =============================
+    // EDIT
+    // =============================
+
+    if (this.editMissionMode && this.editingMissionDocumentId) {
+
+      this.missionTitleError = !this.uploadMissionTitle.trim();
+
+      if (this.missionTitleError) {
+        return;
+      }
+
+      this.missionDocumentService.update(
+
+        this.editingMissionDocumentId,
+
+        {
+
+          title: this.uploadMissionTitle
+
+        }
+
+      ).subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+          this.resetMissionModal();
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+      return;
+
+    }
+
+    // =============================
+    // CREATE
+    // =============================
+
     this.missionTitleError = !this.uploadMissionTitle.trim();
     this.missionIdError = !this.uploadMissionId;
     this.missionFileError = !this.selectedMissionFile;
@@ -761,6 +827,60 @@ export class Documents implements OnInit {
   }
 
   uploadVehicleDocument() {
+
+    // =============================
+    // EDIT
+    // =============================
+
+    if (this.editVehicleMode && this.editingVehicleDocumentId) {
+
+      this.vehicleTitleError = !this.uploadVehicleTitle.trim();
+      this.vehicleTypeError = !this.uploadVehicleType;
+      this.vehicleYearError = !this.uploadVehicleYear;
+
+      if (
+        this.vehicleTitleError ||
+        this.vehicleTypeError ||
+        this.vehicleYearError
+      ) {
+        return;
+      }
+
+      this.vehicleDocumentService.update(
+
+        this.editingVehicleDocumentId,
+
+        {
+
+          title: this.uploadVehicleTitle,
+
+          type: this.uploadVehicleType,
+
+          year: this.uploadVehicleYear
+
+        }
+
+      ).subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+          this.resetVehicleModal();
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+      return;
+
+    }
+
+    // =============================
+    // CREATE
+    // =============================
 
     this.vehicleTitleError = !this.uploadVehicleTitle.trim();
     this.vehicleTypeError = !this.uploadVehicleType;
@@ -841,13 +961,57 @@ export class Documents implements OnInit {
 
     this.driverTitleError = !this.uploadDriverTitle.trim();
     this.driverTypeError = !this.uploadDriverType;
-    this.driverFileError = !this.selectedDriverFile;
 
     if (
       this.driverTitleError ||
-      this.driverTypeError ||
-      this.driverFileError
+      this.driverTypeError
     ) {
+      return;
+    }
+
+    // =============================
+    // EDIT
+    // =============================
+
+    if (this.editDriverMode && this.editingDriverDocumentId) {
+
+      this.driverDocumentService.update(
+
+        this.editingDriverDocumentId,
+
+        {
+
+          title: this.uploadDriverTitle,
+
+          type: this.uploadDriverType
+
+        }
+
+      ).subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+          this.resetDriverModal();
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+      return;
+
+    }
+
+    // =============================
+    // CREATE
+    // =============================
+
+    this.driverFileError = !this.selectedDriverFile;
+
+    if (this.driverFileError) {
       return;
     }
 
@@ -856,46 +1020,563 @@ export class Documents implements OnInit {
     }
 
     this.driverDocumentService.upload(
+
       this.selectedDriverFile!,
+
       this.uploadDriverTitle,
+
       this.uploadDriverType,
+
       this.currentUserId
+
     ).subscribe({
 
       next: () => {
 
         this.loadDocuments();
 
-        bootstrap.Modal.getInstance(
-          document.getElementById('uploadDriverDocumentModal')
-        )?.hide();
-
-        this.selectedDriverFile = null;
-        this.uploadDriverTitle = '';
-        this.uploadDriverType = '';
-
-        this.driverTitleError = false;
-        this.driverTypeError = false;
-        this.driverFileError = false;
-
-        const input = document.getElementById('driverFileInput') as HTMLInputElement;
-
-        if (input) {
-          input.value = '';
-        }
-
-        setTimeout(() => feather.replace(), 0);
+        this.resetDriverModal();
 
       },
 
       error: err => {
 
         console.error(err);
+
         alert('Driver document upload failed');
 
       }
 
     });
+
+  }
+
+  resetDriverModal(): void {
+
+    this.editDriverMode = false;
+
+    this.editingDriverDocumentId = null;
+
+    this.uploadDriverTitle = '';
+
+    this.uploadDriverType = '';
+
+    this.selectedDriverFile = null;
+
+    this.driverTitleError = false;
+
+    this.driverTypeError = false;
+
+    this.driverFileError = false;
+
+    const input = document.getElementById(
+      'driverFileInput'
+    ) as HTMLInputElement;
+
+    if (input) {
+      input.value = '';
+    }
+
+    bootstrap.Modal
+      .getInstance(document.getElementById('uploadDriverDocumentModal'))
+      ?.hide();
+
+  }
+
+  resetVehicleModal(): void {
+
+    this.editVehicleMode = false;
+
+    this.editingVehicleDocumentId = null;
+
+    this.uploadVehicleTitle = '';
+
+    this.uploadVehicleType = '';
+
+    this.uploadVehicleYear = new Date().getFullYear();
+
+    this.uploadVehicleId = '';
+
+    this.selectedVehicleFile = null;
+
+    this.vehicleTitleError = false;
+
+    this.vehicleTypeError = false;
+
+    this.vehicleYearError = false;
+
+    this.vehicleIdError = false;
+
+    this.vehicleFileError = false;
+
+    const input = document.getElementById(
+      'vehicleFileInput'
+    ) as HTMLInputElement;
+
+    if (input) {
+      input.value = '';
+    }
+
+    bootstrap.Modal
+      .getInstance(document.getElementById('uploadVehicleDocumentModal'))
+      ?.hide();
+
+  }
+
+  resetMissionModal(): void {
+
+    this.editMissionMode = false;
+
+    this.editingMissionDocumentId = null;
+
+    this.uploadMissionTitle = '';
+
+    this.uploadMissionId = '';
+
+    this.selectedMissionFile = null;
+
+    this.missionTitleError = false;
+
+    this.missionIdError = false;
+
+    this.missionFileError = false;
+
+    const input = document.getElementById(
+      'missionFileInput'
+    ) as HTMLInputElement;
+
+    if (input) {
+      input.value = '';
+    }
+
+    bootstrap.Modal
+      .getInstance(document.getElementById('uploadMissionDocumentModal'))
+      ?.hide();
+
+  }
+
+  deleteDriverDocument(id: string): void {
+
+    this.driverDocumentToDeleteId = id;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('deleteDriverDocumentModal')
+    );
+
+    modal.show();
+
+  }
+
+  confirmDeleteDriverDocument(): void {
+
+    if (!this.driverDocumentToDeleteId) {
+      return;
+    }
+
+    this.driverDocumentService
+      .deleteDriverDocument(this.driverDocumentToDeleteId)
+      .subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+          this.driverDocumentToDeleteId = null;
+
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('deleteDriverDocumentModal')
+            )
+            ?.hide();
+
+        },
+
+        error: err => {
+
+          console.error(err);
+
+        }
+
+      });
+
+  }
+
+  previewDriverDocument(id: string): void {
+
+    this.driverDocumentService
+      .previewDriverDocument(id)
+      .subscribe({
+
+        next: blob => {
+
+          const url = URL.createObjectURL(blob);
+
+          window.open(url, '_blank');
+
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 1000);
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+  }
+
+  approveDriverDocument(id: string): void {
+
+    this.driverDocumentService
+      .updateDriverDocumentStatus(
+        id,
+        'APPROVED'
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+  }
+
+  rejectDriverDocument(id: string): void {
+
+    this.driverDocumentService
+      .updateDriverDocumentStatus(
+        id,
+        'REJECTED'
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+  }
+
+  openChangeValidationModal(doc: any): void {
+
+    this.selectedDriverDocument.set(doc);
+
+    this.selectedValidationStatus = doc.status;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('changeValidationModal')
+    );
+
+    modal.show();
+
+  }
+
+  saveDriverValidation(): void {
+
+    const doc = this.selectedDriverDocument();
+
+    if (!doc) return;
+
+    this.driverDocumentService
+      .updateDriverDocumentStatus(
+        doc.id,
+        this.selectedValidationStatus
+      )
+      .subscribe({
+
+        next: () => {
+
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('changeValidationModal')
+            )
+            ?.hide();
+
+          this.selectedDriverDocument.set(null);
+
+          this.loadDocuments();
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+  }
+
+
+  openEditDriverDocumentModal(doc: DriverDocument): void {
+
+    this.editDriverMode = true;
+
+    this.editingDriverDocumentId = doc.id;
+
+    this.uploadDriverTitle = doc.title;
+
+    this.uploadDriverType = doc.type;
+
+    this.selectedDriverFile = null;
+
+    this.driverTitleError = false;
+    this.driverTypeError = false;
+    this.driverFileError = false;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('uploadDriverDocumentModal')
+    );
+
+    modal.show();
+
+  }
+
+  openEditVehicleDocumentModal(doc: VehicleDocument): void {
+
+    this.editVehicleMode = true;
+
+    this.editingVehicleDocumentId = doc.id;
+
+    this.uploadVehicleTitle = doc.title;
+
+    this.uploadVehicleType = doc.type;
+
+    this.uploadVehicleYear = doc.year;
+
+    this.selectedVehicleFile = null;
+
+    this.vehicleTitleError = false;
+    this.vehicleTypeError = false;
+    this.vehicleYearError = false;
+    this.vehicleIdError = false;
+    this.vehicleFileError = false;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('uploadVehicleDocumentModal')
+    );
+
+    modal.show();
+
+  }
+
+  deleteVehicleDocument(id: string): void {
+
+    this.vehicleDocumentToDeleteId = id;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('deleteVehicleDocumentModal')
+    );
+
+    modal.show();
+
+  }
+
+  confirmDeleteVehicleDocument(): void {
+
+    if (!this.vehicleDocumentToDeleteId) {
+      return;
+    }
+
+    this.vehicleDocumentService
+      .delete(this.vehicleDocumentToDeleteId)
+      .subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+          this.vehicleDocumentToDeleteId = null;
+
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('deleteVehicleDocumentModal')
+            )
+            ?.hide();
+
+        },
+
+        error: err => {
+          console.error(err);
+        }
+
+      });
+
+  }
+
+  previewVehicleDocument(id: string): void {
+
+    this.vehicleDocumentService
+      .previewVehicleDocument(id)
+      .subscribe({
+
+        next: blob => {
+
+          const url = URL.createObjectURL(blob);
+
+          window.open(url, '_blank');
+
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 1000);
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+  }
+
+  openEditMissionDocumentModal(doc: MissionDocument): void {
+
+    this.editMissionMode = true;
+
+    this.editingMissionDocumentId = doc.id;
+
+    this.uploadMissionTitle = doc.title;
+
+    this.selectedMissionFile = null;
+
+    this.missionTitleError = false;
+    this.missionIdError = false;
+    this.missionFileError = false;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('uploadMissionDocumentModal')
+    );
+
+    modal.show();
+
+  }
+
+  deleteMissionDocument(id: string): void {
+
+    this.missionDocumentToDeleteId = id;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('deleteMissionDocumentModal')
+    );
+
+    modal.show();
+
+  }
+
+  confirmDeleteMissionDocument(): void {
+
+    if (!this.missionDocumentToDeleteId) {
+      return;
+    }
+
+    this.missionDocumentService
+      .deleteDocument(this.missionDocumentToDeleteId)
+      .subscribe({
+
+        next: () => {
+
+          this.loadDocuments();
+
+          this.missionDocumentToDeleteId = null;
+
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('deleteMissionDocumentModal')
+            )
+            ?.hide();
+
+        },
+
+        error: err => {
+          console.error(err);
+        }
+
+      });
+
+  }
+
+  previewMissionDocument(id: string): void {
+
+    this.missionDocumentService
+      .previewMissionDocument(id)
+      .subscribe({
+
+        next: blob => {
+
+          const url = URL.createObjectURL(blob);
+
+          window.open(url, '_blank');
+
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 1000);
+
+        },
+
+        error: err => console.error(err)
+
+      });
+
+  }
+
+  openCreateDriverDocumentModal(): void {
+
+    this.editDriverMode = false;
+    this.editingDriverDocumentId = null;
+
+    this.uploadDriverTitle = '';
+    this.uploadDriverType = '';
+    this.selectedDriverFile = null;
+
+    this.driverTitleError = false;
+    this.driverTypeError = false;
+    this.driverFileError = false;
+
+    new bootstrap.Modal(document.getElementById('uploadDriverDocumentModal')).show();
+
+  }
+
+  openCreateVehicleDocumentModal(): void {
+
+    this.editVehicleMode = false;
+    this.editingVehicleDocumentId = null;
+
+    this.uploadVehicleTitle = '';
+    this.uploadVehicleType = '';
+    this.uploadVehicleYear = new Date().getFullYear();
+    this.uploadVehicleId = '';
+    this.selectedVehicleFile = null;
+
+    this.vehicleTitleError = false;
+    this.vehicleTypeError = false;
+    this.vehicleYearError = false;
+    this.vehicleIdError = false;
+    this.vehicleFileError = false;
+
+    new bootstrap.Modal(document.getElementById('uploadVehicleDocumentModal')).show();
+
+  }
+
+  openCreateMissionDocumentModal(): void {
+
+    this.editMissionMode = false;
+    this.editingMissionDocumentId = null;
+
+    this.uploadMissionTitle = '';
+    this.uploadMissionId = '';
+    this.selectedMissionFile = null;
+
+    this.missionTitleError = false;
+    this.missionIdError = false;
+    this.missionFileError = false;
+
+    new bootstrap.Modal(document.getElementById('uploadMissionDocumentModal')).show();
 
   }
 

@@ -108,5 +108,29 @@ export class MissionDocumentService {
   }
 
 
+  update(
+    id: string,
+    request: {
+      title: string;
+    }
+  ) {
+
+    return this.http.put<MissionDocument>(
+      `${this.baseUrl}/${id}`,
+      request
+    );
+
+  }
+
+  previewMissionDocument(id: string) {
+
+    return this.http.get(
+      `${this.baseUrl}/${id}/preview`,
+      {
+        responseType: 'blob'
+      }
+    );
+
+  }
 
 }

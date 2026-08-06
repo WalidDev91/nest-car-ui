@@ -69,17 +69,7 @@ export class DriverDocumentService {
 
 
 
-  updateStatus(
-    id: string,
-    status: string
-  ) {
 
-    return this.http.patch(
-      `${this.baseUrl}/${id}/status?status=${status}`,
-      {}
-    );
-
-  }
 
 
 
@@ -101,6 +91,54 @@ export class DriverDocumentService {
         observe: 'response',
         responseType: 'blob'
       }
+    );
+
+  }
+
+  previewDriverDocument(id: string) {
+
+    return this.http.get(
+      `${this.baseUrl}/${id}/preview`,
+      {
+        responseType: 'blob'
+      }
+    );
+
+  }
+
+  updateDriverDocumentStatus(
+    id: string,
+    status: 'APPROVED' | 'REJECTED' | 'PENDING'
+  ) {
+
+    return this.http.patch<DriverDocument>(
+      `${this.baseUrl}/${id}/status`,
+      {
+        status
+      }
+    );
+
+  }
+
+  update(
+    id: string,
+    request: {
+      title: string;
+      type: string;
+    }
+  ) {
+
+    return this.http.put<DriverDocument>(
+      `${this.baseUrl}/${id}`,
+      request
+    );
+
+  }
+
+  deleteDriverDocument(id: string) {
+
+    return this.http.delete(
+      `${this.baseUrl}/${id}`
     );
 
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+/* import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import feather from 'feather-icons';
@@ -289,4 +289,4 @@ export class VehicleDocumentDetails implements OnInit {
 
 
 
-}
+} */

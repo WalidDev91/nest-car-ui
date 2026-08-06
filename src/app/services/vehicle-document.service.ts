@@ -98,15 +98,40 @@ export class VehicleDocumentService {
 
   download(id: string) {
 
-  return this.http.get(
-    `${this.baseUrl}/${id}/download`,
-    {
-      observe:'response',
-      responseType:'blob'
-    }
-  );
+    return this.http.get(
+      `${this.baseUrl}/${id}/download`,
+      {
+        observe: 'response',
+        responseType: 'blob'
+      }
+    );
 
-}
+  }
+
+  update(id: string, request: {
+    title: string;
+    type: string;
+    year: number;
+  }
+  ) {
+
+    return this.http.put<VehicleDocument>(
+      `${this.baseUrl}/${id}`,
+      request
+    );
+
+  }
+
+  previewVehicleDocument(id: string) {
+
+    return this.http.get(
+      `${this.baseUrl}/${id}/preview`,
+      {
+        responseType: 'blob'
+      }
+    );
+
+  }
 
 
 

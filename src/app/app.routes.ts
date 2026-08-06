@@ -6,9 +6,9 @@ import { Vehicles } from './pages/vehicles/vehicles';
 import { VehicleDetails } from './pages/vehicles/vehicle-details';
 import { Missions } from './pages/missions/missions';
 import { Documents } from './pages/documents/documents';
-import { DriverDocumentDetails } from './pages/documents/driver-document-details';
-import { VehicleDocumentDetails } from './pages/documents/vehicle-document-details';
-import { MissionDocumentDetails } from './pages/documents/mission-document-details';
+//import { DriverDocumentDetails } from './pages/documents/driver-document-details';
+//import { VehicleDocumentDetails } from './pages/documents/vehicle-document-details';
+//import { MissionDocumentDetails } from './pages/documents/mission-document-details';
 import { Administration } from './pages/administration/administration';
 import { Login } from './auth/login/login';
 import { ForgotPassword } from './auth/forgot-password/forgot-password';
@@ -40,9 +40,9 @@ export const routes: Routes = [
       { path: 'missions/:id', component: MissionDetails },
 
       { path: 'documents', component: Documents },
-      { path: 'documents/driver/:id', component: DriverDocumentDetails },
-      { path: 'documents/vehicle/:id', component: VehicleDocumentDetails },
-      { path: 'documents/mission/:id', component: MissionDocumentDetails },
+      // { path: 'documents/driver/:id', component: DriverDocumentDetails },
+      // { path: 'documents/vehicle/:id', component: VehicleDocumentDetails },
+      // { path: 'documents/mission/:id', component: MissionDocumentDetails },
 
       { path: 'administration', component: Administration }
     ]

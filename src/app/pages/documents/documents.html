@@ -250,6 +250,8 @@
 
                 <th>Type</th>
 
+                <th>Driver</th>
+
                 <th>Status</th>
 
                 <th>Uploaded</th>
@@ -266,11 +268,15 @@
 
               <tr *ngFor="let doc of paginatedDocuments()">
 
+                <!-- Title -->
+
                 <td>
 
                   <strong>{{ doc.title }}</strong>
 
                 </td>
+
+                <!-- Type -->
 
                 <td>
 
@@ -282,13 +288,23 @@
 
                 </td>
 
+                <!-- Driver -->
+
+                <td>
+
+                  {{ doc.driverName }}
+
+                </td>
+
+                <!-- Status -->
+
                 <td>
 
                   <span class="badge" [ngClass]="{
-                      'bg-warning': doc.status==='PENDING',
-                      'bg-success': doc.status==='APPROVED',
-                      'bg-danger': doc.status==='REJECTED'
-                    }">
+              'bg-warning': doc.status === 'PENDING',
+              'bg-success': doc.status === 'APPROVED',
+              'bg-danger': doc.status === 'REJECTED'
+            }">
 
                     {{ doc.status }}
 
@@ -296,33 +312,109 @@
 
                 </td>
 
+                <!-- Uploaded -->
+
                 <td>
 
                   {{ doc.uploadedAt | date:'dd/MM/yyyy' }}
 
                 </td>
 
+                <!-- Actions -->
+
                 <td class="text-end">
 
+                  <!-- View Details 
                   <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDriverDetails(doc.id)">
 
                     <i data-feather="info"></i>
 
                   </button>
+                  -->
 
-                  <button class="btn btn-sm btn-outline-primary" (click)="downloadDriver(doc.id)">
+                  <!-- Preview -->
+
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewDriverDocument(doc.id)">
+
+                    <i data-feather="eye"></i>
+
+                  </button>
+
+                  <!-- Download -->
+
+                  <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadDriver(doc.id)">
 
                     <i data-feather="download"></i>
 
                   </button>
 
+                  <!-- DRIVER ACTIONS -->
+
+                  <ng-container *ngIf="isDriver">
+
+                    <!-- Edit -->
+
+                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-warning me-1"
+                      (click)="openEditDriverDocumentModal(doc)">
+                      <i data-feather="edit"></i>
+                    </button>
+
+                    <!-- Delete -->
+
+                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger"
+                      (click)="deleteDriverDocument(doc.id)">
+
+                      <i data-feather="trash-2"></i>
+
+                    </button>
+
+                  </ng-container>
+
+                  <!-- ADMIN / FLEET MANAGER / SUPER ADMIN -->
+
+                  <ng-container *ngIf="!isDriver">
+
+                    <!-- Approve -->
+
+                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-success me-1"
+                      (click)="approveDriverDocument(doc.id)">
+
+                      <i data-feather="check"></i>
+
+                    </button>
+
+                    <!-- Reject -->
+
+                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger me-1"
+                      (click)="rejectDriverDocument(doc.id)">
+
+                      <i data-feather="x"></i>
+
+                    </button>
+
+                    <!-- Change Validation -->
+
+                    <button *ngIf="doc.status !== 'PENDING'" class="btn btn-sm btn-outline-warning"
+                      (click)="openChangeValidationModal(doc)">
+
+                      <i data-feather="edit"></i>
+
+                    </button>
+
+                  </ng-container>
+
                 </td>
 
               </tr>
+
               <tr *ngIf="!loading() && paginatedDocuments().length === 0">
-                <td colspan="5" class="text-center py-5 text-muted">
+
+                <td colspan="6" class="text-center py-5 text-muted">
+
                   No documents found.
+
                 </td>
+
               </tr>
 
             </tbody>
@@ -364,12 +456,10 @@
               <tr>
 
                 <th>Title</th>
-
                 <th>Type</th>
-
-                <th>Status</th>
-
-                <th>Uploaded</th>
+                <th>Vehicle</th>
+                <th>Year</th>
+                <th>Created</th>
 
                 <th class="text-end">
                   Actions
@@ -384,62 +474,73 @@
               <tr *ngFor="let doc of paginatedDocuments()">
 
                 <td>
-
                   <strong>{{ doc.title }}</strong>
-
                 </td>
 
                 <td>
-
                   <span class="badge bg-light text-dark">
-
                     {{ doc.type }}
-
                   </span>
-
                 </td>
 
                 <td>
-
-                  <span class="badge" [ngClass]="{
-                      'bg-warning': doc.status==='PENDING',
-                      'bg-success': doc.status==='APPROVED',
-                      'bg-danger': doc.status==='REJECTED'
-                    }">
-
-                    {{ doc.status }}
-
-                  </span>
-
+                  {{ doc.vehiclePlateNumber || '—' }}
                 </td>
 
                 <td>
+                  {{ doc.year }}
+                </td>
 
-                  {{ doc.uploadedAt | date:'dd/MM/yyyy' }}
-
+                <td>
+                  {{ doc.createdAt | date:'dd/MM/yyyy' }}
                 </td>
 
                 <td class="text-end">
 
-                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewVehicleDetails(doc.id)">
+                  <!-- Preview -->
 
-                    <i data-feather="info"></i>
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewVehicleDocument(doc.id)">
+
+                    <i data-feather="eye"></i>
 
                   </button>
 
-                  <button class="btn btn-sm btn-outline-primary" (click)="downloadVehicle(doc.id)">
+                  <!-- Download -->
+
+                  <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadVehicle(doc.id)">
 
                     <i data-feather="download"></i>
+
+                  </button>
+
+                  <!-- Edit -->
+
+                  <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditVehicleDocumentModal(doc)">
+
+                    <i data-feather="edit"></i>
+
+                  </button>
+
+                  <!-- Delete -->
+
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteVehicleDocument(doc.id)">
+
+                    <i data-feather="trash-2"></i>
 
                   </button>
 
                 </td>
 
               </tr>
-              <tr *ngIf="!loading() && paginatedDocuments().length === 0">
-                <td colspan="5" class="text-center py-5 text-muted">
+
+              <tr *ngIf="!loading() && paginatedDocuments().length===0">
+
+                <td colspan="6" class="text-center py-5 text-muted">
+
                   No documents found.
+
                 </td>
+
               </tr>
 
             </tbody>
@@ -481,9 +582,7 @@
               <tr>
 
                 <th>Title</th>
-
                 <th>Mission</th>
-
                 <th>Created</th>
 
                 <th class="text-end">
@@ -518,25 +617,50 @@
 
                 <td class="text-end">
 
-                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewMissionDetails(doc.id)">
+                  <!-- Preview -->
 
-                    <i data-feather="info"></i>
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewMissionDocument(doc.id)">
+
+                    <i data-feather="eye"></i>
 
                   </button>
 
-                  <button class="btn btn-sm btn-outline-primary" (click)="downloadMission(doc.id)">
+                  <!-- Download -->
+
+                  <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadMission(doc.id)">
 
                     <i data-feather="download"></i>
+
+                  </button>
+
+                  <!-- Edit -->
+
+                  <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditMissionDocumentModal(doc)">
+
+                    <i data-feather="edit"></i>
+
+                  </button>
+
+                  <!-- Delete -->
+
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteMissionDocument(doc.id)">
+
+                    <i data-feather="trash-2"></i>
 
                   </button>
 
                 </td>
 
               </tr>
-              <tr *ngIf="!loading() && paginatedDocuments().length === 0">
+
+              <tr *ngIf="!loading() && paginatedDocuments().length===0">
+
                 <td colspan="4" class="text-center py-5 text-muted">
+
                   No documents found.
+
                 </td>
+
               </tr>
 
             </tbody>
@@ -624,9 +748,7 @@
       <div class="modal-header">
 
         <h5 class="modal-title">
-
-          Upload Driver Document
-
+          {{ editDriverMode ? 'Edit Driver Document' : 'Upload Driver Document' }}
         </h5>
 
         <button type="button" class="btn-close" data-bs-dismiss="modal">
@@ -737,9 +859,10 @@
 
         <button class="btn btn-primary" (click)="uploadDriverDocument()">
 
-          <i data-feather="upload" class="align-middle me-1"></i>
+          <i [attr.data-feather]="editDriverMode ? 'save' : 'upload'" class="align-middle me-1">
+          </i>
 
-          Upload Document
+          {{ editDriverMode ? 'Save Changes' : 'Upload Document' }}
 
         </button>
 
@@ -1041,4 +1164,132 @@
 
   </div>
 
+</div>
+
+<!-- ========================================================= -->
+<!-- CHANGE VALIDATION STATUS MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade" id="changeValidationModal" tabindex="-1">
+
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 class="modal-title">
+
+          Change Validation Status
+
+        </h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <div class="mb-3">
+
+          <label class="form-label">
+
+            Status
+
+          </label>
+
+          <select class="form-select" [(ngModel)]="selectedValidationStatus">
+
+            <option value="PENDING">
+              Pending
+            </option>
+
+            <option value="APPROVED">
+              Approved
+            </option>
+
+            <option value="REJECTED">
+              Rejected
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+          Cancel
+
+        </button>
+
+        <button class="btn btn-primary" (click)="saveDriverValidation()">
+
+          Save
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- DELETE DRIVER DOCUMENT MODAL -->
+<!-- ========================================================= -->
+
+
+<div class="modal fade" id="deleteDriverDocumentModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 class="modal-title">
+          Delete Document
+        </h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <p class="mb-0">
+
+          Are you sure you want to permanently delete this document?
+
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+          Cancel
+
+        </button>
+
+        <button class="btn btn-danger" (click)="confirmDeleteDriverDocument()">
+
+          Delete
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
 </div>
