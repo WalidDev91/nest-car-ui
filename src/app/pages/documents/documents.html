@@ -1,12 +1,6 @@
 <div class="container-fluid p-0">
 
   <!-- ========================================= -->
-  <!-- HEADER -->
-  <!-- ========================================= -->
-
-
-
-  <!-- ========================================= -->
   <!-- STATISTICS -->
   <!-- ========================================= -->
 
@@ -226,7 +220,7 @@
 
         <div class="d-flex justify-content-end mb-3" *ngIf="isDriver">
 
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadDriverDocumentModal">
+          <button class="btn btn-primary" (click)="openCreateDriverDocumentModal()">
 
             <i data-feather="upload" class="align-middle me-1"></i>
 
@@ -268,15 +262,11 @@
 
               <tr *ngFor="let doc of paginatedDocuments()">
 
-                <!-- Title -->
-
                 <td>
 
                   <strong>{{ doc.title }}</strong>
 
                 </td>
-
-                <!-- Type -->
 
                 <td>
 
@@ -288,15 +278,11 @@
 
                 </td>
 
-                <!-- Driver -->
-
                 <td>
 
                   {{ doc.driverName }}
 
                 </td>
-
-                <!-- Status -->
 
                 <td>
 
@@ -312,25 +298,13 @@
 
                 </td>
 
-                <!-- Uploaded -->
-
                 <td>
 
                   {{ doc.uploadedAt | date:'dd/MM/yyyy' }}
 
                 </td>
 
-                <!-- Actions -->
-
                 <td class="text-end">
-
-                  <!-- View Details 
-                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDriverDetails(doc.id)">
-
-                    <i data-feather="info"></i>
-
-                  </button>
-                  -->
 
                   <!-- Preview -->
 
@@ -352,14 +326,10 @@
 
                   <ng-container *ngIf="isDriver">
 
-                    <!-- Edit -->
-
                     <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-warning me-1"
                       (click)="openEditDriverDocumentModal(doc)">
                       <i data-feather="edit"></i>
                     </button>
-
-                    <!-- Delete -->
 
                     <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger"
                       (click)="deleteDriverDocument(doc.id)">
@@ -374,8 +344,6 @@
 
                   <ng-container *ngIf="!isDriver">
 
-                    <!-- Approve -->
-
                     <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-success me-1"
                       (click)="approveDriverDocument(doc.id)">
 
@@ -383,16 +351,12 @@
 
                     </button>
 
-                    <!-- Reject -->
-
                     <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger me-1"
                       (click)="rejectDriverDocument(doc.id)">
 
                       <i data-feather="x"></i>
 
                     </button>
-
-                    <!-- Change Validation -->
 
                     <button *ngIf="doc.status !== 'PENDING'" class="btn btn-sm btn-outline-warning"
                       (click)="openChangeValidationModal(doc)">
@@ -431,11 +395,9 @@
 
       <div *ngIf="!loading() && selectedTab()==='vehicle'">
 
-        <!-- VEHICLE UPLOAD -->
-
         <div class="d-flex justify-content-end mb-3" *ngIf="!isDriver">
 
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadVehicleDocumentModal">
+          <button class="btn btn-primary" (click)="openCreateVehicleDocumentModal()">
 
             <i data-feather="upload" class="align-middle me-1"></i>
 
@@ -444,8 +406,6 @@
           </button>
 
         </div>
-
-        <!-- VEHICLE TABLE -->
 
         <div class="table-responsive">
 
@@ -497,15 +457,11 @@
 
                 <td class="text-end">
 
-                  <!-- Preview -->
-
                   <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewVehicleDocument(doc.id)">
 
                     <i data-feather="eye"></i>
 
                   </button>
-
-                  <!-- Download -->
 
                   <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadVehicle(doc.id)">
 
@@ -513,21 +469,20 @@
 
                   </button>
 
-                  <!-- Edit -->
+                  <ng-container *ngIf="!isDriver">
 
-                  <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditVehicleDocumentModal(doc)">
+                    <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditVehicleDocumentModal(doc)">
 
-                    <i data-feather="edit"></i>
+                      <i data-feather="edit"></i>
 
-                  </button>
+                    </button>
 
-                  <!-- Delete -->
+                    <button class="btn btn-sm btn-outline-danger" (click)="deleteVehicleDocument(doc.id)">
 
-                  <button class="btn btn-sm btn-outline-danger" (click)="deleteVehicleDocument(doc.id)">
+                      <i data-feather="trash-2"></i>
 
-                    <i data-feather="trash-2"></i>
-
-                  </button>
+                    </button>
+                  </ng-container>
 
                 </td>
 
@@ -557,11 +512,9 @@
 
       <div *ngIf="!loading() && selectedTab()==='mission'">
 
-        <!-- MISSION UPLOAD -->
-
         <div class="d-flex justify-content-end mb-3" *ngIf="!isDriver">
 
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadMissionDocumentModal">
+          <button class="btn btn-primary" (click)="openCreateMissionDocumentModal()">
 
             <i data-feather="upload" class="align-middle me-1"></i>
 
@@ -570,8 +523,6 @@
           </button>
 
         </div>
-
-        <!-- MISSION TABLE -->
 
         <div class="table-responsive">
 
@@ -617,37 +568,31 @@
 
                 <td class="text-end">
 
-                  <!-- Preview -->
-
                   <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewMissionDocument(doc.id)">
 
                     <i data-feather="eye"></i>
 
                   </button>
 
-                  <!-- Download -->
-
                   <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadMission(doc.id)">
 
                     <i data-feather="download"></i>
 
                   </button>
+                  <ng-container *ngIf="!isDriver">
 
-                  <!-- Edit -->
+                    <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditMissionDocumentModal(doc)">
 
-                  <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditMissionDocumentModal(doc)">
+                      <i data-feather="edit"></i>
 
-                    <i data-feather="edit"></i>
+                    </button>
 
-                  </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="deleteMissionDocument(doc.id)">
 
-                  <!-- Delete -->
+                      <i data-feather="trash-2"></i>
 
-                  <button class="btn btn-sm btn-outline-danger" (click)="deleteMissionDocument(doc.id)">
-
-                    <i data-feather="trash-2"></i>
-
-                  </button>
+                    </button>
+                  </ng-container>
 
                 </td>
 
@@ -743,8 +688,6 @@
 
     <div class="modal-content">
 
-      <!-- HEADER -->
-
       <div class="modal-header">
 
         <h5 class="modal-title">
@@ -756,13 +699,9 @@
 
       </div>
 
-      <!-- BODY -->
-
       <div class="modal-body">
 
         <div class="row g-3">
-
-          <!-- TITLE -->
 
           <div class="col-md-6">
 
@@ -781,8 +720,6 @@
             </div>
 
           </div>
-
-          <!-- TYPE -->
 
           <div class="col-md-6">
 
@@ -822,9 +759,7 @@
 
           </div>
 
-          <!-- FILE -->
-
-          <div class="col-12">
+          <div class="col-12" *ngIf="!editDriverMode">
 
             <label class="form-label">
 
@@ -846,8 +781,6 @@
         </div>
 
       </div>
-
-      <!-- FOOTER -->
 
       <div class="modal-footer">
 
@@ -885,20 +818,16 @@
 
     <div class="modal-content">
 
-      <!-- HEADER -->
-
       <div class="modal-header">
 
         <h5 class="modal-title">
-          Upload Vehicle Document
+          {{ editVehicleMode ? 'Edit Vehicle Document' : 'Upload Vehicle Document' }}
         </h5>
 
         <button type="button" class="btn-close" data-bs-dismiss="modal">
         </button>
 
       </div>
-
-      <!-- BODY -->
 
       <div class="modal-body">
 
@@ -954,7 +883,7 @@
 
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-6" *ngIf="!editVehicleMode">
 
             <label class="form-label">
               Vehicle *
@@ -998,7 +927,7 @@
 
           </div>
 
-          <div class="col-12">
+          <div class="col-12" *ngIf="!editVehicleMode">
 
             <label class="form-label">
               File *
@@ -1019,8 +948,6 @@
 
       </div>
 
-      <!-- FOOTER -->
-
       <div class="modal-footer">
 
         <button class="btn btn-secondary" data-bs-dismiss="modal">
@@ -1031,9 +958,9 @@
 
         <button class="btn btn-primary" (click)="uploadVehicleDocument()">
 
-          <i data-feather="upload" class="align-middle me-1"></i>
+          <i [attr.data-feather]="editVehicleMode ? 'save' : 'upload'" class="align-middle me-1"></i>
 
-          Upload Document
+          {{ editVehicleMode ? 'Save Changes' : 'Upload Document' }}
 
         </button>
 
@@ -1060,7 +987,7 @@
 
         <h5 class="modal-title">
 
-          Upload Mission Document
+          {{ editMissionMode ? 'Edit Mission Document' : 'Upload Mission Document' }}
 
         </h5>
 
@@ -1090,7 +1017,7 @@
 
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" *ngIf="!editMissionMode">
 
           <label class="form-label">
 
@@ -1121,7 +1048,7 @@
 
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3" *ngIf="!editMissionMode">
 
           <label class="form-label">
 
@@ -1130,7 +1057,8 @@
 
           </label>
 
-          <input id="missionFileInput" type="file" class="form-control" (change)="onMissionFileSelected($event)">
+          <input id="missionFileInput" type="file" class="form-control" accept=".pdf,.png,.jpg,.jpeg"
+            (change)="onMissionFileSelected($event)">
 
           <small class="text-danger" *ngIf="missionFileError">
 
@@ -1152,9 +1080,9 @@
 
         <button type="button" class="btn btn-primary" (click)="uploadMissionDocument()">
 
-          <i data-feather="upload" class="me-1"></i>
+          <i [attr.data-feather]="editMissionMode ? 'save' : 'upload'" class="me-1"></i>
 
-          Upload Document
+          {{ editMissionMode ? 'Save Changes' : 'Upload Document' }}
 
         </button>
 
@@ -1172,7 +1100,7 @@
 
 <div class="modal fade" id="changeValidationModal" tabindex="-1">
 
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
 
     <div class="modal-content">
 
@@ -1241,11 +1169,9 @@
 
 </div>
 
-
 <!-- ========================================================= -->
 <!-- DELETE DRIVER DOCUMENT MODAL -->
 <!-- ========================================================= -->
-
 
 <div class="modal fade" id="deleteDriverDocumentModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -1282,6 +1208,108 @@
         </button>
 
         <button class="btn btn-danger" (click)="confirmDeleteDriverDocument()">
+
+          Delete
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- DELETE VEHICLE DOCUMENT MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade" id="deleteVehicleDocumentModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 class="modal-title">
+          Delete Document
+        </h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <p class="mb-0">
+
+          Are you sure you want to permanently delete this document?
+
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+          Cancel
+
+        </button>
+
+        <button class="btn btn-danger" (click)="confirmDeleteVehicleDocument()">
+
+          Delete
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- DELETE MISSION DOCUMENT MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade" id="deleteMissionDocumentModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 class="modal-title">
+          Delete Document
+        </h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <div class="modal-body">
+
+        <p class="mb-0">
+
+          Are you sure you want to permanently delete this document?
+
+        </p>
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+
+          Cancel
+
+        </button>
+
+        <button class="btn btn-danger" (click)="confirmDeleteMissionDocument()">
 
           Delete
 
