@@ -11,6 +11,8 @@ import { Vehicle } from '../../models/vehicle';
 import { User } from '../../models/user';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { MissionDocumentService } from '../../services/mission-document.service';
+import { ToastService } from '../../services/toast.service';
 
 declare var bootstrap: any;
 
@@ -38,11 +40,7 @@ export class MissionDetails implements OnInit {
   // ==========================================================
 
   selectedTab = signal<
-    'info'
-    | 'assignment'
-    | 'documents'
-    | 'inspection'
-    | 'photos'
+    'info' | 'assignment' | 'documents' | 'inspection' | 'photos'
   >('info');
 
   // ==========================================================
@@ -60,14 +58,14 @@ export class MissionDetails implements OnInit {
 
   verificationDate = signal<string | null>(null);
 
+  selectedValidationStatus: 'APPROVED' | 'REJECTED' | 'PENDING' = 'APPROVED';
+
   // ==========================================================
   // INSPECTION FORM
   // ==========================================================
 
   inspectionMileage: number | null = null;
-
   inspectionFuelLevel: number | null = null;
-
   inspectionNotes = '';
 
   // ==========================================================
@@ -75,30 +73,29 @@ export class MissionDetails implements OnInit {
   // ==========================================================
 
   selectedPhoto: File | null = null;
-
   photoPreview: string | null = null;
+
+  photoToDeleteId = signal<string | null>(null);
 
   // ==========================================================
   // QUICK INFO
   // ==========================================================
 
-  hasInspection = computed(() =>
-    !!this.mission()?.vehicleInspection
-  );
+  hasInspection = computed(() => !!this.mission()?.vehicleInspection);
 
   totalPhotos = computed(() =>
     this.mission()?.vehicleInspection?.photos.length ?? 0
   );
 
-  totalDocuments = computed(() =>
-    this.mission()?.documents?.length ?? 0
-  );
+  totalDocuments = computed(() => this.mission()?.documents?.length ?? 0);
 
   constructor(
     private route: ActivatedRoute,
     private missionService: MissionService,
     private userService: UserService,
     private vehicleService: VehicleService,
+    private missionDocumentService: MissionDocumentService,
+    private toastService: ToastService,
     private router: Router
   ) { }
 
@@ -133,23 +130,15 @@ export class MissionDetails implements OnInit {
         this.mission.set(data);
 
         this.driverId = data.driverId ?? null;
-
         this.vehicleId = data.vehicleId ?? null;
 
-        this.documentsVerified.set(
-          data.documentsVerified ?? false
-        );
-
-        this.verificationDate.set(
-          data.documentsVerificationDate ?? null
-        );
+        this.documentsVerified.set(data.documentsVerified ?? false);
+        this.verificationDate.set(data.documentsVerificationDate ?? null);
 
         if (data.vehicleInspection) {
 
           this.inspectionMileage = data.vehicleInspection.mileage ?? null;
-
           this.inspectionFuelLevel = data.vehicleInspection.fuelLevel ?? null;
-
           this.inspectionNotes = data.vehicleInspection.notes ?? '';
 
         } else {
@@ -172,6 +161,8 @@ export class MissionDetails implements OnInit {
 
         this.loading.set(false);
 
+        this.toastService.error('Failed to load mission');
+
       }
 
     });
@@ -181,15 +172,7 @@ export class MissionDetails implements OnInit {
   loadDrivers(): void {
 
     this.userService.getAll().subscribe({
-
-      next: users => {
-
-        this.drivers.set(
-          users.filter(u => u.role === 'DRIVER')
-        );
-
-      }
-
+      next: users => this.drivers.set(users.filter(u => u.role === 'DRIVER'))
     });
 
   }
@@ -197,13 +180,7 @@ export class MissionDetails implements OnInit {
   loadVehicles(): void {
 
     this.vehicleService.getAll().subscribe({
-
-      next: vehicles => {
-
-        this.vehicles.set(vehicles);
-
-      }
-
+      next: vehicles => this.vehicles.set(vehicles)
     });
 
   }
@@ -222,14 +199,7 @@ export class MissionDetails implements OnInit {
   // TABS
   // ==========================================================
 
-  selectTab(
-    tab:
-      | 'info'
-      | 'assignment'
-      | 'documents'
-      | 'inspection'
-      | 'photos'
-  ): void {
+  selectTab(tab: 'info' | 'assignment' | 'documents' | 'inspection' | 'photos'): void {
 
     this.selectedTab.set(tab);
 
@@ -238,7 +208,7 @@ export class MissionDetails implements OnInit {
   }
 
   // ==========================================================
-  // EDIT
+  // EDIT / DELETE MISSION
   // ==========================================================
 
   editMission(): void {
@@ -247,14 +217,7 @@ export class MissionDetails implements OnInit {
 
     if (!mission) return;
 
-    this.router.navigate(
-      ['/missions'],
-      {
-        queryParams: {
-          edit: mission.id
-        }
-      }
-    );
+    this.router.navigate(['/missions'], { queryParams: { edit: mission.id } });
 
   }
 
@@ -264,20 +227,30 @@ export class MissionDetails implements OnInit {
 
     if (!mission) return;
 
-    this.router.navigate(
-      ['/missions'],
-      {
-        queryParams: {
-          delete: mission.id
-        }
-      }
-    );
+    this.router.navigate(['/missions'], { queryParams: { delete: mission.id } });
 
   }
 
   // ==========================================================
   // ASSIGNMENT
   // ==========================================================
+
+  openAssignmentModal(): void {
+
+    const current = this.mission();
+
+    if (!current) return;
+
+    // Reset to the current saved values in case a previous
+    // edit was opened and cancelled without saving.
+    this.driverId = current.driverId ?? null;
+    this.vehicleId = current.vehicleId ?? null;
+
+    const modal = new bootstrap.Modal(document.getElementById('assignmentModal'));
+
+    modal.show();
+
+  }
 
   updateAssignment(): void {
 
@@ -286,29 +259,34 @@ export class MissionDetails implements OnInit {
     if (!current) return;
 
     const request = {
-
       driverId: this.driverId,
       vehicleId: this.vehicleId
-
     };
 
-    this.missionService
-      .assignMission(current.id, request)
-      .subscribe({
+    this.missionService.assignMission(current.id, request).subscribe({
 
-        next: (updatedMission) => {
+      next: (updatedMission) => {
 
-          this.mission.set(updatedMission);
+        this.mission.set(updatedMission);
 
-          this.driverId = updatedMission.driverId ?? null;
+        this.driverId = updatedMission.driverId ?? null;
+        this.vehicleId = updatedMission.vehicleId ?? null;
 
-          this.vehicleId = updatedMission.vehicleId ?? null;
+        bootstrap.Modal.getInstance(document.getElementById('assignmentModal'))?.hide();
 
-        },
+        this.toastService.success('Assignment updated successfully');
 
-        error: (err: any) => console.error(err)
+      },
 
-      });
+      error: (err: any) => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to update assignment');
+
+      }
+
+    });
 
   }
 
@@ -316,28 +294,129 @@ export class MissionDetails implements OnInit {
   // DOCUMENT VERIFICATION
   // ==========================================================
 
-  verifyDocuments(): void {
+  validateDocuments(): void {
 
     const current = this.mission();
 
     if (!current) return;
 
-    this.missionService.verifyDocuments(current.id)
-      .subscribe({
+    this.missionService.updateDocumentsVerification(current.id, true).subscribe({
 
-        next: data => {
+      next: (updatedMission: Mission) => {
 
-          this.documentsVerified.set(true);
+        this.mission.set(updatedMission);
 
-          this.verificationDate.set(
-            data.documentsVerificationDate ?? null
-          );
+        this.documentsVerified.set(updatedMission.documentsVerified ?? false);
+        this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
 
-        },
+        this.toastService.success('Documents validated');
 
-        error: (err: any) => console.error(err)
+        setTimeout(() => feather.replace(), 0);
 
-      });
+      },
+
+      error: (err: any) => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to validate documents');
+
+      }
+
+    });
+
+  }
+
+  rejectDocuments(): void {
+
+    const current = this.mission();
+
+    if (!current) return;
+
+    this.missionService.updateDocumentsVerification(current.id, false).subscribe({
+
+      next: (updatedMission: Mission) => {
+
+        this.mission.set(updatedMission);
+
+        this.documentsVerified.set(updatedMission.documentsVerified ?? false);
+        this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
+
+        this.toastService.success('Documents marked as not verified');
+
+        setTimeout(() => feather.replace(), 0);
+
+      },
+
+      error: (err: any) => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to update documents');
+
+      }
+
+    });
+
+  }
+
+  editDocumentsVerification(): void {
+
+    const current = this.mission();
+
+    if (!current || !current.documentsVerificationDate) return;
+
+    this.selectedValidationStatus = current.documentsVerified ? 'APPROVED' : 'REJECTED';
+
+    const modalElement = document.getElementById('changeValidationModal');
+
+    if (!modalElement) return;
+
+    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+
+  }
+
+  saveDocumentsVerification(): void {
+
+    const current = this.mission();
+
+    if (!current) return;
+
+    // NOTE: 'PENDING' sends null to reset the verification decision.
+    // This requires MissionService.updateDocumentsVerification (and the
+    // backend endpoint behind it) to accept `verified: boolean | null`,
+    // not just boolean — confirm/extend that signature if it's not there yet.
+    const verified: boolean | null =
+      this.selectedValidationStatus === 'PENDING'
+        ? null
+        : this.selectedValidationStatus === 'APPROVED';
+
+    this.missionService.updateDocumentsVerification(current.id, verified as any).subscribe({
+
+      next: (updatedMission: Mission) => {
+
+        this.mission.set(updatedMission);
+
+        this.documentsVerified.set(updatedMission.documentsVerified ?? false);
+        this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
+
+        bootstrap.Modal.getInstance(document.getElementById('changeValidationModal'))?.hide();
+
+        this.toastService.success('Verification status updated');
+
+        setTimeout(() => feather.replace(), 0);
+
+      },
+
+      error: (err: any) => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to update verification status');
+
+      }
+
+    });
 
   }
 
@@ -357,46 +436,71 @@ export class MissionDetails implements OnInit {
       notes: this.inspectionNotes
     };
 
-    this.missionService.saveVehicleInspection(current.id, request)
-      .subscribe({
+    this.missionService.saveVehicleInspection(current.id, request).subscribe({
 
-        next: (updatedMission: Mission) => {
+      next: (updatedMission: Mission) => {
 
-          this.mission.set(updatedMission);
+        this.mission.set(updatedMission);
 
-          if (updatedMission.vehicleInspection) {
+        if (updatedMission.vehicleInspection) {
 
-            this.inspectionMileage =
-              updatedMission.vehicleInspection.mileage;
+          this.inspectionMileage = updatedMission.vehicleInspection.mileage;
+          this.inspectionFuelLevel = updatedMission.vehicleInspection.fuelLevel;
+          this.inspectionNotes = updatedMission.vehicleInspection.notes ?? '';
 
-            this.inspectionFuelLevel =
-              updatedMission.vehicleInspection.fuelLevel;
+        }
 
-            this.inspectionNotes =
-              updatedMission.vehicleInspection.notes ?? '';
+        bootstrap.Modal.getInstance(document.getElementById('inspectionModal'))?.hide();
 
-          }
+        this.loadMission(current.id);
 
-          const modalEl =
-            document.getElementById('inspectionModal');
+        this.toastService.success('Inspection saved successfully');
 
-          if (modalEl) {
+        setTimeout(() => feather.replace(), 0);
 
-            bootstrap.Modal
-              .getInstance(modalEl)
-              ?.hide();
+      },
 
-          }
+      error: err => {
 
-          this.loadMission(current.id);
+        console.error(err);
 
-          setTimeout(() => feather.replace(), 0);
+        this.toastService.error('Failed to save inspection');
 
-        },
+      }
 
-        error: err => console.error(err)
+    });
 
-      });
+  }
+
+  deleteInspection(): void {
+
+    const mission = this.mission();
+
+    if (!mission?.vehicleInspection) return;
+
+    this.missionService.deleteInspection(mission.id).subscribe({
+
+      next: () => {
+
+        bootstrap.Modal.getInstance(document.getElementById('deleteInspectionModal'))?.hide();
+
+        this.loadMission(mission.id);
+
+        this.toastService.success('Inspection deleted successfully');
+
+        setTimeout(() => feather.replace(), 0);
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to delete inspection');
+
+      }
+
+    });
 
   }
 
@@ -415,9 +519,7 @@ export class MissionDetails implements OnInit {
     const reader = new FileReader();
 
     reader.onload = () => {
-
       this.photoPreview = reader.result as string;
-
     };
 
     reader.readAsDataURL(this.selectedPhoto);
@@ -430,71 +532,96 @@ export class MissionDetails implements OnInit {
 
     if (!current || !this.selectedPhoto) return;
 
-    this.missionService
-      .uploadInspectionPhoto(current.id, this.selectedPhoto)
-      .subscribe({
+    this.missionService.uploadInspectionPhoto(current.id, this.selectedPhoto).subscribe({
 
-        next: () => {
+      next: () => {
 
-          this.selectedPhoto = null;
+        this.selectedPhoto = null;
+        this.photoPreview = null;
 
-          this.photoPreview = null;
+        const input = document.getElementById('missionPhotoInput') as HTMLInputElement;
 
-          const input = document.getElementById(
-            'missionPhotoInput'
-          ) as HTMLInputElement;
+        if (input) {
+          input.value = '';
+        }
 
-          if (input) {
-            input.value = '';
-          }
+        this.loadMission(current.id);
 
-          this.loadMission(current.id);
+        this.toastService.success('Photo uploaded successfully');
 
-          setTimeout(() => feather.replace(), 0);
+        setTimeout(() => feather.replace(), 0);
 
-        },
+      },
 
-        error: err => {
-          // TODO: Backend should return HTTP 413 for MaxUploadSizeExceededException.
-          if (err.status === 403) {
+      error: err => {
 
-            bootstrap.Modal
-              .getOrCreateInstance(
-                document.getElementById('photoSizeModal')
-              )
-              .show();
+        // TODO: Backend should return HTTP 413 for MaxUploadSizeExceededException.
+        // Current scenario: any 403 during upload is treated as "photo too large".
+        if (err.status === 403) {
 
-            return;
+          bootstrap.Modal.getOrCreateInstance(document.getElementById('photoSizeModal')).show();
 
-          }
-          console.error(err);
+          return;
 
         }
 
-      });
+        console.error(err);
+
+        this.toastService.error('Failed to upload photo');
+
+      }
+
+    });
 
   }
 
   deletePhoto(photoId: string): void {
 
+    this.photoToDeleteId.set(photoId);
+
+    const modal = new bootstrap.Modal(document.getElementById('deletePhotoModal'));
+
+    modal.show();
+
+  }
+
+  confirmDeletePhoto(): void {
+
     const current = this.mission();
 
-    if (!current) return;
+    const photoId = this.photoToDeleteId();
 
-    this.missionService.deleteInspectionPhoto(current.id, photoId)
-      .subscribe({
+    if (!current || !photoId) return;
 
-        next: (updatedMission: Mission) => {
+    this.missionService.deleteInspectionPhoto(current.id, photoId).subscribe({
 
-          this.mission.set(updatedMission);
+      next: (updatedMission: Mission) => {
 
-          setTimeout(() => feather.replace(), 0);
+        this.mission.set(updatedMission);
 
-        },
+        this.photoToDeleteId.set(null);
 
-        error: (err: any) => console.error(err)
+        bootstrap.Modal.getInstance(document.getElementById('deletePhotoModal'))?.hide();
 
-      });
+        this.toastService.success('Photo deleted successfully');
+
+        setTimeout(() => feather.replace(), 0);
+
+      },
+
+      error: (err: any) => {
+
+        console.error(err);
+
+        this.photoToDeleteId.set(null);
+
+        bootstrap.Modal.getInstance(document.getElementById('deletePhotoModal'))?.hide();
+
+        this.toastService.error('Failed to delete photo');
+
+      }
+
+    });
 
   }
 
@@ -502,53 +629,29 @@ export class MissionDetails implements OnInit {
   // DOCUMENTS
   // ==========================================================
 
-  viewMissionDocument(documentId: string): void {
+  previewMissionDocument(id: string) {
 
-    this.router.navigate([
-      '/documents',
-      documentId
-    ]);
+    this.missionDocumentService.previewMissionDocument(id).subscribe({
 
-  }
+      next: (blob) => {
 
-  deleteInspection(): void {
+        const url = URL.createObjectURL(blob);
 
-    const mission = this.mission();
+        window.open(url, '_blank');
 
-    if (!mission?.vehicleInspection) return;
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
 
-    this.missionService
-      .deleteInspection(mission.id)
-      .subscribe({
+      },
 
-        next: () => {
+      error: (error) => {
 
-          const modalEl =
-            document.getElementById('deleteInspectionModal');
+        console.error('Failed to preview mission document', error);
 
-          if (modalEl) {
+        this.toastService.error('Failed to open document');
 
-            bootstrap.Modal
-              .getInstance(modalEl)
-              ?.hide();
+      }
 
-          }
-
-          this.loadMission(mission.id);
-
-          setTimeout(() => feather.replace(), 0);
-
-        },
-
-        error: err => {
-
-          console.error(err);
-
-          alert('Delete failed');
-
-        }
-
-      });
+    });
 
   }
 
@@ -559,19 +662,10 @@ export class MissionDetails implements OnInit {
   getStatusClass(status: string): string {
 
     switch (status) {
-
-      case 'ONGOING':
-        return 'bg-info';
-
-      case 'COMPLETED':
-        return 'bg-success';
-
-      case 'CANCELLED':
-        return 'bg-danger';
-
-      default:
-        return 'bg-warning';
-
+      case 'ONGOING': return 'bg-info';
+      case 'COMPLETED': return 'bg-success';
+      case 'CANCELLED': return 'bg-danger';
+      default: return 'bg-warning';
     }
 
   }
@@ -581,9 +675,7 @@ export class MissionDetails implements OnInit {
   }
 
   goBack(): void {
-
     this.router.navigate(['/missions']);
-
   }
 
 }

@@ -1,11 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { User } from '../../models/user';
-import { UserService } from '../../services/user.service';
-import { AdministrationService } from '../../services/administration.service'
+import { AdministrationService } from '../../services/administration.service';
+import { AppSettings } from '../../models/app-settings';
+import { AuditLog } from '../../models/audit-log';
+import { ThemeService } from '../../services/theme.service';
 import feather from 'feather-icons';
-
 
 @Component({
   selector: 'app-administration',
@@ -15,34 +15,44 @@ import feather from 'feather-icons';
 })
 export class Administration implements OnInit {
 
-  users = signal<User[]>([]);
-  pendingRequests = signal<User[]>([]);
-  auditLogs = signal<any[]>([]);
+  // ==========================
+  // STATE
+  // ==========================
 
-  loading = signal(false);
+  pendingRequests = signal<any[]>([]);
 
-  selectedTab = signal<'users' | 'requests' | 'settings' | 'audit'>('users');
+  auditLogs = signal<AuditLog[]>([]);
 
-  settings = {
+  auditSearch = signal('');
+
+  loadingSettings = signal(false);
+
+  savingSettings = signal(false);
+
+  loadingAudit = signal(false);
+
+  selectedTab = signal<'requests' | 'settings' | 'audit'>('requests');
+
+  settings: AppSettings = {
     applicationName: '',
     language: 'EN',
     sessionTimeout: 30
   };
 
   constructor(
-    private userService: UserService,
-    private administrationService: AdministrationService
+    private administrationService: AdministrationService,
+    public themeService: ThemeService
   ) { }
 
   ngOnInit(): void {
 
-    this.loadUsers();
     this.loadPendingRequests();
+    this.loadSettings();
     this.loadAuditLogs();
 
   }
 
-  selectTab(tab: 'users' | 'requests' | 'settings' | 'audit') {
+  selectTab(tab: 'requests' | 'settings' | 'audit') {
 
     this.selectedTab.set(tab);
 
@@ -51,39 +61,8 @@ export class Administration implements OnInit {
   }
 
   // ==========================
-  // USERS
-  // ==========================
-
-  loadUsers(): void {
-
-    this.loading.set(true);
-
-    this.userService.getAll().subscribe({
-
-      next: users => {
-
-        this.users.set(users);
-
-        this.loading.set(false);
-
-        setTimeout(() => feather.replace(), 0);
-
-      },
-
-      error: err => {
-
-        console.error(err);
-
-        this.loading.set(false);
-
-      }
-
-    });
-
-  }
-
-  // ==========================
   // ACCOUNT REQUESTS
+  // (left as-is — pending supervisor decision)
   // ==========================
 
   loadPendingRequests(): void {
@@ -107,14 +86,7 @@ export class Administration implements OnInit {
   approveRequest(userId: string): void {
 
     this.administrationService.approveRequest(userId).subscribe({
-
-      next: () => {
-
-        this.loadPendingRequests();
-        this.loadUsers();
-
-      }
-
+      next: () => this.loadPendingRequests()
     });
 
   }
@@ -122,76 +94,36 @@ export class Administration implements OnInit {
   rejectRequest(userId: string): void {
 
     this.administrationService.rejectRequest(userId).subscribe({
-
       next: () => this.loadPendingRequests()
-
     });
 
   }
 
   // ==========================
-  // USER MANAGEMENT
+  // SETTINGS
   // ==========================
 
-  activateUser(userId: string): void {
+  loadSettings(): void {
 
-    this.userService.activate(userId).subscribe({
+    this.loadingSettings.set(true);
 
-      next: () => this.loadUsers()
+    this.administrationService.getSettings().subscribe({
 
-    });
+      next: settings => {
 
-  }
+        this.settings = settings;
 
-  deactivateUser(userId: string): void {
-
-    this.userService.deactivate(userId).subscribe({
-
-      next: () => this.loadUsers()
-
-    });
-
-  }
-
-  changeRole(userId: string, role: string): void {
-
-    this.userService.changeRole(userId, role).subscribe({
-
-      next: () => this.loadUsers()
-
-    });
-
-  }
-
-  deleteUser(userId: string): void {
-
-    if (!confirm('Delete this user ?')) return;
-
-    this.userService.delete(userId).subscribe({
-
-      next: () => this.loadUsers()
-
-    });
-
-  }
-
-  // ==========================
-  // AUDIT LOGS
-  // ==========================
-
-  loadAuditLogs(): void {
-
-    this.administrationService.getAuditLogs().subscribe({
-
-      next: logs => {
-
-        this.auditLogs.set(logs);
-
-        setTimeout(() => feather.replace(), 0);
+        this.loadingSettings.set(false);
 
       },
 
-      error: err => console.error(err)
+      error: err => {
+
+        console.error(err);
+
+        this.loadingSettings.set(false);
+
+      }
 
     });
 
@@ -199,18 +131,94 @@ export class Administration implements OnInit {
 
   saveSettings(): void {
 
-    this.administrationService.saveSettings(this.settings)
-      .subscribe({
+    this.savingSettings.set(true);
 
-        next: () => {
-          console.log('Settings saved');
-        },
+    this.administrationService.saveSettings(this.settings).subscribe({
 
-        error: err => {
-          console.error(err);
-        }
+      next: () => {
 
-      });
+        this.savingSettings.set(false);
+
+        alert('Settings saved successfully');
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.savingSettings.set(false);
+
+        alert('Failed to save settings');
+
+      }
+
+    });
+
+  }
+
+  // ==========================
+  // APPEARANCE
+  // ==========================
+
+  isDarkMode = computed(() => this.themeService.theme() === 'dark');
+
+  toggleTheme(): void {
+
+    this.themeService.toggle();
+
+  }
+
+  // ==========================
+  // AUDIT LOG
+  // ==========================
+
+  filteredAuditLogs = computed(() => {
+
+    const keyword = this.auditSearch().trim().toLowerCase();
+
+    if (!keyword) {
+      return this.auditLogs();
+    }
+
+    return this.auditLogs().filter(log =>
+      (log.user ?? '').toLowerCase().includes(keyword) ||
+      (log.action ?? '').toLowerCase().includes(keyword)
+    );
+
+  });
+
+  loadAuditLogs(): void {
+
+    this.loadingAudit.set(true);
+
+    this.administrationService.getAuditLogs().subscribe({
+
+      next: logs => {
+
+        this.auditLogs.set(logs);
+
+        this.loadingAudit.set(false);
+
+        setTimeout(() => feather.replace(), 0);
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.loadingAudit.set(false);
+
+      }
+
+    });
+
+  }
+
+  onAuditSearch(value: string): void {
+
+    this.auditSearch.set(value);
 
   }
 

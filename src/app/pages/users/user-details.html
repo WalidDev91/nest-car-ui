@@ -1,8 +1,7 @@
 <div class="container-fluid p-0">
 
-
-  <!-- HEADER ACTIONS -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <!-- HEADER -->
+  <div class="mb-3">
     <button class="btn btn-outline-secondary" (click)="goBack()">
       <i data-feather="arrow-left" class="me-1"></i>
       Back to Users
@@ -13,31 +12,21 @@
   <!-- LOADING -->
 
   <div *ngIf="loading()" class="text-center py-5">
-
     <div class="spinner-border text-primary"></div>
-
-    <p class="mt-3 text-muted">
-      Loading user information...
-    </p>
-
+    <p class="mt-3 text-muted">Loading user information...</p>
   </div>
 
 
   <!-- ERROR -->
 
   <div *ngIf="error()" class="alert alert-danger">
-
     {{ error() }}
-
   </div>
-
 
 
   <!-- CONTENT -->
 
   <div class="row" *ngIf="user() as user">
-
-
 
     <!-- ==========================
          PROFILE CARD
@@ -45,722 +34,265 @@
 
     <div class="col-12 col-md-4">
 
-
       <div class="card">
-
-
         <div class="card-body text-center">
 
-
-
-          <!-- Avatar -->
-
           <div class="mb-3">
-
             <img
               [src]="user.imageUrl ? 'http://localhost:8080/uploads/users/' + user.imageUrl : 'assets/adminkit/img/avatars/avatar.jpg'"
               class="rounded-circle border shadow-sm" width="120" height="120" alt="User photo">
           </div>
 
+          <h4 class="mb-2">{{ user.firstName }} {{ user.lastName }}</h4>
 
-
-          <!-- Name -->
-
-          <h4 class="mb-1">
-
-            {{ user.firstName }}
-            {{ user.lastName }}
-
-          </h4>
-
-          <!-- Role -->
-
-          <div class="mb-3">
-
+          <!-- Role + status, side by side -->
+          <div class="d-flex justify-content-center gap-2">
 
             <span class="badge fs-6" [ngClass]="{
-
-              'bg-danger':
-              user.role === 'SUPER_ADMIN',
-
-              'bg-primary':
-              user.role === 'ADMIN',
-
-              'bg-info':
-              user.role === 'FLEET_MANAGER',
-
-              'bg-secondary':
-              user.role === 'DRIVER'
-
-              }">
-
-
+              'bg-danger': user.role === 'SUPER_ADMIN',
+              'bg-primary': user.role === 'ADMIN',
+              'bg-info': user.role === 'FLEET_MANAGER',
+              'bg-secondary': user.role === 'DRIVER'
+            }">
               {{ user.role }}
-
-
             </span>
 
-
-          </div>
-
-
-          <!-- Account status -->
-
-          <div>
-
-
-            <span class="badge" [ngClass]="
-              user.isValidate
-              ? 'bg-success'
-              : 'bg-danger'">
-
-
-              {{
-              user.isValidate
-              ? 'Active Account'
-              : 'Inactive Account'
-              }}
-
-
+            <span class="badge fs-6" [ngClass]="user.isValidate ? 'bg-success' : 'bg-danger'">
+              {{ user.isValidate ? 'Active' : 'Inactive' }}
             </span>
 
-
           </div>
-
-
-
 
         </div>
-
-
       </div>
-
-
 
       <!-- QUICK SUMMARY -->
 
-
       <div class="card mt-3">
 
-
         <div class="card-header">
-
-
           <h5 class="card-title mb-0">
-
-            <i data-feather="info" class="me-1"></i>
-
+            <i data-feather="user" class="me-1"></i>
             Quick Information
-
           </h5>
-
-
         </div>
-
-
 
         <div class="card-body">
 
-
-          <div class="mb-2">
-
-            <strong>Email:</strong>
-
-            <br>
-
-            {{ user.email }}
-
-
+          <div class="quick-info-row">
+            <i data-feather="mail" class="quick-info-icon"></i>
+            <div>
+              <div class="text-muted small">Email</div>
+              <div>{{ user.email }}</div>
+            </div>
           </div>
 
-
-
-
-          <div class="mb-2">
-
-            <strong>Phone:</strong>
-
-            <br>
-
-            {{ user.phone || '—' }}
-
-
+          <div class="quick-info-row">
+            <i data-feather="phone" class="quick-info-icon"></i>
+            <div>
+              <div class="text-muted small">Phone</div>
+              <div>{{ user.phone || '—' }}</div>
+            </div>
           </div>
 
-
-
-
-          <div>
-
-            <strong>Supervisor:</strong>
-
-            <br>
-
-            {{ user.adminName || '—' }}
-
-
+          <div class="quick-info-row mb-0">
+            <i data-feather="user-check" class="quick-info-icon"></i>
+            <div>
+              <div class="text-muted small">Supervisor</div>
+              <div>{{ user.adminName || '—' }}</div>
+            </div>
           </div>
-
-
 
         </div>
-
-
       </div>
 
-
-
-
     </div>
-
 
     <!-- ==========================
           DETAILS CARD
     =========================== -->
 
-
     <div class="col-12 col-md-8">
-
 
       <div class="card">
 
-
         <!-- TABS -->
-
         <div class="card-header">
-
-
           <ul class="nav nav-tabs card-header-tabs">
 
-
-
             <li class="nav-item">
-
-
-              <button class="nav-link" [class.active]="
-                selectedTab() === 'info'" (click)="selectTab('info')">
-
-
-                <i data-feather="info" class="me-1">
-                </i>
-
-
+              <button class="nav-link" [class.active]="selectedTab() === 'info'" (click)="selectTab('info')">
+                <i data-feather="info" class="me-1"></i>
                 Information
-
-
               </button>
-
-
             </li>
-
-
 
             <li class="nav-item" *ngIf="isDriver()">
-
-
-
-              <button class="nav-link" [class.active]="
-                selectedTab() === 'documents'" (click)="selectTab('documents')">
-
-
-
-                <i data-feather="file-text" class="me-1">
-                </i>
-
-
+              <button class="nav-link" [class.active]="selectedTab() === 'documents'" (click)="selectTab('documents')">
+                <i data-feather="file-text" class="me-1"></i>
                 Documents
-
-
-
               </button>
-
-
             </li>
 
-
-
           </ul>
-
-
         </div>
-        <div class="card-body">
 
+        <div class="card-body">
 
           <!-- ==========================
                 INFORMATION TAB
           =========================== -->
 
-
           <div *ngIf="selectedTab() === 'info'">
 
-
-            <table class="table table-borderless align-middle">
-
-
+            <table class="table table-borderless align-middle mb-0">
               <tbody>
 
-
                 <tr>
-
-                  <th width="35%">
-                    Full Name
-                  </th>
-
-                  <td>
-                    {{ user.firstName }}
-                    {{ user.lastName }}
-                  </td>
-
+                  <th width="35%">Full Name</th>
+                  <td>{{ user.firstName }} {{ user.lastName }}</td>
                 </tr>
 
                 <tr>
-
-                  <th>
-                    Email
-                  </th>
-
-                  <td>
-                    {{ user.email }}
-                  </td>
-
+                  <th>Email</th>
+                  <td>{{ user.email }}</td>
                 </tr>
 
                 <tr>
-
-                  <th>
-                    Phone
-                  </th>
-
-                  <td>
-                    {{ user.phone || '—' }}
-                  </td>
-
+                  <th>Phone</th>
+                  <td>{{ user.phone || '—' }}</td>
                 </tr>
 
                 <tr>
-
-                  <th>
-                    Role
-                  </th>
-
-
+                  <th>Role</th>
                   <td>
+                    <span class="badge bg-primary">{{ user.role }}</span>
+                  </td>
+                </tr>
 
-                    <span class="badge bg-primary">
-
-                      {{ user.role }}
-
+                <tr>
+                  <th>Account Status</th>
+                  <td>
+                    <span class="badge" [ngClass]="user.isValidate ? 'bg-success' : 'bg-danger'">
+                      {{ user.isValidate ? 'Active' : 'Inactive' }}
                     </span>
-
-
                   </td>
-
-
                 </tr>
-
 
                 <tr>
-
-                  <th>
-                    Account Status
-                  </th>
-
-
-                  <td>
-
-
-                    <span class="badge" [ngClass]="
-                    user.isValidate
-                    ? 'bg-success'
-                    : 'bg-danger'">
-
-
-                      {{
-                      user.isValidate
-                      ? 'Active'
-                      : 'Inactive'
-                      }}
-
-
-                    </span>
-
-
-                  </td>
-
-
+                  <th>Supervisor</th>
+                  <td>{{ user.adminName || '—' }}</td>
                 </tr>
-
 
                 <tr>
-
-                  <th>
-                    Supervisor
-                  </th>
-
-
-                  <td>
-
-                    {{ user.adminName || '—' }}
-
-                  </td>
-
-
+                  <th>Created At</th>
+                  <td>{{ user.createdAt ? (user.createdAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
                 </tr>
-
 
                 <tr>
-
-                  <th>
-                    Created At
-                  </th>
-
-
-                  <td>
-
-                    {{
-                    user.createdAt
-                    ? (user.createdAt
-                    | date:'dd/MM/yyyy HH:mm')
-                    : '—'
-                    }}
-
-                  </td>
-
-
+                  <th>Last Update</th>
+                  <td>{{ user.updatedAt ? (user.updatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
                 </tr>
-
-
-
-                <tr>
-
-                  <th>
-                    Last Update
-                  </th>
-
-
-                  <td>
-
-                    {{
-                    user.updatedAt
-                    ? (user.updatedAt
-                    | date:'dd/MM/yyyy HH:mm')
-                    : '—'
-                    }}
-
-                  </td>
-
-
-                </tr>
-
-
 
               </tbody>
-
-
             </table>
 
-
-
-
-
-
           </div>
-
 
           <!-- ==========================
                 DRIVER DOCUMENTS TAB
           =========================== -->
 
-
-          <div *ngIf="
-          selectedTab() === 'documents'
-          && isDriver()">
-
-
+          <div *ngIf="selectedTab() === 'documents' && isDriver()">
 
             <div class="row g-3">
 
-
-
               <!-- LICENSE -->
-
               <div class="col-md-6">
-
-
                 <div class="card border">
-
-
                   <div class="card-body text-center">
-
-
-                    <i data-feather="credit-card" class="text-primary mb-3" style="width:40px;height:40px;">
-                    </i>
-
-
-
-                    <h5>
-                      Driver License
-                    </h5>
-
-
-
-                    <span class="badge" [ngClass]="
-                    hasLicense()
-                    ? 'bg-success'
-                    : 'bg-danger'">
-
-
-                      {{
-                      hasLicense()
-                      ? 'Uploaded'
-                      : 'Missing'
-                      }}
-
-
+                    <i data-feather="credit-card" class="text-primary mb-3" style="width:40px;height:40px;"></i>
+                    <h5>Driver License</h5>
+                    <span class="badge" [ngClass]="hasLicense() ? 'bg-success' : 'bg-danger'">
+                      {{ hasLicense() ? 'Uploaded' : 'Missing' }}
                     </span>
-
-
-
                   </div>
-
-
                 </div>
-
-
               </div>
 
-
               <!-- ID CARD -->
-
-
               <div class="col-md-6">
-
-
                 <div class="card border">
-
-
                   <div class="card-body text-center">
-
-
-                    <i data-feather="credit-card" class="text-primary mb-3" style="width:40px;height:40px;">
-                    </i>
-
-
-
-                    <h5>
-                      Identity Card
-                    </h5>
-
-
-
-                    <span class="badge" [ngClass]="
-                    hasIdCard()
-                    ? 'bg-success'
-                    : 'bg-danger'">
-
-
-                      {{
-                      hasIdCard()
-                      ? 'Uploaded'
-                      : 'Missing'
-                      }}
-
-
+                    <i data-feather="file-text" class="text-primary mb-3" style="width:40px;height:40px;"></i>
+                    <h5>Identity Card</h5>
+                    <span class="badge" [ngClass]="hasIdCard() ? 'bg-success' : 'bg-danger'">
+                      {{ hasIdCard() ? 'Uploaded' : 'Missing' }}
                     </span>
-
-
-
                   </div>
-
-
                 </div>
-
-
               </div>
 
             </div>
-
-
 
             <!-- GLOBAL DOCUMENT STATUS -->
 
-
-            <div class="alert mt-4" [ngClass]="
-            hasCompleteDocuments()
-            ? 'alert-success'
-            : 'alert-warning'">
-
-
-
-              <i data-feather="info" class="me-1">
-              </i>
-
-
-
-
-              <span *ngIf="hasCompleteDocuments()">
-
-                All required driver documents are Uploaded.
-              </span>
-
-
-
-              <span *ngIf="!hasCompleteDocuments()">
-
-                Driver documents are incomplete.
-              </span>
-
-
-
+            <div class="alert mt-4" [ngClass]="hasCompleteDocuments() ? 'alert-success' : 'alert-warning'">
+              <i data-feather="info" class="me-1"></i>
+              <span *ngIf="hasCompleteDocuments()">All required driver documents are uploaded.</span>
+              <span *ngIf="!hasCompleteDocuments()">Driver documents are incomplete.</span>
             </div>
 
-
-            <!-- DOCUMENT LIST FUTURE READY -->
-
+            <!-- DOCUMENT LIST -->
 
             <div class="mt-4">
 
-
-
               <table class="table table-hover" *ngIf="driverDocs().length > 0">
-
-
                 <thead>
-
-
                   <tr>
-
-                    <th>
-                      Title
-                    </th>
-
-
-                    <th>
-                      Type
-                    </th>
-
-
-                    <th>
-                      Status
-                    </th>
-
-                    <th class="text-end">
-
-                      Actions
-
-                    </th>
-
-
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
                   </tr>
-
-
                 </thead>
-
-
                 <tbody>
-
-
                   <tr *ngFor="let doc of driverDocs()">
-
-
-
+                    <td>{{ doc.title }}</td>
+                    <td>{{ doc.type === 'DRIVER_LICENSE' ? 'Driver License' : 'ID Card' }}</td>
                     <td>
-                      {{ doc.title }}
-                    </td>
-
-
-                    <td>
-
-                      {{
-                      doc.type === 'DRIVER_LICENSE'
-                      ? 'Driver License'
-                      : 'ID Card'
-                      }}
-
-                    </td>
-
-
-                    <td>
-
                       <span class="badge" [ngClass]="{
-
-                      'bg-warning':
-                      doc.status === 'PENDING',
-
-                      'bg-success':
-                      doc.status === 'APPROVED',
-
-                      'bg-danger':
-                      doc.status === 'REJECTED'
-
+                        'bg-warning': doc.status === 'PENDING',
+                        'bg-success': doc.status === 'APPROVED',
+                        'bg-danger': doc.status === 'REJECTED'
                       }">
-
-
                         {{ doc.status }}
-
-
                       </span>
-
-
                     </td>
-
                     <td class="text-end">
-
                       <button class="btn btn-sm btn-outline-secondary" (click)="viewDriverDocument(doc.id)"
                         title="View">
-
                         <i data-feather="info"></i>
-
                       </button>
-
                     </td>
-
-
-
                   </tr>
-
-
                 </tbody>
-
-
               </table>
 
-
-
-              <!-- EMPTY STATE -->
-
-
               <div *ngIf="driverDocs().length === 0" class="text-center text-muted py-4">
-
-
-                <i data-feather="file" style="width:40px;height:40px;">
-                </i>
-
-
-                <p class="mt-2">
-
-                  No documents uploaded yet.
-
-                </p>
-
-
+                <i data-feather="file" style="width:40px;height:40px;"></i>
+                <p class="mt-2">No documents uploaded yet.</p>
               </div>
-
 
             </div>
 
-
           </div>
-
 
         </div>
 
-
       </div>
 
-
     </div>
-
 
   </div>
 

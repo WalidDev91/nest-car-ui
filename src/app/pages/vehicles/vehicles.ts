@@ -8,6 +8,7 @@ import { VehicleService } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle';
 import { VehicleDocumentService } from '../../services/vehicle-document.service';
 import { MissionService } from '../../services/mission.service';
+import { ToastService } from '../../services/toast.service';
 import { forkJoin } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
@@ -31,10 +32,17 @@ export class Vehicles implements OnInit {
   loading = signal(false);
 
   // ==========================================================
-  // SEARCH
+  // SEARCH / FILTER
   // ==========================================================
 
   search = signal('');
+
+  availabilityFilter = signal<'ALL' | 'AVAILABLE' | 'IN_MISSION'>('ALL');
+
+  hasActiveFilters = computed(() =>
+    this.search().trim().length > 0 ||
+    this.availabilityFilter() !== 'ALL'
+  );
 
   // ==========================================================
   // SORT
@@ -51,19 +59,20 @@ export class Vehicles implements OnInit {
   currentPage = signal(1);
 
   // ==========================================================
-  // CREATE FORM
+  // CREATE / EDIT FORM
   // ==========================================================
 
   editMode = false;
 
   editingVehicleId: string | null = null;
 
+  submitted = signal(false);
+
   plateNumber = '';
   brand = '';
   model = '';
   year = new Date().getFullYear();
 
-  // Vehicle picture
   selectedImage: File | null = null;
   imagePreview: string | null = null;
 
@@ -73,30 +82,103 @@ export class Vehicles implements OnInit {
     return this.role === 'DRIVER';
   }
 
-  vehicleToDeleteId: string | null = null;
+  // ==========================================================
+  // VALIDATION
+  // ==========================================================
 
+  get plateNumberInvalid(): boolean {
+    return this.submitted() && !this.plateNumber.trim();
+  }
+
+  get brandInvalid(): boolean {
+    return this.submitted() && !this.brand.trim();
+  }
+
+  get modelInvalid(): boolean {
+    return this.submitted() && !this.model.trim();
+  }
+
+  get yearInvalid(): boolean {
+    if (!this.submitted()) return false;
+    const currentYear = new Date().getFullYear();
+    return !this.year || this.year < 1980 || this.year > currentYear + 1;
+  }
 
   // ==========================================================
-  // CARDS
+  // DELETE
+  // ==========================================================
+
+  vehicleToDeleteId = signal<string | null>(null);
+
+  vehicleToDeletePlate = computed(() => {
+    const id = this.vehicleToDeleteId();
+    return this.vehicles().find(v => v.id === id)?.plateNumber ?? '';
+  });
+
+  linkedDocumentsCount = computed(() => {
+    const id = this.vehicleToDeleteId();
+    if (!id) return 0;
+    return this.vehicleDocuments().filter((d: any) => d.vehicleId === id).length;
+  });
+
+  linkedMissionsCount = computed(() => {
+    const id = this.vehicleToDeleteId();
+    if (!id) return 0;
+    return this.missions().filter((m: any) => m.vehicleId === id).length;
+  });
+
+  hasLinkedRecords = computed(() =>
+    this.linkedDocumentsCount() > 0 || this.linkedMissionsCount() > 0
+  );
+
+  // ==========================================================
+  // STAT CARDS
   // ==========================================================
 
   totalVehicles = computed(() =>
     this.vehicles().length
   );
 
-  vehiclesInMission = computed(() => {
+  // Availability is now purely date-based (see vehicleStatusMap):
+  // a vehicle is "in mission" only while now() falls between an
+  // assigned mission's startDate and endDate, regardless of status.
+  vehicleStatusMap = computed(() => {
+
+    const now = new Date();
 
     const activeVehicleIds = new Set(
       this.missions()
-        .filter(m => m.status === 'ONGOING')
+        .filter(m => {
+
+          if (!m.vehicleId) return false;
+
+          const start = new Date(m.startDate);
+          const end = new Date(m.endDate);
+
+          return now >= start && now <= end;
+
+        })
         .map(m => m.vehicleId)
     );
 
-    return this.vehicles()
-      .filter(v => activeVehicleIds.has(v.id))
-      .length;
+    const map = new Map<string, 'IN_MISSION' | 'AVAILABLE'>();
+
+    this.vehicles().forEach(v => {
+      map.set(
+        v.id,
+        activeVehicleIds.has(v.id) ? 'IN_MISSION' : 'AVAILABLE'
+      );
+    });
+
+    return map;
 
   });
+
+  vehiclesInMission = computed(() =>
+    this.vehicles().filter(v =>
+      this.vehicleStatusMap().get(v.id) === 'IN_MISSION'
+    ).length
+  );
 
   availableVehicles = computed(() =>
     this.totalVehicles() - this.vehiclesInMission()
@@ -117,29 +199,8 @@ export class Vehicles implements OnInit {
 
   });
 
-  vehicleStatusMap = computed(() => {
-
-    const ongoingVehicleIds = new Set(
-      this.missions()
-        .filter(m => m.status === 'ONGOING')
-        .map(m => m.vehicleId)
-    );
-
-    const map = new Map<string, 'IN_MISSION' | 'AVAILABLE'>();
-
-    this.vehicles().forEach(v => {
-      map.set(
-        v.id,
-        ongoingVehicleIds.has(v.id) ? 'IN_MISSION' : 'AVAILABLE'
-      );
-    });
-
-    return map;
-
-  });
-
   // ==========================================================
-  // FILTERED
+  // FILTERED / SORTED
   // ==========================================================
 
   filteredVehicles = computed(() => {
@@ -151,15 +212,20 @@ export class Vehicles implements OnInit {
     if (search) {
 
       data = data.filter(v =>
-
         v.plateNumber.toLowerCase().includes(search) ||
-
         v.brand.toLowerCase().includes(search) ||
-
         v.model.toLowerCase().includes(search) ||
-
         (v.adminName ?? '').toLowerCase().includes(search)
+      );
 
+    }
+
+    const availability = this.availabilityFilter();
+
+    if (availability !== 'ALL') {
+
+      data = data.filter(v =>
+        this.vehicleStatusMap().get(v.id) === availability
       );
 
     }
@@ -171,17 +237,11 @@ export class Vehicles implements OnInit {
       let valueA = a[column];
       let valueB = b[column];
 
-      if (typeof valueA === 'string')
-        valueA = valueA.toLowerCase();
+      if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+      if (typeof valueB === 'string') valueB = valueB.toLowerCase();
 
-      if (typeof valueB === 'string')
-        valueB = valueB.toLowerCase();
-
-      if (valueA < valueB)
-        return this.sortDirection() === 'asc' ? -1 : 1;
-
-      if (valueA > valueB)
-        return this.sortDirection() === 'asc' ? 1 : -1;
+      if (valueA < valueB) return this.sortDirection() === 'asc' ? -1 : 1;
+      if (valueA > valueB) return this.sortDirection() === 'asc' ? 1 : -1;
 
       return 0;
 
@@ -193,26 +253,14 @@ export class Vehicles implements OnInit {
 
   paginatedVehicles = computed(() => {
 
-    const start =
-      (this.currentPage() - 1) * this.pageSize();
+    const start = (this.currentPage() - 1) * this.pageSize();
 
-    return this.filteredVehicles().slice(
-      start,
-      start + this.pageSize()
-    );
+    return this.filteredVehicles().slice(start, start + this.pageSize());
 
   });
 
   totalPages = computed(() =>
-
-    Math.max(
-      1,
-      Math.ceil(
-        this.filteredVehicles().length /
-        this.pageSize()
-      )
-    )
-
+    Math.max(1, Math.ceil(this.filteredVehicles().length / this.pageSize()))
   );
 
   // ==========================================================
@@ -223,18 +271,13 @@ export class Vehicles implements OnInit {
     private vehicleService: VehicleService,
     private missionService: MissionService,
     private vehicleDocumentService: VehicleDocumentService,
+    private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
 
-  // ==========================================================
-  // INIT
-  // ==========================================================
-
   ngOnInit(): void {
-
     this.loadVehicles();
-
   }
 
   // ==========================================================
@@ -261,10 +304,6 @@ export class Vehicles implements OnInit {
 
         this.route.queryParams.subscribe(params => {
 
-          // =========================
-          // EDIT
-          // =========================
-
           const editId = params['edit'];
 
           if (editId) {
@@ -285,10 +324,6 @@ export class Vehicles implements OnInit {
 
             return;
           }
-
-          // =========================
-          // DELETE
-          // =========================
 
           const deleteId = params['delete'];
 
@@ -322,6 +357,8 @@ export class Vehicles implements OnInit {
 
         this.loading.set(false);
 
+        this.toastService.error('Failed to load vehicles');
+
       }
 
     });
@@ -329,7 +366,7 @@ export class Vehicles implements OnInit {
   }
 
   // ==========================================================
-  // SEARCH
+  // SEARCH / FILTER
   // ==========================================================
 
   onSearch(value: string) {
@@ -342,6 +379,24 @@ export class Vehicles implements OnInit {
 
   }
 
+  filterAvailability(value: 'ALL' | 'AVAILABLE' | 'IN_MISSION') {
+
+    this.availabilityFilter.set(value);
+
+    this.currentPage.set(1);
+
+  }
+
+  clearFilters() {
+
+    this.search.set('');
+
+    this.availabilityFilter.set('ALL');
+
+    this.currentPage.set(1);
+
+  }
+
   // ==========================================================
   // SORT
   // ==========================================================
@@ -350,18 +405,11 @@ export class Vehicles implements OnInit {
 
     if (this.sortColumn() === column) {
 
-      this.sortDirection.set(
-
-        this.sortDirection() === 'asc'
-          ? 'desc'
-          : 'asc'
-
-      );
+      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
 
     } else {
 
       this.sortColumn.set(column);
-
       this.sortDirection.set('asc');
 
     }
@@ -375,9 +423,7 @@ export class Vehicles implements OnInit {
   nextPage() {
 
     if (this.currentPage() < this.totalPages()) {
-
       this.currentPage.update(v => v + 1);
-
     }
 
   }
@@ -385,9 +431,7 @@ export class Vehicles implements OnInit {
   previousPage() {
 
     if (this.currentPage() > 1) {
-
       this.currentPage.update(v => v - 1);
-
     }
 
   }
@@ -407,42 +451,35 @@ export class Vehicles implements OnInit {
     const reader = new FileReader();
 
     reader.onload = () => {
-
       this.imagePreview = reader.result as string;
-
     };
 
     reader.readAsDataURL(this.selectedImage);
 
   }
+
   // ==========================================================
   // SAVE VEHICLE (CREATE / UPDATE)
   // ==========================================================
 
   createVehicle() {
 
+    this.submitted.set(true);
+
     if (
-      !this.plateNumber.trim() ||
-      !this.brand.trim() ||
-      !this.model.trim()
+      this.plateNumberInvalid ||
+      this.brandInvalid ||
+      this.modelInvalid ||
+      this.yearInvalid
     ) {
-
-      alert('Please fill all required fields.');
-
       return;
-
     }
 
     const vehicle = {
-
       plateNumber: this.plateNumber.trim().toUpperCase(),
-
       brand: this.brand.trim(),
-
       model: this.model.trim(),
-
       year: this.year
-
     };
 
     if (!this.editMode) {
@@ -451,122 +488,75 @@ export class Vehicles implements OnInit {
 
         next: (createdVehicle) => {
 
-
           if (this.selectedImage) {
 
-            this.vehicleService.uploadImage(
-              createdVehicle.id,
-              this.selectedImage
-            )
-              .subscribe({
+            this.vehicleService.uploadImage(createdVehicle.id, this.selectedImage).subscribe({
 
-                next: () => {
+              next: () => this.loadVehicles(),
 
-                  this.loadVehicles();
+              error: err => {
+                console.error(err);
+                this.toastService.error('Vehicle created, but image upload failed');
+              }
 
-                },
+            });
 
-                error: err => {
-
-                  console.error(err);
-
-                  alert('Image upload failed');
-
-                }
-
-              });
-
-          }
-          else {
-
+          } else {
             this.loadVehicles();
-
           }
 
+          this.toastService.success('Vehicle created successfully');
 
           this.resetForm();
 
-
-
-          bootstrap.Modal
-            .getInstance(document.getElementById('vehicleModal'))
-            ?.hide();
-
+          bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
 
         },
 
         error: err => {
-
           console.error(err);
-
-          alert('Vehicle creation failed.');
-
+          this.toastService.error('Vehicle creation failed');
         }
 
       });
 
-    }
-
-    else {
+    } else {
 
       this.vehicleService.update(this.editingVehicleId!, vehicle).subscribe({
 
         next: (updatedVehicle) => {
 
-
           if (this.selectedImage) {
 
-            this.vehicleService.uploadImage(
-              updatedVehicle.id,
-              this.selectedImage
-            )
-              .subscribe({
+            this.vehicleService.uploadImage(updatedVehicle.id, this.selectedImage).subscribe({
 
-                next: () => {
+              next: () => this.loadVehicles(),
 
-                  this.loadVehicles();
+              error: err => {
+                console.error(err);
+                this.toastService.error('Vehicle updated, but image upload failed');
+              }
 
-                },
+            });
 
-                error: err => {
-
-                  console.error(err);
-
-                  alert('Image upload failed');
-
-                }
-
-              });
-
-          }
-          else {
-
+          } else {
             this.loadVehicles();
-
           }
 
+          this.toastService.success('Vehicle updated successfully');
 
           this.resetForm();
 
-
           this.editMode = false;
-
           this.editingVehicleId = null;
 
-
-          bootstrap.Modal
-            .getInstance(document.getElementById('vehicleModal'))
-            ?.hide();
-
+          bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
 
         },
 
         error: err => {
-
           console.error(err);
-
-          alert('Vehicle update failed.');
-
+          this.toastService.error('Vehicle update failed');
         }
 
       });
@@ -582,24 +572,19 @@ export class Vehicles implements OnInit {
   resetForm() {
 
     this.plateNumber = '';
-
     this.brand = '';
-
     this.model = '';
-
     this.year = new Date().getFullYear();
 
     this.selectedImage = null;
-
     this.imagePreview = null;
 
     this.editMode = false;
-
     this.editingVehicleId = null;
 
-    const input = document.getElementById(
-      'vehicleImageInput'
-    ) as HTMLInputElement;
+    this.submitted.set(false);
+
+    const input = document.getElementById('vehicleImageInput') as HTMLInputElement;
 
     if (input) {
       input.value = '';
@@ -612,9 +597,7 @@ export class Vehicles implements OnInit {
   // ==========================================================
 
   viewVehicleDetails(id: string) {
-
     this.router.navigate(['/vehicles', id]);
-
   }
 
   // ==========================================================
@@ -628,15 +611,13 @@ export class Vehicles implements OnInit {
     if (!vehicle) return;
 
     this.editMode = true;
-
     this.editingVehicleId = id;
 
+    this.submitted.set(false);
+
     this.plateNumber = vehicle.plateNumber;
-
     this.brand = vehicle.brand;
-
     this.model = vehicle.model;
-
     this.year = vehicle.year;
 
     this.imagePreview = vehicle.imageUrl
@@ -645,9 +626,7 @@ export class Vehicles implements OnInit {
 
     this.selectedImage = null;
 
-    const modal = new bootstrap.Modal(
-      document.getElementById('vehicleModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('vehicleModal'));
 
     modal.show();
 
@@ -659,11 +638,9 @@ export class Vehicles implements OnInit {
 
   deleteVehicle(id: string) {
 
-    this.vehicleToDeleteId = id;
+    this.vehicleToDeleteId.set(id);
 
-    const modal = new bootstrap.Modal(
-      document.getElementById('deleteVehicleModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('deleteVehicleModal'));
 
     modal.show();
 
@@ -671,19 +648,21 @@ export class Vehicles implements OnInit {
 
   confirmDeleteVehicle() {
 
-    if (!this.vehicleToDeleteId) return;
+    const id = this.vehicleToDeleteId();
 
-    this.vehicleService.delete(this.vehicleToDeleteId).subscribe({
+    if (!id) return;
+
+    this.vehicleService.delete(id).subscribe({
 
       next: () => {
 
         this.loadVehicles();
 
-        this.vehicleToDeleteId = null;
+        this.vehicleToDeleteId.set(null);
 
-        bootstrap.Modal
-          .getInstance(document.getElementById('deleteVehicleModal'))
-          ?.hide();
+        bootstrap.Modal.getInstance(document.getElementById('deleteVehicleModal'))?.hide();
+
+        this.toastService.success('Vehicle deleted successfully');
 
       },
 
@@ -691,13 +670,11 @@ export class Vehicles implements OnInit {
 
         console.error(err);
 
-        this.vehicleToDeleteId = null;
+        bootstrap.Modal.getInstance(document.getElementById('deleteVehicleModal'))?.hide();
 
-        bootstrap.Modal
-          .getInstance(document.getElementById('deleteVehicleModal'))
-          ?.hide();
+        this.toastService.error('Failed to delete vehicle');
 
-        alert('Delete failed.');
+        this.vehicleToDeleteId.set(null);
 
       }
 
@@ -706,26 +683,21 @@ export class Vehicles implements OnInit {
   }
 
   // ==========================================================
-  // REFRESH
+  // REFRESH / CREATE
   // ==========================================================
 
   refresh() {
-
     this.loadVehicles();
-
   }
 
   openCreateModal() {
 
     this.editMode = false;
-
     this.editingVehicleId = null;
 
     this.resetForm();
 
-    const modal = new bootstrap.Modal(
-      document.getElementById('vehicleModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('vehicleModal'));
 
     modal.show();
 

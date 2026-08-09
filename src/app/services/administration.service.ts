@@ -2,46 +2,32 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { User } from '../models/user';
+import { AppSettings } from '../models/app-settings';
+import { AuditLog } from '../models/audit-log';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdministrationService {
-  
-private baseUrl = `${environment.apiUrl}/administration`;
 
-  constructor(
-    private http: HttpClient
-  ) {}
+  private baseUrl = `${environment.apiUrl}/administration`;
+
+  constructor(private http: HttpClient) { }
 
   // ==========================
   // ACCOUNT REQUESTS
   // ==========================
 
   getPendingRequests() {
-
-    return this.http.get<User[]>(
-      `${this.baseUrl}/requests`
-    );
-
+    return this.http.get<User[]>(`${this.baseUrl}/requests`);
   }
 
   approveRequest(userId: string) {
-
-    return this.http.patch<void>(
-      `${this.baseUrl}/requests/${userId}/approve`,
-      {}
-    );
-
+    return this.http.patch<void>(`${this.baseUrl}/requests/${userId}/approve`, {});
   }
 
   rejectRequest(userId: string) {
-
-    return this.http.patch<void>(
-      `${this.baseUrl}/requests/${userId}/reject`,
-      {}
-    );
-
+    return this.http.patch<void>(`${this.baseUrl}/requests/${userId}/reject`, {});
   }
 
   // ==========================
@@ -49,11 +35,7 @@ private baseUrl = `${environment.apiUrl}/administration`;
   // ==========================
 
   getAuditLogs() {
-
-    return this.http.get<any[]>(
-      `${this.baseUrl}/audit`
-    );
-
+    return this.http.get<AuditLog[]>(`${this.baseUrl}/audit`);
   }
 
   // ==========================
@@ -61,20 +43,11 @@ private baseUrl = `${environment.apiUrl}/administration`;
   // ==========================
 
   getSettings() {
-
-    return this.http.get<any>(
-      `${this.baseUrl}/settings`
-    );
-
+    return this.http.get<AppSettings>(`${this.baseUrl}/settings`);
   }
 
-  saveSettings(settings: any) {
-
-    return this.http.put(
-      `${this.baseUrl}/settings`,
-      settings
-    );
-
+  saveSettings(settings: AppSettings) {
+    return this.http.put<void>(`${this.baseUrl}/settings`, settings);
   }
 
 }

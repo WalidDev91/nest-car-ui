@@ -1,391 +1,270 @@
 <div class="container-fluid p-0">
 
-  <!-- ========================================= -->
+  <!-- PAGE HEADER -->
+  <div class="mb-3">
+    <h4 class="mb-0">Documents</h4>
+    <small class="text-muted">Manage driver, vehicle, and mission documents.</small>
+  </div>
+
   <!-- STATISTICS -->
-  <!-- ========================================= -->
-
-  <div class="row">
+  <div class="row g-3 mb-3">
 
     <div class="col-xl-3 col-md-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Total Documents</h6>
-
-          <h2>{{ totalDocuments() }}</h2>
-
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-secondary-subtle text-secondary">
+            <i data-feather="file-text"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Total Documents</h6>
+            <h3 class="mb-0">{{ totalDocuments() }}</h3>
+          </div>
         </div>
-
       </div>
-
     </div>
 
     <div class="col-xl-3 col-md-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Driver Documents</h6>
-
-          <h2 class="text-primary">
-
-            {{ driverCount() }}
-
-          </h2>
-
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-primary-subtle text-primary">
+            <i data-feather="user"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Driver Documents</h6>
+            <h3 class="mb-0">{{ driverCount() }}</h3>
+          </div>
         </div>
-
       </div>
-
     </div>
 
     <div class="col-xl-3 col-md-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Vehicle Documents</h6>
-
-          <h2 class="text-success">
-
-            {{ vehicleCount() }}
-
-          </h2>
-
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-success-subtle text-success">
+            <i data-feather="truck"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Vehicle Documents</h6>
+            <h3 class="mb-0">{{ vehicleCount() }}</h3>
+          </div>
         </div>
-
       </div>
-
     </div>
 
     <div class="col-xl-3 col-md-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Mission Documents</h6>
-
-          <h2 class="text-warning">
-
-            {{ missionCount() }}
-
-          </h2>
-
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-warning-subtle text-warning">
+            <i data-feather="map"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Mission Documents</h6>
+            <h3 class="mb-0">{{ missionCount() }}</h3>
+          </div>
         </div>
-
       </div>
-
     </div>
 
   </div>
 
-  <!-- ========================================= -->
-  <!-- FILTER BAR -->
-  <!-- ========================================= -->
-
-  <div class="card mb-3">
-
-    <div class="card-body">
-
-      <div class="row">
-
-        <div class="col-md-5">
-
-          <input class="form-control" placeholder="Search documents..." [value]="search()"
-            (input)="onSearch($any($event.target).value)">
-
-        </div>
-
-        <div class="col-md-3">
-
-          <select class="form-select" (change)="selectTab($any($event.target).value)">
-
-            <option value="driver">
-              Driver Documents
-            </option>
-
-            <option value="vehicle">
-              Vehicle Documents
-            </option>
-
-            <option value="mission">
-              Mission Documents
-            </option>
-
-          </select>
-
-        </div>
-
-        <div class="col-md-4">
-
-          <button class="btn btn-outline-secondary w-100" (click)="loadDocuments()">
-
-            <i data-feather="refresh-cw" class="align-middle me-1">
-            </i>
-
-            Refresh
-
-          </button>
-
-        </div>
-
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ========================================= -->
-  <!-- TABLE CARD -->
-  <!-- ========================================= -->
-
+  <!-- TABLE (tabs + toolbar live inside) -->
   <div class="card">
 
     <div class="card-header">
-
       <ul class="nav nav-tabs card-header-tabs">
 
         <li class="nav-item">
-
           <button class="nav-link" [class.active]="selectedTab()==='driver'" (click)="selectTab('driver')">
-
+            <i data-feather="user" class="me-1"></i>
             Driver Documents
-
-            <span class="badge bg-secondary ms-1">
-
-              {{ driverDocs().length }}
-
-            </span>
-
+            <span class="badge bg-secondary ms-1">{{ driverDocs().length }}</span>
           </button>
-
         </li>
 
         <li class="nav-item">
-
           <button class="nav-link" [class.active]="selectedTab()==='vehicle'" (click)="selectTab('vehicle')">
-
+            <i data-feather="truck" class="me-1"></i>
             Vehicle Documents
-
-            <span class="badge bg-secondary ms-1">
-
-              {{ vehicleDocs().length }}
-
-            </span>
-
+            <span class="badge bg-secondary ms-1">{{ vehicleDocs().length }}</span>
           </button>
-
         </li>
 
         <li class="nav-item">
-
           <button class="nav-link" [class.active]="selectedTab()==='mission'" (click)="selectTab('mission')">
-
+            <i data-feather="map" class="me-1"></i>
             Mission Documents
-
-            <span class="badge bg-secondary ms-1">
-
-              {{ missionDocs().length }}
-
-            </span>
-
+            <span class="badge bg-secondary ms-1">{{ missionDocs().length }}</span>
           </button>
-
         </li>
 
       </ul>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="card-header bg-transparent">
+
+      <div class="d-flex flex-wrap align-items-center gap-2">
+
+        <div class="input-group" style="max-width:280px;">
+          <span class="input-group-text bg-transparent">
+            <i data-feather="search" style="width:16px;height:16px;"></i>
+          </span>
+          <input class="form-control" placeholder="Search documents..." [value]="search()"
+            (input)="onSearch($any($event.target).value)">
+        </div>
+
+        <select *ngIf="selectedTab()==='driver'" class="form-select" style="max-width:180px;"
+          [value]="driverStatusFilter()" (change)="filterDriverStatus($any($event.target).value)">
+          <option value="ALL">Any Status</option>
+          <option value="PENDING">Pending</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+
+        <select *ngIf="selectedTab()==='vehicle'" class="form-select" style="max-width:200px;"
+          [value]="vehicleTypeFilter()" (change)="filterVehicleType($any($event.target).value)">
+          <option value="ALL">Any Type</option>
+          <option value="LICENSE">License</option>
+          <option value="TECHNICAL_CHECK">Technical Check</option>
+          <option value="INSURANCE">Insurance</option>
+        </select>
+
+        <div class="ms-auto d-flex gap-2">
+
+          <button class="btn btn-outline-secondary" (click)="loadDocuments()" title="Refresh">
+            <i data-feather="refresh-cw"></i>
+          </button>
+
+          <button *ngIf="hasActiveFilters()" class="btn btn-outline-secondary" (click)="clearFilters()"
+            title="Clear filters">
+            <i data-feather="x"></i>
+          </button>
+
+          <button *ngIf="canUpload()" class="btn btn-primary" (click)="openCreateModalForCurrentTab()">
+            <i data-feather="upload" class="align-middle me-1"></i>
+            Upload Document
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 
-    <div class="card-body">
+    <div class="card-body p-0">
 
       <div class="text-center py-5" *ngIf="loading()">
-
+        <div class="spinner-border spinner-border-sm me-2"></div>
         Loading documents...
-
       </div>
+
       <!-- ========================================= -->
       <!-- DRIVER TAB -->
       <!-- ========================================= -->
 
-      <div *ngIf="!loading() && selectedTab()==='driver'">
+      <div *ngIf="!loading() && selectedTab()==='driver'" class="table-responsive">
 
-        <!-- DRIVER UPLOAD -->
+        <table class="table table-hover align-middle mb-0">
 
-        <div class="d-flex justify-content-end mb-3" *ngIf="isDriver">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Driver</th>
+              <th>Status</th>
+              <th>Uploaded</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
 
-          <button class="btn btn-primary" (click)="openCreateDriverDocumentModal()">
+          <tbody>
 
-            <i data-feather="upload" class="align-middle me-1"></i>
+            <tr *ngFor="let doc of paginatedDocuments()">
 
-            Upload Document
+              <td><strong>{{ doc.title }}</strong></td>
 
-          </button>
+              <td><span class="badge bg-light text-dark">{{ doc.type }}</span></td>
 
-        </div>
+              <td>{{ doc.driverName }}</td>
 
-        <!-- DRIVER TABLE -->
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-warning text-dark': doc.status === 'PENDING',
+                  'bg-success': doc.status === 'APPROVED',
+                  'bg-danger': doc.status === 'REJECTED'
+                }">
+                  {{ doc.status }}
+                </span>
+              </td>
 
-        <div class="table-responsive">
+              <td>{{ doc.uploadedAt | date:'dd/MM/yyyy' }}</td>
 
-          <table class="table table-hover align-middle mb-0">
+              <td class="text-end">
 
-            <thead>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewDriverDocument(doc.id)"
+                  title="Preview">
+                  <i data-feather="eye"></i>
+                </button>
 
-              <tr>
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadDriver(doc.id)" title="Download">
+                  <i data-feather="download"></i>
+                </button>
 
-                <th>Title</th>
+                <ng-container *ngIf="isDriver">
 
-                <th>Type</th>
-
-                <th>Driver</th>
-
-                <th>Status</th>
-
-                <th>Uploaded</th>
-
-                <th class="text-end">
-                  Actions
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              <tr *ngFor="let doc of paginatedDocuments()">
-
-                <td>
-
-                  <strong>{{ doc.title }}</strong>
-
-                </td>
-
-                <td>
-
-                  <span class="badge bg-light text-dark">
-
-                    {{ doc.type }}
-
-                  </span>
-
-                </td>
-
-                <td>
-
-                  {{ doc.driverName }}
-
-                </td>
-
-                <td>
-
-                  <span class="badge" [ngClass]="{
-              'bg-warning': doc.status === 'PENDING',
-              'bg-success': doc.status === 'APPROVED',
-              'bg-danger': doc.status === 'REJECTED'
-            }">
-
-                    {{ doc.status }}
-
-                  </span>
-
-                </td>
-
-                <td>
-
-                  {{ doc.uploadedAt | date:'dd/MM/yyyy' }}
-
-                </td>
-
-                <td class="text-end">
-
-                  <!-- Preview -->
-
-                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewDriverDocument(doc.id)">
-
-                    <i data-feather="eye"></i>
-
+                  <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-warning me-1"
+                    (click)="openEditDriverDocumentModal(doc)" title="Edit">
+                    <i data-feather="edit"></i>
                   </button>
 
-                  <!-- Download -->
-
-                  <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadDriver(doc.id)">
-
-                    <i data-feather="download"></i>
-
+                  <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger"
+                    (click)="deleteDriverDocument(doc.id)" title="Delete">
+                    <i data-feather="trash-2"></i>
                   </button>
 
-                  <!-- DRIVER ACTIONS -->
+                </ng-container>
 
-                  <ng-container *ngIf="isDriver">
+                <ng-container *ngIf="!isDriver">
 
-                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-warning me-1"
-                      (click)="openEditDriverDocumentModal(doc)">
-                      <i data-feather="edit"></i>
-                    </button>
+                  <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-success me-1"
+                    (click)="approveDriverDocument(doc.id)" title="Approve">
+                    <i data-feather="check"></i>
+                  </button>
 
-                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger"
-                      (click)="deleteDriverDocument(doc.id)">
+                  <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger me-1"
+                    (click)="rejectDriverDocument(doc.id)" title="Reject">
+                    <i data-feather="x"></i>
+                  </button>
 
-                      <i data-feather="trash-2"></i>
+                  <button *ngIf="doc.status !== 'PENDING'" class="btn btn-sm btn-outline-warning"
+                    (click)="openChangeValidationModal(doc)" title="Edit Status">
+                    <i data-feather="edit"></i>
+                  </button>
 
-                    </button>
+                </ng-container>
 
-                  </ng-container>
+              </td>
 
-                  <!-- ADMIN / FLEET MANAGER / SUPER ADMIN -->
+            </tr>
 
-                  <ng-container *ngIf="!isDriver">
+            <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
+                <div>No driver documents yet.</div>
+              </td>
+            </tr>
 
-                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-success me-1"
-                      (click)="approveDriverDocument(doc.id)">
+            <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
+                <div>No documents match your filters.</div>
+                <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
+              </td>
+            </tr>
 
-                      <i data-feather="check"></i>
+          </tbody>
 
-                    </button>
-
-                    <button *ngIf="doc.status === 'PENDING'" class="btn btn-sm btn-outline-danger me-1"
-                      (click)="rejectDriverDocument(doc.id)">
-
-                      <i data-feather="x"></i>
-
-                    </button>
-
-                    <button *ngIf="doc.status !== 'PENDING'" class="btn btn-sm btn-outline-warning"
-                      (click)="openChangeValidationModal(doc)">
-
-                      <i data-feather="edit"></i>
-
-                    </button>
-
-                  </ng-container>
-
-                </td>
-
-              </tr>
-
-              <tr *ngIf="!loading() && paginatedDocuments().length === 0">
-
-                <td colspan="6" class="text-center py-5 text-muted">
-
-                  No documents found.
-
-                </td>
-
-              </tr>
-
-            </tbody>
-
-          </table>
-
-        </div>
+        </table>
 
       </div>
 
@@ -393,116 +272,81 @@
       <!-- VEHICLE TAB -->
       <!-- ========================================= -->
 
-      <div *ngIf="!loading() && selectedTab()==='vehicle'">
+      <div *ngIf="!loading() && selectedTab()==='vehicle'" class="table-responsive">
 
-        <div class="d-flex justify-content-end mb-3" *ngIf="!isDriver">
+        <table class="table table-hover align-middle mb-0">
 
-          <button class="btn btn-primary" (click)="openCreateVehicleDocumentModal()">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Vehicle</th>
+              <th>Year</th>
+              <th>Created</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
 
-            <i data-feather="upload" class="align-middle me-1"></i>
+          <tbody>
 
-            Upload Document
+            <tr *ngFor="let doc of paginatedDocuments()">
 
-          </button>
+              <td><strong>{{ doc.title }}</strong></td>
 
-        </div>
+              <td><span class="badge bg-light text-dark">{{ doc.type }}</span></td>
 
-        <div class="table-responsive">
+              <td>{{ doc.vehiclePlateNumber || '—' }}</td>
 
-          <table class="table table-hover align-middle mb-0">
+              <td>{{ doc.year }}</td>
 
-            <thead>
+              <td>{{ doc.createdAt | date:'dd/MM/yyyy' }}</td>
 
-              <tr>
+              <td class="text-end">
 
-                <th>Title</th>
-                <th>Type</th>
-                <th>Vehicle</th>
-                <th>Year</th>
-                <th>Created</th>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewVehicleDocument(doc.id)"
+                  title="Preview">
+                  <i data-feather="eye"></i>
+                </button>
 
-                <th class="text-end">
-                  Actions
-                </th>
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadVehicle(doc.id)" title="Download">
+                  <i data-feather="download"></i>
+                </button>
 
-              </tr>
+                <ng-container *ngIf="!isDriver">
 
-            </thead>
-
-            <tbody>
-
-              <tr *ngFor="let doc of paginatedDocuments()">
-
-                <td>
-                  <strong>{{ doc.title }}</strong>
-                </td>
-
-                <td>
-                  <span class="badge bg-light text-dark">
-                    {{ doc.type }}
-                  </span>
-                </td>
-
-                <td>
-                  {{ doc.vehiclePlateNumber || '—' }}
-                </td>
-
-                <td>
-                  {{ doc.year }}
-                </td>
-
-                <td>
-                  {{ doc.createdAt | date:'dd/MM/yyyy' }}
-                </td>
-
-                <td class="text-end">
-
-                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewVehicleDocument(doc.id)">
-
-                    <i data-feather="eye"></i>
-
+                  <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditVehicleDocumentModal(doc)"
+                    title="Edit">
+                    <i data-feather="edit"></i>
                   </button>
 
-                  <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadVehicle(doc.id)">
-
-                    <i data-feather="download"></i>
-
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteVehicleDocument(doc.id)" title="Delete">
+                    <i data-feather="trash-2"></i>
                   </button>
 
-                  <ng-container *ngIf="!isDriver">
+                </ng-container>
 
-                    <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditVehicleDocumentModal(doc)">
+              </td>
 
-                      <i data-feather="edit"></i>
+            </tr>
 
-                    </button>
+            <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
+                <div>No vehicle documents yet.</div>
+              </td>
+            </tr>
 
-                    <button class="btn btn-sm btn-outline-danger" (click)="deleteVehicleDocument(doc.id)">
+            <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
+                <div>No documents match your filters.</div>
+                <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
+              </td>
+            </tr>
 
-                      <i data-feather="trash-2"></i>
+          </tbody>
 
-                    </button>
-                  </ng-container>
-
-                </td>
-
-              </tr>
-
-              <tr *ngIf="!loading() && paginatedDocuments().length===0">
-
-                <td colspan="6" class="text-center py-5 text-muted">
-
-                  No documents found.
-
-                </td>
-
-              </tr>
-
-            </tbody>
-
-          </table>
-
-        </div>
+        </table>
 
       </div>
 
@@ -510,162 +354,100 @@
       <!-- MISSION TAB -->
       <!-- ========================================= -->
 
-      <div *ngIf="!loading() && selectedTab()==='mission'">
+      <div *ngIf="!loading() && selectedTab()==='mission'" class="table-responsive">
 
-        <div class="d-flex justify-content-end mb-3" *ngIf="!isDriver">
+        <table class="table table-hover align-middle mb-0">
 
-          <button class="btn btn-primary" (click)="openCreateMissionDocumentModal()">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Mission</th>
+              <th>Created</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
 
-            <i data-feather="upload" class="align-middle me-1"></i>
+          <tbody>
 
-            Upload Document
+            <tr *ngFor="let doc of paginatedDocuments()">
 
-          </button>
+              <td><strong>{{ doc.title }}</strong></td>
 
-        </div>
+              <td>{{ doc.missionTitle || '—' }}</td>
 
-        <div class="table-responsive">
+              <td>{{ doc.createdAt | date:'dd/MM/yyyy' }}</td>
 
-          <table class="table table-hover align-middle mb-0">
+              <td class="text-end">
 
-            <thead>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewMissionDocument(doc.id)"
+                  title="Preview">
+                  <i data-feather="eye"></i>
+                </button>
 
-              <tr>
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadMission(doc.id)" title="Download">
+                  <i data-feather="download"></i>
+                </button>
 
-                <th>Title</th>
-                <th>Mission</th>
-                <th>Created</th>
+                <ng-container *ngIf="!isDriver">
 
-                <th class="text-end">
-                  Actions
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              <tr *ngFor="let doc of paginatedDocuments()">
-
-                <td>
-
-                  <strong>{{ doc.title }}</strong>
-
-                </td>
-
-                <td>
-
-                  {{ doc.missionTitle || '—' }}
-
-                </td>
-
-                <td>
-
-                  {{ doc.createdAt | date:'dd/MM/yyyy' }}
-
-                </td>
-
-                <td class="text-end">
-
-                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewMissionDocument(doc.id)">
-
-                    <i data-feather="eye"></i>
-
+                  <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditMissionDocumentModal(doc)"
+                    title="Edit">
+                    <i data-feather="edit"></i>
                   </button>
 
-                  <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadMission(doc.id)">
-
-                    <i data-feather="download"></i>
-
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteMissionDocument(doc.id)" title="Delete">
+                    <i data-feather="trash-2"></i>
                   </button>
-                  <ng-container *ngIf="!isDriver">
 
-                    <button class="btn btn-sm btn-outline-warning me-1" (click)="openEditMissionDocumentModal(doc)">
+                </ng-container>
 
-                      <i data-feather="edit"></i>
+              </td>
 
-                    </button>
+            </tr>
 
-                    <button class="btn btn-sm btn-outline-danger" (click)="deleteMissionDocument(doc.id)">
+            <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
+              <td colspan="4" class="text-center py-5 text-muted">
+                <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
+                <div>No mission documents yet.</div>
+              </td>
+            </tr>
 
-                      <i data-feather="trash-2"></i>
+            <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
+              <td colspan="4" class="text-center py-5 text-muted">
+                <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
+                <div>No documents match your filters.</div>
+                <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
+              </td>
+            </tr>
 
-                    </button>
-                  </ng-container>
+          </tbody>
 
-                </td>
-
-              </tr>
-
-              <tr *ngIf="!loading() && paginatedDocuments().length===0">
-
-                <td colspan="4" class="text-center py-5 text-muted">
-
-                  No documents found.
-
-                </td>
-
-              </tr>
-
-            </tbody>
-
-          </table>
-
-        </div>
+        </table>
 
       </div>
 
-      <!-- ========================================= -->
-      <!-- FOOTER -->
-      <!-- ========================================= -->
+    </div>
 
-      <div class="card-footer">
+    <div class="card-footer bg-transparent">
 
-        <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center">
 
-          <small>
+        <small class="text-muted">
+          Displaying {{ paginatedDocuments().length }} of {{ filteredDocuments().length }} documents
+        </small>
 
-            Displaying
+        <div>
 
-            {{ paginatedDocuments().length }}
+          <button class="btn btn-outline-secondary btn-sm me-2" (click)="previousPage()" [disabled]="currentPage()===1">
+            Previous
+          </button>
 
-            of
+          <span class="mx-2">Page {{ currentPage() }} / {{ totalPages() }}</span>
 
-            {{ filteredDocuments().length }}
-
-            documents
-
-          </small>
-
-          <div>
-
-            <button class="btn btn-outline-secondary btn-sm me-2" (click)="previousPage()"
-              [disabled]="currentPage()===1">
-
-              Previous
-
-            </button>
-
-            <span class="mx-2">
-
-              Page
-
-              {{ currentPage() }}
-
-              /
-
-              {{ totalPages() || 1 }}
-
-            </span>
-
-            <button class="btn btn-outline-secondary btn-sm" (click)="nextPage()">
-
-              Next
-
-            </button>
-
-          </div>
+          <button class="btn btn-outline-secondary btn-sm" (click)="nextPage()"
+            [disabled]="currentPage()>=totalPages()">
+            Next
+          </button>
 
         </div>
 
@@ -685,18 +467,11 @@
   data-bs-keyboard="false">
 
   <div class="modal-dialog modal-lg modal-dialog-centered">
-
     <div class="modal-content">
 
       <div class="modal-header">
-
-        <h5 class="modal-title">
-          {{ editDriverMode ? 'Edit Driver Document' : 'Upload Driver Document' }}
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title">{{ editDriverMode ? 'Edit Driver Document' : 'Upload Driver Document' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
@@ -704,78 +479,26 @@
         <div class="row g-3">
 
           <div class="col-md-6">
-
-            <label class="form-label">
-
-              Document Title *
-
-            </label>
-
-            <input class="form-control" [(ngModel)]="uploadDriverTitle">
-
-            <div *ngIf="driverTitleError" class="text-danger small mt-1">
-
-              Document title is required.
-
-            </div>
-
+            <label class="form-label">Document Title *</label>
+            <input class="form-control" [class.is-invalid]="driverTitleError" [(ngModel)]="uploadDriverTitle">
+            <div class="invalid-feedback">Document title is required.</div>
           </div>
 
           <div class="col-md-6">
-
-            <label class="form-label">
-
-              Document Type *
-
-            </label>
-
-            <select class="form-select" [(ngModel)]="uploadDriverType">
-
-              <option value="">
-
-                -- Select Document Type --
-
-              </option>
-
-              <option value="DRIVER_LICENSE">
-
-                Driver License
-
-              </option>
-
-              <option value="ID_CARD">
-
-                ID Card
-
-              </option>
-
+            <label class="form-label">Document Type *</label>
+            <select class="form-select" [class.is-invalid]="driverTypeError" [(ngModel)]="uploadDriverType">
+              <option value="">-- Select Document Type --</option>
+              <option value="DRIVER_LICENSE">Driver License</option>
+              <option value="ID_CARD">ID Card</option>
             </select>
-
-            <div *ngIf="driverTypeError" class="text-danger small mt-1">
-
-              Please select a document type.
-
-            </div>
-
+            <div class="invalid-feedback">Please select a document type.</div>
           </div>
 
           <div class="col-12" *ngIf="!editDriverMode">
-
-            <label class="form-label">
-
-              File *
-
-            </label>
-
-            <input id="driverFileInput" type="file" class="form-control" accept=".pdf,.png,.jpg,.jpeg"
-              (change)="onDriverFileSelected($event)">
-
-            <div *ngIf="driverFileError" class="text-danger small mt-1">
-
-              Please select a file.
-
-            </div>
-
+            <label class="form-label">File *</label>
+            <input id="driverFileInput" type="file" class="form-control" [class.is-invalid]="driverFileError"
+              accept=".pdf,.png,.jpg,.jpeg" (change)="onDriverFileSelected($event)">
+            <div class="invalid-feedback">Please select a file.</div>
           </div>
 
         </div>
@@ -783,26 +506,14 @@
       </div>
 
       <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-primary" (click)="uploadDriverDocument()">
-
-          <i [attr.data-feather]="editDriverMode ? 'save' : 'upload'" class="align-middle me-1">
-          </i>
-
+          <i [attr.data-feather]="editDriverMode ? 'save' : 'upload'" class="align-middle me-1"></i>
           {{ editDriverMode ? 'Save Changes' : 'Upload Document' }}
-
         </button>
-
       </div>
 
     </div>
-
   </div>
 
 </div>
@@ -815,18 +526,11 @@
   data-bs-keyboard="false">
 
   <div class="modal-dialog modal-lg modal-dialog-centered">
-
     <div class="modal-content">
 
       <div class="modal-header">
-
-        <h5 class="modal-title">
-          {{ editVehicleMode ? 'Edit Vehicle Document' : 'Upload Vehicle Document' }}
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title">{{ editVehicleMode ? 'Edit Vehicle Document' : 'Upload Vehicle Document' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
@@ -834,114 +538,43 @@
         <div class="row g-3">
 
           <div class="col-md-6">
-
-            <label class="form-label">
-              Title *
-            </label>
-
-            <input class="form-control" [(ngModel)]="uploadVehicleTitle">
-
-            <small class="text-danger" *ngIf="vehicleTitleError">
-
-              Title is required.
-
-            </small>
-
+            <label class="form-label">Title *</label>
+            <input class="form-control" [class.is-invalid]="vehicleTitleError" [(ngModel)]="uploadVehicleTitle">
+            <div class="invalid-feedback">Title is required.</div>
           </div>
 
           <div class="col-md-6">
-
-            <label class="form-label">
-              Document Type *
-            </label>
-
-            <select class="form-select" [(ngModel)]="uploadVehicleType">
-
-              <option value="">
-                Select document type
-              </option>
-
-              <option value="LICENSE">
-                License
-              </option>
-
-              <option value="TECHNICAL_CHECK">
-                Technical Check
-              </option>
-
-              <option value="INSURANCE">
-                Insurance
-              </option>
-
+            <label class="form-label">Document Type *</label>
+            <select class="form-select" [class.is-invalid]="vehicleTypeError" [(ngModel)]="uploadVehicleType">
+              <option value="">Select document type</option>
+              <option value="LICENSE">License</option>
+              <option value="TECHNICAL_CHECK">Technical Check</option>
+              <option value="INSURANCE">Insurance</option>
             </select>
-
-            <small class="text-danger" *ngIf="vehicleTypeError">
-
-              Document type is required.
-
-            </small>
-
+            <div class="invalid-feedback">Document type is required.</div>
           </div>
 
           <div class="col-md-6" *ngIf="!editVehicleMode">
-
-            <label class="form-label">
-              Vehicle *
-            </label>
-
-            <select class="form-select" [(ngModel)]="uploadVehicleId">
-
-              <option value="">
-                Select vehicle
-              </option>
-
-              <option *ngFor="let vehicle of vehicles()" [value]="vehicle.id">
-
-                {{ vehicle.plateNumber }}
-
-              </option>
-
+            <label class="form-label">Vehicle *</label>
+            <select class="form-select" [class.is-invalid]="vehicleIdError" [(ngModel)]="uploadVehicleId">
+              <option value="">Select vehicle</option>
+              <option *ngFor="let vehicle of vehicles()" [value]="vehicle.id">{{ vehicle.plateNumber }}</option>
             </select>
-
-            <small class="text-danger" *ngIf="vehicleIdError">
-
-              Vehicle is required.
-
-            </small>
-
+            <div class="invalid-feedback">Vehicle is required.</div>
           </div>
 
           <div class="col-md-6">
-
-            <label class="form-label">
-              Year *
-            </label>
-
-            <input type="number" class="form-control" [(ngModel)]="uploadVehicleYear">
-
-            <small class="text-danger" *ngIf="vehicleYearError">
-
-              Year is required.
-
-            </small>
-
+            <label class="form-label">Year *</label>
+            <input type="number" class="form-control" [class.is-invalid]="vehicleYearError"
+              [(ngModel)]="uploadVehicleYear">
+            <div class="invalid-feedback">Year is required.</div>
           </div>
 
           <div class="col-12" *ngIf="!editVehicleMode">
-
-            <label class="form-label">
-              File *
-            </label>
-
-            <input id="vehicleFileInput" type="file" class="form-control" accept=".pdf,.png,.jpg,.jpeg"
-              (change)="onVehicleFileSelected($event)">
-
-            <small class="text-danger" *ngIf="vehicleFileError">
-
-              Please select a file.
-
-            </small>
-
+            <label class="form-label">File *</label>
+            <input id="vehicleFileInput" type="file" class="form-control" [class.is-invalid]="vehicleFileError"
+              accept=".pdf,.png,.jpg,.jpeg" (change)="onVehicleFileSelected($event)">
+            <div class="invalid-feedback">Please select a file.</div>
           </div>
 
         </div>
@@ -949,25 +582,14 @@
       </div>
 
       <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-primary" (click)="uploadVehicleDocument()">
-
           <i [attr.data-feather]="editVehicleMode ? 'save' : 'upload'" class="align-middle me-1"></i>
-
           {{ editVehicleMode ? 'Save Changes' : 'Upload Document' }}
-
         </button>
-
       </div>
 
     </div>
-
   </div>
 
 </div>
@@ -980,116 +602,48 @@
   data-bs-keyboard="false">
 
   <div class="modal-dialog modal-lg modal-dialog-centered">
-
     <div class="modal-content">
 
       <div class="modal-header">
-
-        <h5 class="modal-title">
-
-          {{ editMissionMode ? 'Edit Mission Document' : 'Upload Mission Document' }}
-
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title">{{ editMissionMode ? 'Edit Mission Document' : 'Upload Mission Document' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
 
         <div class="mb-3">
-
-          <label class="form-label">
-
-            Document Title
-            <span class="text-danger">*</span>
-
-          </label>
-
-          <input class="form-control" [(ngModel)]="uploadMissionTitle">
-
-          <small class="text-danger" *ngIf="missionTitleError">
-
-            This field can't be empty.
-
-          </small>
-
+          <label class="form-label">Document Title *</label>
+          <input class="form-control" [class.is-invalid]="missionTitleError" [(ngModel)]="uploadMissionTitle">
+          <div class="invalid-feedback">This field can't be empty.</div>
         </div>
 
         <div class="mb-3" *ngIf="!editMissionMode">
-
-          <label class="form-label">
-
-            Mission
-            <span class="text-danger">*</span>
-
-          </label>
-
-          <select class="form-select" [(ngModel)]="uploadMissionId">
-
-            <option value="">
-              Select mission
-            </option>
-
-            <option *ngFor="let mission of missions()" [value]="mission.id">
-
-              {{ mission.title }}
-
-            </option>
-
+          <label class="form-label">Mission *</label>
+          <select class="form-select" [class.is-invalid]="missionIdError" [(ngModel)]="uploadMissionId">
+            <option value="">Select mission</option>
+            <option *ngFor="let mission of missions()" [value]="mission.id">{{ mission.title }}</option>
           </select>
-
-          <small class="text-danger" *ngIf="missionIdError">
-
-            This field can't be empty.
-
-          </small>
-
+          <div class="invalid-feedback">This field can't be empty.</div>
         </div>
 
         <div class="mb-3" *ngIf="!editMissionMode">
-
-          <label class="form-label">
-
-            File
-            <span class="text-danger">*</span>
-
-          </label>
-
-          <input id="missionFileInput" type="file" class="form-control" accept=".pdf,.png,.jpg,.jpeg"
-            (change)="onMissionFileSelected($event)">
-
-          <small class="text-danger" *ngIf="missionFileError">
-
-            Please select a file.
-
-          </small>
-
+          <label class="form-label">File *</label>
+          <input id="missionFileInput" type="file" class="form-control" [class.is-invalid]="missionFileError"
+            accept=".pdf,.png,.jpg,.jpeg" (change)="onMissionFileSelected($event)">
+          <div class="invalid-feedback">Please select a file.</div>
         </div>
 
       </div>
 
       <div class="modal-footer">
-
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="uploadMissionDocument()">
-
           <i [attr.data-feather]="editMissionMode ? 'save' : 'upload'" class="me-1"></i>
-
           {{ editMissionMode ? 'Save Changes' : 'Upload Document' }}
-
         </button>
-
       </div>
 
     </div>
-
   </div>
 
 </div>
@@ -1101,70 +655,30 @@
 <div class="modal fade" id="changeValidationModal" tabindex="-1">
 
   <div class="modal-dialog modal-dialog-centered">
-
     <div class="modal-content">
 
       <div class="modal-header">
-
-        <h5 class="modal-title">
-
-          Change Validation Status
-
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title">Change Validation Status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
-
-        <div class="mb-3">
-
-          <label class="form-label">
-
-            Status
-
-          </label>
-
+        <div class="mb-0">
+          <label class="form-label">Status</label>
           <select class="form-select" [(ngModel)]="selectedValidationStatus">
-
-            <option value="PENDING">
-              Pending
-            </option>
-
-            <option value="APPROVED">
-              Approved
-            </option>
-
-            <option value="REJECTED">
-              Rejected
-            </option>
-
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
           </select>
-
         </div>
-
       </div>
 
       <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
-        <button class="btn btn-primary" (click)="saveDriverValidation()">
-
-          Save
-
-        </button>
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" (click)="saveDriverValidation()">Save</button>
       </div>
 
     </div>
-
   </div>
 
 </div>
@@ -1175,48 +689,27 @@
 
 <div class="modal fade" id="deleteDriverDocumentModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-
     <div class="modal-content">
 
       <div class="modal-header">
-
-        <h5 class="modal-title">
-          Delete Document
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title text-danger">Delete Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body">
-
-        <p class="mb-0">
-
-          Are you sure you want to permanently delete this document?
-
-        </p>
-
+      <div class="modal-body text-center">
+        <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;"></i>
+        <p class="mb-0">Are you sure you want to permanently delete this document?</p>
       </div>
 
-      <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-danger" (click)="confirmDeleteDriverDocument()">
-
+          <i data-feather="trash-2" class="me-1"></i>
           Delete
-
         </button>
-
       </div>
 
     </div>
-
   </div>
 </div>
 
@@ -1226,48 +719,27 @@
 
 <div class="modal fade" id="deleteVehicleDocumentModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-
     <div class="modal-content">
 
       <div class="modal-header">
-
-        <h5 class="modal-title">
-          Delete Document
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title text-danger">Delete Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body">
-
-        <p class="mb-0">
-
-          Are you sure you want to permanently delete this document?
-
-        </p>
-
+      <div class="modal-body text-center">
+        <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;"></i>
+        <p class="mb-0">Are you sure you want to permanently delete this document?</p>
       </div>
 
-      <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-danger" (click)="confirmDeleteVehicleDocument()">
-
+          <i data-feather="trash-2" class="me-1"></i>
           Delete
-
         </button>
-
       </div>
 
     </div>
-
   </div>
 </div>
 
@@ -1277,47 +749,26 @@
 
 <div class="modal fade" id="deleteMissionDocumentModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-
     <div class="modal-content">
 
       <div class="modal-header">
-
-        <h5 class="modal-title">
-          Delete Document
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title text-danger">Delete Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body">
-
-        <p class="mb-0">
-
-          Are you sure you want to permanently delete this document?
-
-        </p>
-
+      <div class="modal-body text-center">
+        <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;"></i>
+        <p class="mb-0">Are you sure you want to permanently delete this document?</p>
       </div>
 
-      <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-danger" (click)="confirmDeleteMissionDocument()">
-
+          <i data-feather="trash-2" class="me-1"></i>
           Delete
-
         </button>
-
       </div>
 
     </div>
-
   </div>
 </div>

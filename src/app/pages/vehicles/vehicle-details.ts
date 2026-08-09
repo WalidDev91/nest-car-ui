@@ -6,10 +6,13 @@ import feather from 'feather-icons';
 import { VehicleService } from '../../services/vehicle.service';
 import { VehicleDocumentService } from '../../services/vehicle-document.service';
 import { MissionService } from '../../services/mission.service';
+import { ToastService } from '../../services/toast.service';
 
 import { Vehicle } from '../../models/vehicle';
 import { VehicleDocument } from '../../models/vehicle-document';
 import { Mission } from '../../models/mission';
+
+const UPLOADS_BASE = 'http://localhost:8080/uploads/vehicles/';
 
 @Component({
   selector: 'app-vehicle-details',
@@ -33,6 +36,44 @@ export class VehicleDetails implements OnInit {
   error = signal('');
 
   // ==========================================================
+  // GALLERY
+  // ==========================================================
+
+  selectedPhoto = signal<string | null>(null);
+
+  // Every image tied to this vehicle: the primary imageUrl first,
+  // then any additional photos[] once the backend supports them.
+  // Nothing here needs to change when that lands — it'll just
+  // start returning more than one item.
+  allPhotos = computed(() => {
+
+    const v = this.vehicle();
+
+    if (!v) return [];
+
+    const list: string[] = [];
+
+    if (v.imageUrl) list.push(v.imageUrl);
+
+    if (v.photos?.length) list.push(...v.photos);
+
+    return list;
+
+  });
+
+  resolvePhotoUrl(filename: string): string {
+    return UPLOADS_BASE + filename;
+  }
+
+  selectPhoto(filename: string): void {
+    this.selectedPhoto.set(this.resolvePhotoUrl(filename));
+  }
+
+  onAddPhotoClick(): void {
+    this.toastService.info('Multiple photo uploads will be available once backend support is added.');
+  }
+
+  // ==========================================================
   // STATUS
   // ==========================================================
 
@@ -40,10 +81,25 @@ export class VehicleDetails implements OnInit {
   hasLicense = signal(false);
   hasTechnicalCheck = signal(false);
 
-  // Availability — mirrors the same logic used on the vehicles list page
-  isInMission = computed(() =>
-    this.missions().some(m => m.status === 'ONGOING')
-  );
+  // Availability — date-based, identical logic to the Vehicles
+  // list page: a vehicle is "in mission" only while now() falls
+  // between an assigned mission's startDate and endDate.
+  isInMission = computed(() => {
+
+    const now = new Date();
+
+    return this.missions().some(m => {
+
+      if (!m.startDate || !m.endDate) return false;
+
+      const start = new Date(m.startDate);
+      const end = new Date(m.endDate);
+
+      return now >= start && now <= end;
+
+    });
+
+  });
 
   // ==========================================================
   // TABS
@@ -56,7 +112,8 @@ export class VehicleDetails implements OnInit {
     private router: Router,
     private vehicleService: VehicleService,
     private vehicleDocumentService: VehicleDocumentService,
-    private missionService: MissionService
+    private missionService: MissionService,
+    private toastService: ToastService
   ) { }
 
   // ==========================================================
@@ -90,6 +147,10 @@ export class VehicleDetails implements OnInit {
       next: vehicle => {
 
         this.vehicle.set(vehicle);
+
+        this.selectedPhoto.set(
+          vehicle.imageUrl ? this.resolvePhotoUrl(vehicle.imageUrl) : null
+        );
 
         this.loading.set(false);
 
@@ -127,21 +188,18 @@ export class VehicleDetails implements OnInit {
 
         this.documents.set(docs);
 
-        this.hasLicense.set(
-          docs.some(d => d.type === 'LICENSE')
-        );
+        this.hasLicense.set(docs.some(d => d.type === 'LICENSE'));
 
-        this.hasInsurance.set(
-          docs.some(d => d.type === 'INSURANCE')
-        );
+        this.hasInsurance.set(docs.some(d => d.type === 'INSURANCE'));
 
-        this.hasTechnicalCheck.set(
-          docs.some(d => d.type === 'TECHNICAL_CHECK')
-        );
+        this.hasTechnicalCheck.set(docs.some(d => d.type === 'TECHNICAL_CHECK'));
 
       },
 
-      error: err => console.error(err)
+      error: err => {
+        console.error(err);
+        this.toastService.error('Failed to load vehicle documents');
+      }
 
     });
 
@@ -159,7 +217,10 @@ export class VehicleDetails implements OnInit {
         this.missions.set(missions);
       },
 
-      error: err => console.error(err)
+      error: err => {
+        console.error(err);
+        this.toastService.error('Failed to load vehicle missions');
+      }
 
     });
 
@@ -192,9 +253,7 @@ export class VehicleDetails implements OnInit {
   }
 
   goBack() {
-
     this.router.navigate(['/vehicles']);
-
   }
 
   editVehicle(): void {
@@ -203,14 +262,7 @@ export class VehicleDetails implements OnInit {
 
     if (!vehicle) return;
 
-    this.router.navigate(
-      ['/vehicles'],
-      {
-        queryParams: {
-          edit: vehicle.id
-        }
-      }
-    );
+    this.router.navigate(['/vehicles'], { queryParams: { edit: vehicle.id } });
 
   }
 
@@ -220,33 +272,16 @@ export class VehicleDetails implements OnInit {
 
     if (!vehicle) return;
 
-    this.router.navigate(
-      ['/vehicles'],
-      {
-        queryParams: {
-          delete: vehicle.id
-        }
-      }
-    );
+    this.router.navigate(['/vehicles'], { queryParams: { delete: vehicle.id } });
 
   }
 
   viewVehicleDocument(id: string) {
-
-    this.router.navigate([
-      '/documents/vehicle',
-      id
-    ]);
-
+    this.router.navigate(['/documents/vehicle', id]);
   }
 
   viewMissionDetails(id: string): void {
-
-    this.router.navigate([
-      '/missions',
-      id
-    ]);
-
+    this.router.navigate(['/missions', id]);
   }
 
 }

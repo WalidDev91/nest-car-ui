@@ -1,106 +1,112 @@
 <div class="container-fluid p-0">
 
-  <!-- ========================================= -->
   <!-- PAGE HEADER -->
-  <!-- ========================================= -->
-
-  <div class="d-flex justify-content-between align-items-center mb-3">
-
-    <div>
-      <!--
-      <h3 class="mb-0">Vehicle Management</h3>
-      <small class="text-muted">
-        Manage the company's fleet.
-      </small>
-      -->
-    </div>
-
-    <button *ngIf="!isDriver" class="btn btn-primary" (click)="openCreateModal()">
-
-      <i data-feather="plus" class="align-middle me-1"></i>
-
-      Create Vehicle
-
-    </button>
-
+  <div class="mb-3">
+    <h4 class="mb-0">Vehicles</h4>
+    <small class="text-muted">Manage the company's fleet.</small>
   </div>
 
-  <!-- ========================================= -->
   <!-- STATISTICS -->
-  <!-- ========================================= -->
-
-  <div class="row">
+  <div class="row g-3 mb-3">
 
     <div class="col-xl-3 col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h6>Total Vehicles</h6>
-          <h2>{{ totalVehicles() }}</h2>
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-primary-subtle text-primary">
+            <i data-feather="truck"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Total Vehicles</h6>
+            <h3 class="mb-0">{{ totalVehicles() }}</h3>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="col-xl-3 col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h6>In Mission</h6>
-          <h2 class="text-primary">
-            {{ vehiclesInMission() }}
-          </h2>
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-warning-subtle text-warning">
+            <i data-feather="map"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">In Mission</h6>
+            <h3 class="mb-0">{{ vehiclesInMission() }}</h3>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="col-xl-3 col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h6>Available Now</h6>
-          <h2 class="text-success">
-            {{ availableVehicles() }}
-          </h2>
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-success-subtle text-success">
+            <i data-feather="check-circle"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Available Now</h6>
+            <h3 class="mb-0">{{ availableVehicles() }}</h3>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="col-xl-3 col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <h6>Average Age</h6>
-          <h2 class="text-info">
-            {{ averageVehicleAge() }} yrs
-          </h2>
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-info-subtle text-info">
+            <i data-feather="clock"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Avg. Fleet Age</h6>
+            <h3 class="mb-0">{{ averageVehicleAge() }} yrs</h3>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- ========================================= -->
-  <!-- FILTERS -->
-  <!-- ========================================= -->
+  <!-- TABLE (filters + create live inside as a toolbar) -->
+  <div class="card">
 
-  <div class="card mb-3">
+    <div class="card-header bg-transparent">
 
-    <div class="card-body">
-
-      <div class="row">
-
-        <div class="col-md-8">
-
-          <input class="form-control" placeholder="Search vehicles..." [value]="search()"
-            (input)="onSearch($any($event.target).value)">
-
-        </div>
+      <div class="row g-2 align-items-center">
 
         <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent">
+              <i data-feather="search" style="width:16px;height:16px;"></i>
+            </span>
+            <input class="form-control" placeholder="Search plate, brand, model..." [value]="search()"
+              (input)="onSearch($any($event.target).value)">
+          </div>
+        </div>
 
-          <button class="btn btn-outline-secondary w-100" (click)="refresh()">
+        <div class="col-md-3">
+          <select class="form-select" [value]="availabilityFilter()"
+            (change)="filterAvailability($any($event.target).value)">
+            <option value="ALL">All Vehicles</option>
+            <option value="AVAILABLE">Available</option>
+            <option value="IN_MISSION">In Mission</option>
+          </select>
+        </div>
 
-            <i data-feather="refresh-cw" class="align-middle me-1">
-            </i>
+        <div class="col-md-5 d-flex justify-content-end gap-2">
 
-            Refresh
+          <button class="btn btn-outline-secondary" (click)="refresh()" title="Refresh">
+            <i data-feather="refresh-cw"></i>
+          </button>
 
+          <button *ngIf="hasActiveFilters()" class="btn btn-outline-secondary" (click)="clearFilters()"
+            title="Clear filters">
+            <i data-feather="x"></i>
+          </button>
+
+          <button *ngIf="!isDriver" class="btn btn-primary" (click)="openCreateModal()">
+            <i data-feather="plus-circle" class="align-middle me-1"></i>
+            Create Vehicle
           </button>
 
         </div>
@@ -108,14 +114,6 @@
       </div>
 
     </div>
-
-  </div>
-
-  <!-- ========================================= -->
-  <!-- TABLE -->
-  <!-- ========================================= -->
-
-  <div class="card">
 
     <div class="table-responsive">
 
@@ -125,41 +123,32 @@
 
           <tr>
 
-            <th role="button" (click)="sort('plateNumber')">
-
+            <th class="sortable" (click)="sort('plateNumber')">
               Plate Number
-
+              <i data-feather="chevron-down" class="sort-icon" *ngIf="sortColumn()==='plateNumber'"
+                [class.flip]="sortDirection()==='desc'"></i>
             </th>
 
-            <th role="button" (click)="sort('brand')">
-
+            <th class="sortable" (click)="sort('brand')">
               Brand
-
+              <i data-feather="chevron-down" class="sort-icon" *ngIf="sortColumn()==='brand'"
+                [class.flip]="sortDirection()==='desc'"></i>
             </th>
 
-            <th role="button" (click)="sort('model')">
-
+            <th class="sortable" (click)="sort('model')">
               Model
-
+              <i data-feather="chevron-down" class="sort-icon" *ngIf="sortColumn()==='model'"
+                [class.flip]="sortDirection()==='desc'"></i>
             </th>
 
-            <th role="button" (click)="sort('year')">
-
+            <th class="sortable" (click)="sort('year')">
               Year
-
+              <i data-feather="chevron-down" class="sort-icon" *ngIf="sortColumn()==='year'"
+                [class.flip]="sortDirection()==='desc'"></i>
             </th>
 
-            <th>
-
-              Availability
-
-            </th>
-
-            <th class="text-end">
-
-              Actions
-
-            </th>
+            <th>Availability</th>
+            <th class="text-end">Actions</th>
 
           </tr>
 
@@ -168,50 +157,24 @@
         <tbody>
 
           <tr *ngIf="loading()">
-
-            <td colspan="6" class="text-center py-5">
-
+            <td colspan="6" class="text-center py-5 text-muted">
+              <div class="spinner-border spinner-border-sm me-2"></div>
               Loading vehicles...
-
             </td>
-
           </tr>
 
           <tr *ngFor="let vehicle of paginatedVehicles()">
 
-            <td>
-
-              <strong>
-
-                {{ vehicle.plateNumber }}
-
-              </strong>
-
-            </td>
-
-            <td>
-
-              {{ vehicle.brand }}
-
-            </td>
-
-            <td>
-
-              {{ vehicle.model }}
-
-            </td>
-
-            <td>
-
-              {{ vehicle.year }}
-
-            </td>
+            <td><strong>{{ vehicle.plateNumber }}</strong></td>
+            <td>{{ vehicle.brand }}</td>
+            <td>{{ vehicle.model }}</td>
+            <td>{{ vehicle.year }}</td>
 
             <td>
               <span class="badge" [ngClass]="{
-          'bg-warning': vehicleStatusMap().get(vehicle.id) === 'IN_MISSION',
-          'bg-success': vehicleStatusMap().get(vehicle.id) === 'AVAILABLE'
-        }">
+                'bg-warning': vehicleStatusMap().get(vehicle.id) === 'IN_MISSION',
+                'bg-success': vehicleStatusMap().get(vehicle.id) === 'AVAILABLE'
+              }">
                 {{ vehicleStatusMap().get(vehicle.id) === 'IN_MISSION' ? 'In Mission' : 'Available' }}
               </span>
             </td>
@@ -220,35 +183,36 @@
 
               <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewVehicleDetails(vehicle.id)"
                 title="View">
-
                 <i data-feather="info"></i>
-
               </button>
 
               <button class="btn btn-sm btn-outline-primary me-1" (click)="editVehicle(vehicle.id)" title="Edit">
-
                 <i data-feather="edit"></i>
-
               </button>
 
               <button class="btn btn-sm btn-outline-danger" (click)="deleteVehicle(vehicle.id)" title="Delete">
-
                 <i data-feather="trash-2"></i>
-
               </button>
 
             </td>
 
           </tr>
 
-          <tr *ngIf="!loading() && paginatedVehicles().length===0">
-
+          <!-- EMPTY: no vehicles at all -->
+          <tr *ngIf="!loading() && paginatedVehicles().length===0 && !hasActiveFilters()">
             <td colspan="6" class="text-center py-5 text-muted">
-
-              No vehicles found.
-
+              <i data-feather="truck" class="mb-2" style="width:32px;height:32px;"></i>
+              <div>No vehicles yet.</div>
             </td>
+          </tr>
 
+          <!-- EMPTY: filters/search excluded everyone -->
+          <tr *ngIf="!loading() && paginatedVehicles().length===0 && hasActiveFilters()">
+            <td colspan="6" class="text-center py-5 text-muted">
+              <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
+              <div>No vehicles match your filters.</div>
+              <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
+            </td>
           </tr>
 
         </tbody>
@@ -257,49 +221,25 @@
 
     </div>
 
-    <div class="card-footer">
+    <div class="card-footer bg-transparent">
 
       <div class="d-flex justify-content-between align-items-center">
 
-        <small>
-
-          Displaying
-
-          {{ paginatedVehicles().length }}
-
-          of
-
-          {{ filteredVehicles().length }}
-
-          vehicles
-
+        <small class="text-muted">
+          Displaying {{ paginatedVehicles().length }} of {{ filteredVehicles().length }} vehicles
         </small>
 
         <div>
 
           <button class="btn btn-outline-secondary btn-sm me-2" [disabled]="currentPage()===1" (click)="previousPage()">
-
             Previous
-
           </button>
 
-          <span class="mx-2">
-
-            Page
-
-            {{ currentPage() }}
-
-            /
-
-            {{ totalPages() || 1 }}
-
-          </span>
+          <span class="mx-2">Page {{ currentPage() }} / {{ totalPages() || 1 }}</span>
 
           <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage()>=totalPages()"
             (click)="nextPage()">
-
             Next
-
           </button>
 
         </div>
@@ -311,6 +251,7 @@
   </div>
 
 </div>
+
 <!-- ========================================================= -->
 <!-- CREATE / EDIT VEHICLE MODAL -->
 <!-- ========================================================= -->
@@ -322,115 +263,61 @@
 
     <div class="modal-content">
 
-      <!-- HEADER -->
-
       <div class="modal-header">
-
-        <h5 class="modal-title">
-
-          {{ editMode ? 'Edit Vehicle' : 'Create Vehicle' }}
-
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title">{{ editMode ? 'Edit Vehicle' : 'Create Vehicle' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-      <!-- BODY -->
 
       <div class="modal-body">
 
         <div class="row g-3">
 
           <div class="col-md-6">
-
-            <label class="form-label">
-
-              Plate Number *
-
-            </label>
-
-            <input class="form-control" placeholder="123 TUN 456" [(ngModel)]="plateNumber">
-
+            <label class="form-label">Plate Number *</label>
+            <input class="form-control" [class.is-invalid]="plateNumberInvalid" placeholder="e.g. 123 TUN 456"
+              [(ngModel)]="plateNumber">
+            <div class="invalid-feedback">Plate number can't be empty.</div>
           </div>
 
           <div class="col-md-6">
-
-            <label class="form-label">
-
-              Brand *
-
-            </label>
-
-            <input class="form-control" placeholder="Mercedes" [(ngModel)]="brand">
-
+            <label class="form-label">Brand *</label>
+            <input class="form-control" [class.is-invalid]="brandInvalid" placeholder="e.g. Mercedes"
+              [(ngModel)]="brand">
+            <div class="invalid-feedback">Brand can't be empty.</div>
           </div>
 
           <div class="col-md-6">
-
-            <label class="form-label">
-
-              Model *
-
-            </label>
-
-            <input class="form-control" placeholder="Actros" [(ngModel)]="model">
-
+            <label class="form-label">Model *</label>
+            <input class="form-control" [class.is-invalid]="modelInvalid" placeholder="e.g. Actros" [(ngModel)]="model">
+            <div class="invalid-feedback">Model can't be empty.</div>
           </div>
 
           <div class="col-md-6">
-
-            <label class="form-label">
-
-              Year *
-
-            </label>
-
-            <input type="number" class="form-control" [(ngModel)]="year">
-
+            <label class="form-label">Year *</label>
+            <input type="number" class="form-control" [class.is-invalid]="yearInvalid" [(ngModel)]="year">
+            <div class="invalid-feedback">Enter a valid year.</div>
           </div>
 
           <div class="col-12">
-
-            <label class="form-label">
-
-              Vehicle Picture
-
-            </label>
-
-            <input id="vehicleImageInput" class="form-control" type="file" accept="image/*" (change)="onImageSelected($event)">
-
+            <label class="form-label">Vehicle Picture</label>
+            <input id="vehicleImageInput" class="form-control" type="file" accept="image/*"
+              (change)="onImageSelected($event)">
           </div>
 
           <div class="col-12 text-center" *ngIf="imagePreview">
-
             <img [src]="imagePreview" class="img-thumbnail rounded shadow-sm" style="max-height:220px">
-
           </div>
 
         </div>
 
       </div>
 
-      <!-- FOOTER -->
-
       <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-primary" (click)="createVehicle()">
-
           <i data-feather="save" class="align-middle me-1"></i>
-
           {{ editMode ? 'Update Vehicle' : 'Create Vehicle' }}
-
         </button>
-
       </div>
 
     </div>
@@ -438,6 +325,7 @@
   </div>
 
 </div>
+
 <!-- ========================================================= -->
 <!-- DELETE VEHICLE MODAL -->
 <!-- ========================================================= -->
@@ -449,61 +337,38 @@
 
     <div class="modal-content">
 
-      <!-- HEADER -->
-
       <div class="modal-header">
-
-        <h5 class="modal-title text-danger">
-
-          Confirm Vehicle Deletion
-
-        </h5>
-
-        <button type="button" class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title text-danger">Confirm Vehicle Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-      <!-- BODY -->
 
       <div class="modal-body text-center">
 
-        <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;">
-        </i>
+        <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;"></i>
 
-        <h5 class="mb-3">
+        <h5 class="mb-2">Delete {{ vehicleToDeletePlate() }}?</h5>
 
-          Delete this vehicle?
-
-        </h5>
-
-        <p class="text-muted mb-0">
-
+        <p class="text-muted mb-0" *ngIf="!hasLinkedRecords()">
           This action cannot be undone.
-
         </p>
+
+        <div class="alert alert-warning text-start mt-3 mb-0" *ngIf="hasLinkedRecords()">
+          <i data-feather="alert-triangle" class="me-1"></i>
+          This vehicle has
+          <strong *ngIf="linkedMissionsCount() > 0">{{ linkedMissionsCount() }} mission(s)</strong>
+          <span *ngIf="linkedMissionsCount() > 0 && linkedDocumentsCount() > 0"> and </span>
+          <strong *ngIf="linkedDocumentsCount() > 0">{{ linkedDocumentsCount() }} document(s)</strong>
+          linked to it. Deleting it will also permanently delete those records.
+        </div>
 
       </div>
 
-      <!-- FOOTER -->
-
       <div class="modal-footer justify-content-center">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-danger" (click)="confirmDeleteVehicle()">
-
-          <i data-feather="trash-2" class="align-middle me-1">
-          </i>
-
+          <i data-feather="trash-2" class="align-middle me-1"></i>
           Delete Vehicle
-
         </button>
-
       </div>
 
     </div>

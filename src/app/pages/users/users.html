@@ -4,240 +4,137 @@
   <!-- PAGE HEADER -->
   <!-- ========================================= -->
 
-  <!--
   <div class="d-flex justify-content-between align-items-center mb-3">
 
     <div>
-       <h3 class="mb-0">
-        User Management
-      </h3> 
-
-       <small class="text-muted">
-        Manage all users of the system.
-      </small> 
+      <h4 class="mb-0">Users</h4>
+      <small class="text-muted">Manage accounts, roles and supervisors.</small>
     </div>
 
+    <!--
     <button class="btn btn-primary" (click)="createUser()">
-
       <i data-feather="user-plus" class="align-middle me-1"></i>
-
       Create User
-
     </button>
+    -->
 
   </div>
-  -->
 
   <!-- ========================================= -->
   <!-- STATISTICS -->
   <!-- ========================================= -->
 
-  <div class="row">
+  <div class="row g-3 mb-3">
 
-    <div class="col-xl-3 col-md-4 col-sm-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Total Users</h6>
-
-          <h2>{{ totalUsers() }}</h2>
-
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-primary-subtle text-primary">
+            <i data-feather="users"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Total Users</h6>
+            <h3 class="mb-0">{{ totalUsers() }}</h3>
+          </div>
         </div>
-
       </div>
-
     </div>
 
-    <!--
-    <div class="col-xl-2 col-md-4 col-sm-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Active</h6>
-
-          <h2 class="text-success">
-
-            {{ activeUsers() }}
-
-          </h2>
-
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-danger-subtle text-danger">
+            <i data-feather="shield"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Admins</h6>
+            <h3 class="mb-0">{{ admins() }}</h3>
+          </div>
         </div>
-
       </div>
-
     </div>
 
-    <div class="col-xl-2 col-md-4 col-sm-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Inactive</h6>
-
-          <h2 class="text-danger">
-
-            {{ inactiveUsers() }}
-
-          </h2>
-
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-info-subtle text-info">
+            <i data-feather="briefcase"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Fleet Managers</h6>
+            <h3 class="mb-0">{{ fleetManagers() }}</h3>
+          </div>
         </div>
-
       </div>
-
-    </div>
-    -->
-
-    <div class="col-xl-3 col-md-4 col-sm-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Admins</h6>
-
-          <h2>
-
-            {{ admins() }}
-
-          </h2>
-
-        </div>
-
-      </div>
-
     </div>
 
-    <div class="col-xl-3 col-md-4 col-sm-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Fleet Managers</h6>
-
-          <h2>
-
-            {{ fleetManagers() }}
-
-          </h2>
-
+    <div class="col-xl-3 col-md-6">
+      <div class="card stat-card">
+        <div class="card-body d-flex align-items-center">
+          <div class="stat-icon bg-secondary-subtle text-secondary">
+            <i data-feather="truck"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="mb-0 text-muted">Drivers</h6>
+            <h3 class="mb-0">{{ drivers() }}</h3>
+          </div>
         </div>
-
       </div>
-
-    </div>
-
-    <div class="col-xl-3 col-md-4 col-sm-6">
-
-      <div class="card">
-
-        <div class="card-body">
-
-          <h6>Drivers</h6>
-
-          <h2>
-
-            {{ drivers() }}
-
-          </h2>
-
-        </div>
-
-      </div>
-
     </div>
 
   </div>
 
   <!-- ========================================= -->
-  <!-- FILTERS -->
-  <!-- ========================================= -->
-
-  <div class="card mb-3">
-
-    <div class="card-body">
-
-      <div class="row">
-
-        <div class="col-md-5">
-
-          <input class="form-control" placeholder="Search users..." [value]="search()"
-            (input)="onSearch($any($event.target).value)">
-
-        </div>
-
-        <div class="col-md-3">
-
-          <select class="form-select" (change)="filterRole($any($event.target).value)">
-
-            <option value="ALL">All Roles</option>
-
-            <option value="SUPER_ADMIN">Super Admin</option>
-
-            <option value="ADMIN">Admin</option>
-
-            <option value="FLEET_MANAGER">Fleet Manager</option>
-
-            <option value="DRIVER">Driver</option>
-
-          </select>
-
-        </div>
-
-        <div class="col-md-2">
-
-          <select class="form-select" (change)="filterStatus($any($event.target).value)">
-
-            <option value="ALL">
-
-              All Status
-
-            </option>
-
-            <option value="ACTIVE">
-
-              Active
-
-            </option>
-
-            <option value="INACTIVE">
-
-              Inactive
-
-            </option>
-
-          </select>
-
-        </div>
-
-        <div class="col-md-2">
-
-          <button class="btn btn-outline-secondary w-100" (click)="loadUsers()">
-            <i data-feather="refresh-cw" class="align-middle me-1">
-            </i>
-
-            Refresh
-
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ========================================= -->
-  <!-- TABLE -->
+  <!-- TABLE (filters live inside as a toolbar) -->
   <!-- ========================================= -->
 
   <div class="card">
+
+    <div class="card-header bg-transparent">
+
+      <div class="row g-2 align-items-center">
+
+        <div class="col-md-5">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent">
+              <i data-feather="search" style="width:16px;height:16px;"></i>
+            </span>
+            <input class="form-control" placeholder="Search by name, email or phone..." [value]="search()"
+              (input)="onSearch($any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <select class="form-select" [value]="selectedRole()" (change)="filterRole($any($event.target).value)">
+            <option value="ALL">All Roles</option>
+            <option value="SUPER_ADMIN">Super Admin</option>
+            <option value="ADMIN">Admin</option>
+            <option value="FLEET_MANAGER">Fleet Manager</option>
+            <option value="DRIVER">Driver</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <select class="form-select" [value]="selectedStatus()" (change)="filterStatus($any($event.target).value)">
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </div>
+
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-outline-secondary flex-fill" (click)="loadUsers()" title="Refresh">
+            <i data-feather="refresh-cw"></i>
+          </button>
+          <button *ngIf="hasActiveFilters()" class="btn btn-outline-secondary flex-fill" (click)="clearFilters()"
+            title="Clear filters">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
 
     <div class="table-responsive">
 
@@ -247,47 +144,23 @@
 
           <tr>
 
-            <th (click)="sort('firstName')" style="cursor:pointer">
-
+            <th (click)="sort('firstName')" class="sortable">
               Name
-
+              <i data-feather="chevron-down" class="sort-icon" *ngIf="sortColumn()==='firstName'"
+                [class.flip]="sortDirection()==='desc'"></i>
             </th>
 
-            <th (click)="sort('email')" style="cursor:pointer">
-
+            <th (click)="sort('email')" class="sortable">
               Email
-
+              <i data-feather="chevron-down" class="sort-icon" *ngIf="sortColumn()==='email'"
+                [class.flip]="sortDirection()==='desc'"></i>
             </th>
 
-            <th>
-
-              Phone
-
-            </th>
-
-            <th>
-
-              Role
-
-            </th>
-
-            <th>
-
-              Status
-
-            </th>
-
-            <th>
-
-              Supervisor
-
-            </th>
-
-            <th class="text-end">
-
-              Actions
-
-            </th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Supervisor</th>
+            <th class="text-end">Actions</th>
 
           </tr>
 
@@ -296,142 +169,88 @@
         <tbody>
 
           <tr *ngIf="loading()">
-
-            <td colspan="7" class="text-center py-5">
-
+            <td colspan="7" class="text-center py-5 text-muted">
+              <div class="spinner-border spinner-border-sm me-2"></div>
               Loading users...
-
             </td>
-
           </tr>
 
           <tr *ngFor="let user of paginatedUsers()">
+
             <td>
-
-              <strong>
-
-                {{ user.firstName }}
-
-                {{ user.lastName }}
-
-              </strong>
-
+              <strong>{{ user.firstName }} {{ user.lastName }}</strong>
             </td>
 
-            <td>
+            <td>{{ user.email }}</td>
 
-              {{ user.email }}
-
-            </td>
+            <td>{{ user.phone || '—' }}</td>
 
             <td>
-
-              {{ user.phone }}
-
-            </td>
-
-            <td>
-
               <span class="badge" [ngClass]="{
-
                                 'bg-danger': user.role==='SUPER_ADMIN',
-
                                 'bg-primary': user.role==='ADMIN',
-
                                 'bg-info': user.role==='FLEET_MANAGER',
-
                                 'bg-secondary': user.role==='DRIVER'
-
                             }">
-
                 {{ user.role }}
-
               </span>
-
             </td>
 
             <td>
-
               <span class="badge" [ngClass]="{
-
                                     'bg-success': user.isValidate,
-
                                     'bg-danger': !user.isValidate
-
                                 }">
-
                 {{ user.isValidate ? 'Active' : 'Inactive' }}
-
               </span>
-
             </td>
 
-            <td>
-
-              {{ user.adminName || '—' }}
-
-            </td>
+            <td>{{ user.adminName || '—' }}</td>
 
             <td class="text-end">
 
               <button class="btn btn-sm btn-outline-secondary me-1" (click)="viewDetails(user.id)" title="View">
-
                 <i data-feather="info"></i>
-
               </button>
 
-              <button *ngIf="user.role !== 'SUPER_ADMIN'" class="btn btn-sm btn-outline-dark me-1"
+              <button *ngIf="user.role !== 'SUPER_ADMIN'" class="btn btn-sm btn-outline-primary me-1"
                 (click)="editSupervisorModal(user)" title="Assign Supervisor">
-
                 <i data-feather="user-check"></i>
-
               </button>
 
-              <!-- 
-              <button class="btn btn-sm btn-outline-primary me-1" (click)="editUser(user)" title="Edit">
-
-                <i data-feather="edit"></i>
-
-              </button>
-              -->
               <button *ngIf="!user.isValidate" class="btn btn-sm btn-outline-success me-1"
                 (click)="openStatusModal(user)" title="Activate">
-
                 <i data-feather="check-circle"></i>
-
               </button>
 
               <button *ngIf="user.isValidate" class="btn btn-sm btn-outline-warning me-1"
                 (click)="openStatusModal(user)" title="Deactivate">
-
                 <i data-feather="slash"></i>
-
               </button>
 
-              <button class="btn btn-sm btn-outline-info me-1" (click)="changeRole(user)" title="Role">
-
+              <button class="btn btn-sm btn-outline-info" (click)="changeRole(user)" title="Change Role">
                 <i data-feather="shield"></i>
-
               </button>
-              <!-- 
-              <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)" title="Delete">
 
-                <i data-feather="trash-2"></i>
-
-              </button>
-              -->
             </td>
 
           </tr>
 
-          <tr *ngIf="!loading() && paginatedUsers().length===0">
-
+          <!-- EMPTY: no users in the system at all -->
+          <tr *ngIf="!loading() && paginatedUsers().length===0 && !hasActiveFilters()">
             <td colspan="7" class="text-center py-5 text-muted">
-
-              No users found.
-
+              <i data-feather="users" class="mb-2" style="width:32px;height:32px;"></i>
+              <div>No users yet.</div>
             </td>
+          </tr>
 
+          <!-- EMPTY: filters/search excluded everyone -->
+          <tr *ngIf="!loading() && paginatedUsers().length===0 && hasActiveFilters()">
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
+              <div>No users match your filters.</div>
+              <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
+            </td>
           </tr>
 
         </tbody>
@@ -440,49 +259,25 @@
 
     </div>
 
-    <div class="card-footer">
+    <div class="card-footer bg-transparent">
 
       <div class="d-flex justify-content-between align-items-center">
 
-        <small>
-
-          Displaying
-
-          {{ paginatedUsers().length }}
-
-          of
-
-          {{ filteredUsers().length }}
-
-          users
-
+        <small class="text-muted">
+          Displaying {{ paginatedUsers().length }} of {{ filteredUsers().length }} users
         </small>
 
         <div>
 
           <button class="btn btn-outline-secondary btn-sm me-2" [disabled]="currentPage()===1" (click)="previousPage()">
-
             Previous
-
           </button>
 
-          <span class="mx-2">
-
-            Page
-
-            {{ currentPage() }}
-
-            /
-
-            {{ totalPages() || 1 }}
-
-          </span>
+          <span class="mx-2">Page {{ currentPage() }} / {{ totalPages() || 1 }}</span>
 
           <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage()>=totalPages()"
             (click)="nextPage()">
-
             Next
-
           </button>
 
         </div>
@@ -495,76 +290,34 @@
 
 </div>
 
+<!-- Modals unchanged below — only class names inside kept identical to your originals -->
+
 <!-- ========================================= -->
 <!-- ASSIGN SUPERVISOR MODAL -->
 <!-- ========================================= -->
 
 <div class="modal fade" id="supervisorModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-
   <div class="modal-dialog modal-dialog-centered">
-
     <div class="modal-content">
-
       <div class="modal-header">
-
-        <h5 class="modal-title">
-
-          Update Supervisor
-
-        </h5>
-
-        <button class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+        <h5 class="modal-title">Update Supervisor</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
       <div class="modal-body">
-
-        <label class="form-label">
-
-          Supervisor
-
-        </label>
-
+        <label class="form-label">Supervisor</label>
         <select class="form-select" [(ngModel)]="selectedSupervisorId">
-
-          <option value="">
-
-            Select supervisor
-
-          </option>
-
+          <option value="">Select supervisor</option>
           <option *ngFor="let admin of supervisors()" [value]="admin.id">
-
-            {{ admin.firstName }}
-            {{ admin.lastName }}
-
+            {{ admin.firstName }} {{ admin.lastName }}
           </option>
-
         </select>
-
       </div>
-
       <div class="modal-footer">
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
-        <button class="btn btn-primary" (click)="saveSupervisor()">
-
-          Save
-
-        </button>
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" (click)="saveSupervisor()">Save</button>
       </div>
-
     </div>
-
   </div>
-
 </div>
 
 <!-- ========================================= -->
@@ -572,152 +325,38 @@
 <!-- ========================================= -->
 
 <div class="modal fade" id="roleModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-
-
   <div class="modal-dialog modal-dialog-centered">
-
-
     <div class="modal-content">
-
-
       <div class="modal-header">
-
-
-        <h5 class="modal-title">
-
-          Change User Role
-
-        </h5>
-
-
-        <button class="btn-close" data-bs-dismiss="modal">
-        </button>
-
-
+        <h5 class="modal-title">Change User Role</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-
-
       <div class="modal-body">
-
-
         <div class="mb-3">
-
-
-          <label class="form-label">
-
-            User
-
-          </label>
-
-
-          <input class="form-control" [value]="
-              selectedUser?.firstName +
-              ' ' +
-              selectedUser?.lastName
-            " disabled>
-
-
-          <label class="form-label">
-            Current Role
-          </label>
-
+          <label class="form-label">User</label>
+          <input class="form-control" [value]="selectedUser?.firstName + ' ' + selectedUser?.lastName" disabled>
+          <label class="form-label mt-2">Current Role</label>
           <input class="form-control" [value]="selectedUser?.role" disabled>
-
-
         </div>
-
-
-
-
         <div>
-
-
-          <label class="form-label">
-
-            New Role
-
-          </label>
-
-
+          <label class="form-label">New Role</label>
           <select class="form-select" [(ngModel)]="selectedRoleValue">
-
-
-            <option value="DRIVER">
-
-              Driver
-
-            </option>
-
-
-            <option value="FLEET_MANAGER">
-
-              Fleet Manager
-
-            </option>
-
-
-            <option value="ADMIN">
-
-              Admin
-
-            </option>
-
-
+            <option value="DRIVER">Driver</option>
+            <option value="FLEET_MANAGER">Fleet Manager</option>
+            <option value="ADMIN">Admin</option>
           </select>
-
-
         </div>
-
-
         <div class="alert alert-warning mt-3 mb-0">
-
-
           <i data-feather="alert-triangle" class="me-1"></i>
-
-
           Super Admin role cannot be assigned.
-
-
         </div>
-
-
-
       </div>
-
-
-
-
       <div class="modal-footer">
-
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-          Cancel
-
-        </button>
-
-
-
-        <button class="btn btn-primary" (click)="saveRoleChange()">
-
-
-          Save
-
-
-        </button>
-
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" (click)="saveRoleChange()">Save</button>
       </div>
-
-
-
     </div>
-
-
   </div>
-
-
 </div>
 
 <!-- ========================================= -->
@@ -725,168 +364,49 @@
 <!-- ========================================= -->
 
 <div class="modal fade" id="statusModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-
-
   <div class="modal-dialog modal-dialog-centered">
-
-
     <div class="modal-content">
-
-
       <div class="modal-header">
-
-
-        <h5 class="modal-title" [ngClass]="
-              actionType === 'DEACTIVATE'
-              ? 'text-warning'
-              : 'text-success'
-            ">
-
-          {{
-          actionType === 'DEACTIVATE'
-          ? 'Deactivate User'
-          : 'Activate User'
-          }}
-
+        <h5 class="modal-title" [ngClass]="actionType === 'DEACTIVATE' ? 'text-warning' : 'text-success'">
+          {{ actionType === 'DEACTIVATE' ? 'Deactivate User' : 'Activate User' }}
         </h5>
-
-
         <button class="btn-close" data-bs-dismiss="modal"></button>
-
-
       </div>
-
-
-
-
       <div class="modal-body text-center">
 
-
-        <!-- DEACTIVATE ICON -->
         <svg *ngIf="actionType === 'DEACTIVATE'" xmlns="http://www.w3.org/2000/svg" width="48" height="48"
           viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round" class="mb-3">
-
-
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-          </path>
-
-          <line x1="12" y1="9" x2="12" y2="13">
-          </line>
-
-          <line x1="12" y1="17" x2="12.01" y2="17">
-          </line>
-
-
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
 
-
-
-
-        <!-- ACTIVATE ICON -->
         <svg *ngIf="actionType === 'ACTIVATE'" xmlns="http://www.w3.org/2000/svg" width="48" height="48"
           viewBox="0 0 24 24" fill="none" stroke="#198754" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round" class="mb-3">
-
-
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14">
-          </path>
-
-          <polyline points="22 4 12 14.01 9 11.01">
-          </polyline>
-
-
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
         </svg>
 
-
-
-
-        <h5>
-
-
-          {{
-          actionType === 'DEACTIVATE'
-          ? 'Deactivate this user?'
-          : 'Activate this user?'
-          }}
-
-
-        </h5>
-
-
-
+        <h5>{{ actionType === 'DEACTIVATE' ? 'Deactivate this user?' : 'Activate this user?' }}</h5>
 
         <p class="text-muted mb-0">
-
-
-          {{
-          actionType === 'DEACTIVATE'
+          {{ actionType === 'DEACTIVATE'
           ? 'The user will no longer be able to access the system.'
-          : 'The user will regain access to the system.'
-          }}
-
-
+          : 'The user will regain access to the system.' }}
           <br><br>
-
-
-          <strong>
-
-            {{ selectedUser?.firstName }}
-
-            {{ selectedUser?.lastName }}
-
-          </strong>
-
-
+          <strong>{{ selectedUser?.firstName }} {{ selectedUser?.lastName }}</strong>
         </p>
 
-
       </div>
-
-
-
-
-
       <div class="modal-footer justify-content-center">
-
-
-        <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-
-          Cancel
-
-
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn" [ngClass]="actionType === 'DEACTIVATE' ? 'btn-warning' : 'btn-success'"
+          (click)="confirmStatusChange()">
+          {{ actionType === 'DEACTIVATE' ? 'Deactivate' : 'Activate' }}
         </button>
-
-
-
-
-        <button class="btn" [ngClass]="
-                  actionType === 'DEACTIVATE'
-                  ? 'btn-warning'
-                  : 'btn-success'
-                " (click)="confirmStatusChange()">
-
-
-
-          {{
-          actionType === 'DEACTIVATE'
-          ? 'Deactivate'
-          : 'Activate'
-          }}
-
-
-
-        </button>
-
-
       </div>
-
-
     </div>
-
-
   </div>
-
-
 </div>

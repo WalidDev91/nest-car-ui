@@ -12,6 +12,16 @@
 		<ul class="navbar-nav navbar-align">
 
 			<!-- ========================= -->
+			<!-- THEME TOGGLE -->
+			<!-- ========================= -->
+
+			<li class="nav-item">
+				<a class="nav-icon" href="#" (click)="toggleTheme(); $event.preventDefault()" title="Toggle dark mode">
+					<span [innerHTML]="themeIconSvg"></span>
+				</a>
+			</li>
+
+			<!-- ========================= -->
 			<!-- NOTIFICATIONS -->
 			<!-- ========================= -->
 
@@ -264,12 +274,16 @@
 
 				<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
 
-					<div
-						class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center me-1">
+					<ng-container *ngIf="hasAvatar; else initialsAvatar">
+						<img [src]="avatarUrl" class="avatar rounded me-1" alt="User photo">
+					</ng-container>
 
-						{{ firstName.charAt(0) }}{{ lastName.charAt(0) }}
-
-					</div>
+					<ng-template #initialsAvatar>
+						<div
+							class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center me-1">
+							{{ initials }}
+						</div>
+					</ng-template>
 
 					<span class="text-dark">
 

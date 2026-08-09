@@ -1,140 +1,114 @@
 <div class="container-fluid p-0">
 
-    <!-- ========================================= -->
     <!-- PAGE HEADER -->
-    <!-- ========================================= -->
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-
-        <div>
-            <!--
-      <h3 class="mb-0">Mission Management</h3>
-      <small class="text-muted">
-        Manage transport missions.
-      </small>
-      -->
-        </div>
-
-        <button *ngIf="!isDriver" class="btn btn-primary" (click)="openCreateModal()">
-
-            <i data-feather="plus" class="align-middle me-1"></i>
-
-            Create Mission
-
-        </button>
-
+    <div class="mb-3">
+        <h4 class="mb-0">Missions</h4>
+        <small class="text-muted">Plan and track transport missions.</small>
     </div>
 
-    <!-- ========================================= -->
     <!-- STATISTICS -->
-    <!-- ========================================= -->
-
-    <div class="row">
+    <div class="row g-3 mb-3">
 
         <div class="col-xl-3 col-md-6">
-
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6>Total Missions</h6>
-
-                    <h2>{{ totalMissions() }}</h2>
-
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i data-feather="map"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">Total Missions</h6>
+                        <h3 class="mb-0">{{ totalMissions() }}</h3>
+                    </div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="col-xl-3 col-md-6">
-
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6>Planned</h6>
-
-                    <h2 class="text-warning">
-
-                        {{ plannedMissions() }}
-
-                    </h2>
-
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-warning-subtle text-warning">
+                        <i data-feather="clock"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">Planned</h6>
+                        <h3 class="mb-0">{{ plannedMissions() }}</h3>
+                    </div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="col-xl-3 col-md-6">
-
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6>Ongoing</h6>
-
-                    <h2 class="text-primary">
-
-                        {{ ongoingMissions() }}
-
-                    </h2>
-
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i data-feather="navigation"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">Ongoing</h6>
+                        <h3 class="mb-0">{{ ongoingMissions() }}</h3>
+                    </div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="col-xl-3 col-md-6">
-
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6>Completed</h6>
-
-                    <h2 class="text-success">
-
-                        {{ completedMissions() }}
-
-                    </h2>
-
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i data-feather="check-circle"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">Completed</h6>
+                        <h3 class="mb-0">{{ completedMissions() }}</h3>
+                    </div>
                 </div>
-
             </div>
-
         </div>
 
     </div>
 
-    <!-- ========================================= -->
-    <!-- FILTERS -->
-    <!-- ========================================= -->
+    <!-- TABLE (filters + create live inside as a toolbar) -->
+    <div class="card">
 
-    <div class="card mb-3">
+        <div class="card-header bg-transparent">
 
-        <div class="card-body">
-
-            <div class="row">
-
-                <div class="col-md-8">
-
-                    <input class="form-control" placeholder="Search missions..." [value]="search()"
-                        (input)="onSearch($any($event.target).value)">
-
-                </div>
+            <div class="row g-2 align-items-center">
 
                 <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent">
+                            <i data-feather="search" style="width:16px;height:16px;"></i>
+                        </span>
+                        <input class="form-control" placeholder="Search title, driver, vehicle..." [value]="search()"
+                            (input)="onSearch($any($event.target).value)">
+                    </div>
+                </div>
 
-                    <button class="btn btn-outline-secondary w-100" (click)="refresh()">
+                <div class="col-md-3">
+                    <select class="form-select" [value]="statusFilter()"
+                        (change)="filterStatus($any($event.target).value)">
+                        <option value="ALL">All Status</option>
+                        <option value="PLANNED">Planned</option>
+                        <option value="ONGOING">Ongoing</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
 
-                        <i data-feather="refresh-cw" class="align-middle me-1">
-                        </i>
+                <div class="col-md-5 d-flex justify-content-end gap-2">
 
-                        Refresh
+                    <button class="btn btn-outline-secondary" (click)="refresh()" title="Refresh">
+                        <i data-feather="refresh-cw"></i>
+                    </button>
 
+                    <button *ngIf="hasActiveFilters()" class="btn btn-outline-secondary" (click)="clearFilters()"
+                        title="Clear filters">
+                        <i data-feather="x"></i>
+                    </button>
+
+                    <button *ngIf="!isDriver" class="btn btn-primary" (click)="openCreateModal()">
+                        <i data-feather="plus-circle" class="align-middle me-1"></i>
+                        Create Mission
                     </button>
 
                 </div>
@@ -142,14 +116,6 @@
             </div>
 
         </div>
-
-    </div>
-
-    <!-- ========================================= -->
-    <!-- TABLE -->
-    <!-- ========================================= -->
-
-    <div class="card">
 
         <div class="table-responsive">
 
@@ -159,23 +125,33 @@
 
                     <tr>
 
-                        <th>Title</th>
+                        <th class="sortable" (click)="sort('title')">
+                            Title
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='title'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
 
-                        <th>Start Date</th>
+                        <th class="sortable" (click)="sort('startDate')">
+                            Start Date
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='startDate'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
 
-                        <th>End Date</th>
+                        <th class="sortable" (click)="sort('endDate')">
+                            End Date
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='endDate'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
 
-                        <th>Status</th>
+                        <th class="sortable" (click)="sort('status')">
+                            Status
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='status'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
 
                         <th>Driver</th>
-
                         <th>Vehicle</th>
-
-                        <th class="text-end">
-
-                            Actions
-
-                        </th>
+                        <th class="text-end">Actions</th>
 
                     </tr>
 
@@ -184,111 +160,64 @@
                 <tbody>
 
                     <tr *ngIf="loading()">
-
-                        <td colspan="7" class="text-center py-5">
-
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <div class="spinner-border spinner-border-sm me-2"></div>
                             Loading missions...
-
                         </td>
-
                     </tr>
 
-                    <tr *ngFor="let mission of paginatedMissions()">
+                    <tr *ngFor="let mission of paginatedMissions(); trackBy: trackByMission">
+
+                        <td><strong>{{ mission.title }}</strong></td>
+
+                        <td>{{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                        <td>{{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}</td>
 
                         <td>
-
-                            <strong>
-
-                                {{ mission.title }}
-
-                            </strong>
-
-                            <br>
-
-                            <!--  
-                            <small class="text-muted">
-
-                                {{ mission.description }}
-
-                            </small>
-                        -->
-                        </td>
-
-                        <td>
-                            {{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}
-                        </td>
-
-                        <td>
-                            {{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}
-                        </td>
-
-                        <td>
-
-                            <span class="badge" [ngClass]="{
-
-                  'bg-warning': mission.status==='PLANNED',
-
-                  'bg-primary': mission.status==='ONGOING',
-
-                  'bg-success': mission.status==='COMPLETED',
-
-                  'bg-danger': mission.status==='CANCELLED'
-
-                }">
-
+                            <span class="badge" [ngClass]="getStatusClass(mission.status)">
                                 {{ mission.status }}
-
                             </span>
-
                         </td>
 
-                        <td>
-
-                            {{ mission.driverName || '—' }}
-
-                        </td>
-
-                        <td>
-
-                            {{ mission.vehiclePlateNumber || '—' }}
-
-                        </td>
+                        <td>{{ mission.driverName || '—' }}</td>
+                        <td>{{ mission.vehiclePlateNumber || '—' }}</td>
 
                         <td class="text-end">
 
                             <button class="btn btn-sm btn-outline-secondary me-1"
-                                (click)="viewMissionDetails(mission.id)">
-
+                                (click)="viewMissionDetails(mission.id)" title="View">
                                 <i data-feather="info"></i>
-
                             </button>
 
                             <button *ngIf="!isDriver" class="btn btn-sm btn-outline-primary me-1"
-                                (click)="openEditModal(mission)">
-
+                                (click)="openEditModal(mission)" title="Edit">
                                 <i data-feather="edit"></i>
-
                             </button>
 
                             <button *ngIf="!isDriver" class="btn btn-sm btn-outline-danger"
-                                (click)="deleteMission(mission.id)">
-
+                                (click)="deleteMission(mission.id)" title="Delete">
                                 <i data-feather="trash-2"></i>
-
                             </button>
 
                         </td>
 
                     </tr>
 
-                    <tr *ngIf="!loading() && paginatedMissions().length===0">
-
+                    <!-- EMPTY: no missions at all -->
+                    <tr *ngIf="!loading() && paginatedMissions().length===0 && !hasActiveFilters()">
                         <td colspan="7" class="text-center py-5 text-muted">
-
-                            No missions found.
-
+                            <i data-feather="map" class="mb-2" style="width:32px;height:32px;"></i>
+                            <div>No missions yet.</div>
                         </td>
+                    </tr>
 
+                    <!-- EMPTY: filters/search excluded everyone -->
+                    <tr *ngIf="!loading() && paginatedMissions().length===0 && hasActiveFilters()">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
+                            <div>No missions match your filters.</div>
+                            <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
+                        </td>
                     </tr>
 
                 </tbody>
@@ -297,50 +226,26 @@
 
         </div>
 
-        <div class="card-footer">
+        <div class="card-footer bg-transparent">
 
             <div class="d-flex justify-content-between align-items-center">
 
-                <small>
-
-                    Displaying
-
-                    {{ paginatedMissions().length }}
-
-                    of
-
-                    {{ filteredMissions().length }}
-
-                    missions
-
+                <small class="text-muted">
+                    Displaying {{ paginatedMissions().length }} of {{ filteredMissions().length }} missions
                 </small>
 
                 <div>
 
                     <button class="btn btn-outline-secondary btn-sm me-2" [disabled]="currentPage()===1"
                         (click)="previousPage()">
-
                         Previous
-
                     </button>
 
-                    <span class="mx-2">
-
-                        Page
-
-                        {{ currentPage() }}
-
-                        /
-
-                        {{ totalPages() || 1 }}
-
-                    </span>
+                    <span class="mx-2">Page {{ currentPage() }} / {{ totalPages() || 1 }}</span>
 
                     <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage()>=totalPages()"
                         (click)="nextPage()">
-
                         Next
-
                     </button>
 
                 </div>
@@ -352,6 +257,7 @@
     </div>
 
 </div>
+
 <!-- ========================================================= -->
 <!-- CREATE / EDIT MISSION MODAL -->
 <!-- ========================================================= -->
@@ -363,180 +269,80 @@
 
         <div class="modal-content">
 
-            <!-- HEADER -->
-
             <div class="modal-header">
-
-                <h5 class="modal-title">
-
-                    {{ editMode ? 'Edit Mission' : 'Create Mission' }}
-
-                </h5>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                </button>
-
+                <h5 class="modal-title">{{ editMode ? 'Edit Mission' : 'Create Mission' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
-            <!-- BODY -->
 
             <div class="modal-body">
 
                 <div class="row g-3">
 
-                    <!-- TITLE -->
-
                     <div class="col-md-6">
-
-                        <label class="form-label">
-
-                            Mission Title *
-
-                        </label>
-
-                        <input class="form-control" [(ngModel)]="title">
-
+                        <label class="form-label">Mission Title *</label>
+                        <input class="form-control" [class.is-invalid]="titleInvalid" [(ngModel)]="title">
+                        <div class="invalid-feedback">Mission title can't be empty.</div>
                     </div>
 
-                    <!-- STATUS -->
-
                     <div class="col-md-6">
-
-                        <label class="form-label">
-
-                            Status *
-
-                        </label>
-
+                        <label class="form-label">Status *</label>
                         <select class="form-select" [(ngModel)]="status">
-
                             <option value="PLANNED">Planned</option>
                             <option value="ONGOING">Ongoing</option>
                             <option value="COMPLETED">Completed</option>
                             <option value="CANCELLED">Cancelled</option>
-
                         </select>
-
                     </div>
-
-                    <!-- DESCRIPTION -->
 
                     <div class="col-12">
-
-                        <label class="form-label">
-
-                            Description
-
-                        </label>
-
-                        <textarea rows="4" class="form-control" [(ngModel)]="description">
-
-                        </textarea>
-
+                        <label class="form-label">Description</label>
+                        <textarea rows="4" class="form-control" [(ngModel)]="description"></textarea>
                     </div>
 
-                    <!-- START -->
-
                     <div class="col-md-6">
-
-                        <label class="form-label">
-
-                            Start Date *
-
-                        </label>
-
-                        <input type="datetime-local" class="form-control" [(ngModel)]="startDate">
-
+                        <label class="form-label">Start Date *</label>
+                        <input type="datetime-local" class="form-control" [class.is-invalid]="startDateInvalid"
+                            [(ngModel)]="startDate">
+                        <div class="invalid-feedback">Start date is required.</div>
                     </div>
 
-                    <!-- END -->
-
                     <div class="col-md-6">
-
-                        <label class="form-label">
-
-                            End Date *
-
-                        </label>
-
-                        <input type="datetime-local" class="form-control" [(ngModel)]="endDate">
-
+                        <label class="form-label">End Date *</label>
+                        <input type="datetime-local" class="form-control" [class.is-invalid]="endDateInvalid"
+                            [(ngModel)]="endDate">
+                        <div class="invalid-feedback">{{ endDateErrorMessage }}</div>
                     </div>
 
-                    <!-- DRIVER -->
-
                     <div class="col-md-6">
-
-                        <label class="form-label">
-
-                            Driver
-
-                        </label>
-
+                        <label class="form-label">Driver</label>
                         <select class="form-select" [(ngModel)]="driverId">
-
-                            <option [ngValue]="null">
-
-                                -- No Driver Assigned --
-
-                            </option>
-
+                            <option [ngValue]="null">-- No Driver Assigned --</option>
                             <option *ngFor="let driver of driversList()" [ngValue]="driver.id">
                                 {{ driver.firstName }} {{ driver.lastName }}
                             </option>
-
                         </select>
-
                     </div>
 
-                    <!-- VEHICLE -->
-
                     <div class="col-md-6">
-
-                        <label class="form-label">
-
-                            Vehicle
-
-                        </label>
-
+                        <label class="form-label">Vehicle</label>
                         <select class="form-select" [(ngModel)]="vehicleId">
-
-                            <option [ngValue]="null">
-
-                                -- No Vehicle Assigned --
-
-                            </option>
-
+                            <option [ngValue]="null">-- No Vehicle Assigned --</option>
                             <option *ngFor="let vehicle of vehiclesList()" [ngValue]="vehicle.id">
                                 {{ vehicle.plateNumber }} — {{ vehicle.brand }} {{ vehicle.model }}
                             </option>
-
                         </select>
-
                     </div>
 
                 </div>
 
             </div>
 
-            <!-- FOOTER -->
-
             <div class="modal-footer">
-
-                <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-                    Cancel
-
-                </button>
-
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button class="btn btn-primary" (click)="createMission()">
-
                     <i data-feather="save" class="align-middle me-1"></i>
-
                     {{ editMode ? 'Update Mission' : 'Create Mission' }}
-
                 </button>
-
             </div>
 
         </div>
@@ -544,6 +350,7 @@
     </div>
 
 </div>
+
 <!-- ========================================================= -->
 <!-- DELETE MISSION MODAL -->
 <!-- ========================================================= -->
@@ -555,61 +362,30 @@
 
         <div class="modal-content">
 
-            <!-- HEADER -->
-
             <div class="modal-header">
-
-                <h5 class="modal-title text-danger">
-
-                    Confirm Mission Deletion
-
-                </h5>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                </button>
-
+                <h5 class="modal-title text-danger">Confirm Mission Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
-            <!-- BODY -->
 
             <div class="modal-body text-center">
 
-                <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;">
-                </i>
+                <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;"></i>
 
-                <h5 class="mb-3">
-
-                    Delete this mission?
-
-                </h5>
+                <h5 class="mb-3">Delete this mission?</h5>
 
                 <p class="text-muted mb-0">
-
-                    This action cannot be undone.
-
+                    This action cannot be undone. Any related documents or inspections tied to this mission may be
+                    affected.
                 </p>
 
             </div>
 
-            <!-- FOOTER -->
-
             <div class="modal-footer justify-content-center">
-
-                <button class="btn btn-secondary" data-bs-dismiss="modal">
-
-                    Cancel
-
-                </button>
-
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button class="btn btn-danger" (click)="confirmDeleteMission()">
-
-                    <i data-feather="trash-2" class="align-middle me-1">
-                    </i>
-
+                    <i data-feather="trash-2" class="align-middle me-1"></i>
                     Delete Mission
-
                 </button>
-
             </div>
 
         </div>

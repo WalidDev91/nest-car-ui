@@ -96,14 +96,22 @@ export class MissionService {
   // DOCUMENT VERIFICATION
   // ==========================================================
 
+  updateDocumentsVerification(
+    id: string,
+    verified: boolean | null
+  ) {
 
-  verifyDocuments(id: string) {
+    const options = verified === null
+      ? {}
+      : { params: { verified: verified.toString() } };
+
     return this.http.patch<Mission>(
       `${this.baseUrl}/${id}/verification`,
-      {}
+      {},
+      options
     );
-  }
 
+  }
 
 
 

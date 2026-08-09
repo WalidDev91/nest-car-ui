@@ -1,6 +1,5 @@
 <div class="container-fluid p-0">
 
-  <!-- Welcome -->
   <h1 class="h3 mb-3">
     Welcome back, <strong>{{ loggedInName }}</strong> 👋
   </h1>
@@ -17,44 +16,44 @@
 
           <div class="col-sm-6">
 
-            <div class="card">
+            <div class="card stat-card">
               <div class="card-body">
-                <div class="row">
-                  <div class="col mt-0">
-                    <h5 class="card-title">Active Missions</h5>
-                  </div>
-                  <div class="col-auto">
-                    <div class="stat text-primary">
-                      <i class="align-middle" data-feather="navigation"></i>
-                    </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <h6 class="text-muted mb-0">Active Missions</h6>
+                  <div class="stat-icon bg-primary-subtle text-primary">
+                    <i data-feather="navigation"></i>
                   </div>
                 </div>
-                <h1 class="mt-1 mb-3">{{ activeMissions() }}</h1>
+
+                <h1 class="mb-1">{{ activeMissions() }}</h1>
+
                 <div class="mb-0">
                   <span [ngClass]="activeMissionsDelta() >= 0 ? 'text-success' : 'text-danger'">
                     {{ activeMissionsDelta() >= 0 ? '+' : '' }}{{ activeMissionsDelta() }}%
                   </span>
                   <span class="text-muted">vs last month</span>
                 </div>
+
               </div>
             </div>
 
-            <div class="card">
+            <div class="card stat-card">
               <div class="card-body">
-                <div class="row">
-                  <div class="col mt-0">
-                    <h5 class="card-title">Drivers</h5>
-                  </div>
-                  <div class="col-auto">
-                    <div class="stat text-warning">
-                      <i class="align-middle" data-feather="user"></i>
-                    </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <h6 class="text-muted mb-0">Drivers</h6>
+                  <div class="stat-icon bg-warning-subtle text-warning">
+                    <i data-feather="user"></i>
                   </div>
                 </div>
-                <h1 class="mt-1 mb-3">{{ totalDrivers() }}</h1>
+
+                <h1 class="mb-1">{{ totalDrivers() }}</h1>
+
                 <div class="mb-0">
                   <span class="text-muted">Total registered drivers</span>
                 </div>
+
               </div>
             </div>
 
@@ -62,41 +61,41 @@
 
           <div class="col-sm-6">
 
-            <div class="card">
+            <div class="card stat-card">
               <div class="card-body">
-                <div class="row">
-                  <div class="col mt-0">
-                    <h5 class="card-title">Vehicles</h5>
-                  </div>
-                  <div class="col-auto">
-                    <div class="stat text-success">
-                      <i class="align-middle" data-feather="truck"></i>
-                    </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <h6 class="text-muted mb-0">Vehicles</h6>
+                  <div class="stat-icon bg-success-subtle text-success">
+                    <i data-feather="truck"></i>
                   </div>
                 </div>
-                <h1 class="mt-1 mb-3">{{ totalVehicles() }}</h1>
+
+                <h1 class="mb-1">{{ totalVehicles() }}</h1>
+
                 <div class="mb-0">
                   <span class="text-muted">Total vehicles in fleet</span>
                 </div>
+
               </div>
             </div>
 
-            <div class="card">
+            <div class="card stat-card">
               <div class="card-body">
-                <div class="row">
-                  <div class="col mt-0">
-                    <h5 class="card-title">Pending Documents</h5>
-                  </div>
-                  <div class="col-auto">
-                    <div class="stat text-info">
-                      <i class="align-middle" data-feather="clock"></i>
-                    </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <h6 class="text-muted mb-0">Pending Documents</h6>
+                  <div class="stat-icon bg-info-subtle text-info">
+                    <i data-feather="clock"></i>
                   </div>
                 </div>
-                <h1 class="mt-1 mb-3">{{ pendingDocuments() }}</h1>
+
+                <h1 class="mb-1">{{ pendingDocuments() }}</h1>
+
                 <div class="mb-0">
                   <span class="text-muted">Awaiting approval</span>
                 </div>
+
               </div>
             </div>
 
@@ -109,7 +108,10 @@
     <div class="col-xl-6 col-xxl-7">
       <div class="card flex-fill w-100">
         <div class="card-header">
-          <h5 class="card-title mb-0">Recent Activity</h5>
+          <h5 class="card-title mb-0">
+            <i data-feather="activity" class="me-1"></i>
+            Recent Activity
+          </h5>
         </div>
         <div class="card-body py-3">
           <div class="chart chart-sm" style="height: 250px;">
@@ -130,7 +132,10 @@
     <div class="col-12 col-lg-8 col-xxl-9 d-flex">
       <div class="card flex-fill">
         <div class="card-header">
-          <h5 class="card-title mb-0">Recent Missions</h5>
+          <h5 class="card-title mb-0">
+            <i data-feather="map" class="me-1"></i>
+            Recent Missions
+          </h5>
         </div>
         <table class="table table-hover my-0">
           <thead>
@@ -144,6 +149,7 @@
             </tr>
           </thead>
           <tbody>
+
             <tr *ngFor="let mission of recentMissions()">
               <td>{{ mission.title }}</td>
               <td>{{ mission.driverName }}</td>
@@ -161,6 +167,11 @@
                 </span>
               </td>
             </tr>
+
+            <tr *ngIf="dataLoaded && recentMissions().length === 0">
+              <td colspan="6" class="text-center py-4 text-muted">No missions yet.</td>
+            </tr>
+
           </tbody>
         </table>
       </div>
@@ -169,7 +180,10 @@
     <div class="col-12 col-lg-4 col-xxl-3 d-flex">
       <div class="card flex-fill w-100">
         <div class="card-header">
-          <h5 class="card-title mb-0">Missions by Status</h5>
+          <h5 class="card-title mb-0">
+            <i data-feather="pie-chart" class="me-1"></i>
+            Missions by Status
+          </h5>
         </div>
         <div class="card-body d-flex">
           <div class="align-self-center w-100">
@@ -204,17 +218,19 @@
   <!-- ========================================= -->
   <!-- DOCUMENT STATUS -->
   <!-- ========================================= -->
-
   <!--
   <div class="row">
 
     <div class="col-12">
       <div class="card flex-fill w-100">
         <div class="card-header">
-          <h5 class="card-title mb-0">Document Status</h5>
+          <h5 class="card-title mb-0">
+            <i data-feather="file-text" class="me-1"></i>
+            Document Status
+          </h5>
         </div>
         <div class="card-body py-3">
-          <div class="chart chart-sm" style="height: 250px;">
+          <div class="chart chart-sm" style="height: 200px;">
             <canvas #documentStatusChart></canvas>
           </div>
         </div>

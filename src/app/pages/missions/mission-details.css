@@ -1,0 +1,50 @@
+.inspection-photo-card {
+    position: relative;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--bs-tertiary-bg, #f8f9fa);
+    transition: box-shadow 0.15s ease;
+}
+
+.inspection-photo-card:hover {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+}
+
+.inspection-photo-card img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    display: block;
+}
+
+.inspection-photo-caption {
+    padding: 0.4rem 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.photo-delete-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--bs-body-bg);
+    color: var(--bs-danger);
+}
+
+.photo-delete-btn:hover {
+    background-color: var(--bs-danger);
+    color: #fff;
+    border-color: var(--bs-danger);
+}
+
+.photo-delete-btn i {
+    width: 14px;
+    height: 14px;
+}

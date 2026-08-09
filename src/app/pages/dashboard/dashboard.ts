@@ -1,9 +1,10 @@
-import { Component, OnInit, signal, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, signal, effect, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { MissionService } from '../../services/mission.service';
 import { DriverDocumentService } from '../../services/driver-document.service';
+import { ThemeService } from '../../services/theme.service';
 import { Mission } from '../../models/mission';
 import { Chart, registerables } from 'chart.js';
 
@@ -33,32 +34,60 @@ export class Dashboard implements OnInit, AfterViewInit {
   activeMissions = signal<number>(0);
   pendingDocuments = signal<number>(0);
 
-  // delta (this month vs last month), based on startDate
   activeMissionsDelta = signal<number>(0);
 
-  // legend table under the Missions by Status doughnut
   missionStatusCounts = signal<StatusCount[]>([]);
   documentStatusCounts = signal<StatusCount[]>([]);
 
-  // recent missions
   recentMissions = signal<Mission[]>([]);
 
-  // raw data for charts
   allMissions: Mission[] = [];
   allDocuments: any[] = [];
 
-  // logged in user
   loggedInName =
     `${localStorage.getItem('firstName') ?? ''} ${localStorage.getItem('lastName') ?? ''}`.trim() || 'User';
 
   dataLoaded = false;
 
+  // ==========================================================
+  // CHART INSTANCES — kept so we can destroy() before rebuilding,
+  // both on initial load and whenever the theme toggles.
+  // ==========================================================
+
+  private missionStatusChart: Chart | null = null;
+  private missionsTrendChart: Chart | null = null;
+  private documentStatusChartInstance: Chart | null = null;
+
+  private missionChartsReady = false;
+  private documentChartReady = false;
+
   constructor(
     private userService: UserService,
     private vehicleService: VehicleService,
     private missionService: MissionService,
-    private driverDocumentService: DriverDocumentService
-  ) { }
+    private driverDocumentService: DriverDocumentService,
+    public themeService: ThemeService
+  ) {
+
+    // Redraw charts with theme-correct colors whenever dark/light mode
+    // toggles while this page is open — otherwise they'd stay stale
+    // until a full reload.
+    effect(() => {
+
+      this.themeService.theme();
+
+      if (this.missionChartsReady) {
+        this.buildStatusChart();
+        this.buildTrendChart();
+      }
+
+      if (this.documentChartReady) {
+        this.buildDocumentChart();
+      }
+
+    });
+
+  }
 
   ngOnInit(): void {
 
@@ -137,6 +166,25 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   // ==========================================================
+  // THEME-AWARE CHART PALETTE
+  // ==========================================================
+
+  private getChartPalette() {
+
+    const isDark = this.themeService.theme() === 'dark';
+
+    return {
+      // Matches the dashboard card background in each theme, so
+      // doughnut segment borders and line-chart point centers blend
+      // into the card instead of showing as a hardcoded white ring.
+      surfaceColor: isDark ? '#1c2028' : '#ffffff',
+      gridColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+      tickColor: isDark ? '#9aa0ac' : '#6c757d'
+    };
+
+  }
+
+  // ==========================================================
   // MISSION CHARTS
   // ==========================================================
 
@@ -144,10 +192,13 @@ export class Dashboard implements OnInit, AfterViewInit {
     setTimeout(() => {
       this.buildStatusChart();
       this.buildTrendChart();
+      this.missionChartsReady = true;
     }, 0);
   }
 
   buildStatusChart(): void {
+
+    if (!this.missionStatusChartRef) return;
 
     const counts = {
       PLANNED: this.allMissions.filter(m => m.status === 'PLANNED').length,
@@ -163,13 +214,18 @@ export class Dashboard implements OnInit, AfterViewInit {
       { label: 'Cancelled', count: counts.CANCELLED, color: '#dc3545' },
     ]);
 
-    new Chart(this.missionStatusChartRef.nativeElement, {
+    const palette = this.getChartPalette();
+
+    this.missionStatusChart?.destroy();
+
+    this.missionStatusChart = new Chart(this.missionStatusChartRef.nativeElement, {
       type: 'doughnut',
       data: {
         labels: ['Planned', 'Ongoing', 'Completed', 'Cancelled'],
         datasets: [{
           data: [counts.PLANNED, counts.ONGOING, counts.COMPLETED, counts.CANCELLED],
           backgroundColor: ['#ffc107', '#3b7ddd', '#28a745', '#dc3545'],
+          borderColor: palette.surfaceColor,
           borderWidth: 5
         }]
       },
@@ -185,6 +241,8 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   buildTrendChart(): void {
 
+    if (!this.missionsTrendChartRef) return;
+
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const counts = new Array(12).fill(0);
 
@@ -193,12 +251,16 @@ export class Dashboard implements OnInit, AfterViewInit {
       counts[month]++;
     });
 
+    const palette = this.getChartPalette();
+
     const ctx = this.missionsTrendChartRef.nativeElement.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, 225);
     gradient.addColorStop(0, 'rgba(59, 125, 221, 0.35)');
     gradient.addColorStop(1, 'rgba(59, 125, 221, 0)');
 
-    new Chart(this.missionsTrendChartRef.nativeElement, {
+    this.missionsTrendChart?.destroy();
+
+    this.missionsTrendChart = new Chart(this.missionsTrendChartRef.nativeElement, {
       type: 'line',
       data: {
         labels: months,
@@ -210,7 +272,7 @@ export class Dashboard implements OnInit, AfterViewInit {
           borderColor: '#3b7ddd',
           borderWidth: 2,
           pointRadius: 4,
-          pointBackgroundColor: '#fff',
+          pointBackgroundColor: palette.surfaceColor,
           pointBorderColor: '#3b7ddd',
           pointBorderWidth: 2,
           pointHoverRadius: 6,
@@ -229,11 +291,12 @@ export class Dashboard implements OnInit, AfterViewInit {
         scales: {
           y: {
             beginAtZero: true,
-            ticks: { stepSize: 1 },
-            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { stepSize: 1, color: palette.tickColor },
+            grid: { color: palette.gridColor },
             border: { dash: [3, 3] }
           },
           x: {
+            ticks: { color: palette.tickColor },
             grid: { color: 'transparent' },
             border: { display: false }
           }
@@ -243,11 +306,12 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   // ==========================================================
-  // DOCUMENT STATUS CHART — different data dimension entirely,
-  // horizontal bar so it's visually distinct from the mission charts
+  // DOCUMENT STATUS CHART
   // ==========================================================
 
   buildDocumentChart(): void {
+
+    if (!this.documentStatusChartRef) return;
 
     const counts = {
       PENDING: this.allDocuments.filter(d => d.status === 'PENDING').length,
@@ -261,9 +325,13 @@ export class Dashboard implements OnInit, AfterViewInit {
       { label: 'Rejected', count: counts.REJECTED, color: '#dc3545' },
     ]);
 
+    const palette = this.getChartPalette();
+
     setTimeout(() => {
 
-      new Chart(this.documentStatusChartRef.nativeElement, {
+      this.documentStatusChartInstance?.destroy();
+
+      this.documentStatusChartInstance = new Chart(this.documentStatusChartRef.nativeElement, {
         type: 'bar',
         data: {
           labels: ['Pending', 'Approved', 'Rejected'],
@@ -284,17 +352,20 @@ export class Dashboard implements OnInit, AfterViewInit {
           scales: {
             x: {
               beginAtZero: true,
-              ticks: { stepSize: 1 },
-              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: { stepSize: 1, color: palette.tickColor },
+              grid: { color: palette.gridColor },
               border: { dash: [3, 3] }
             },
             y: {
+              ticks: { color: palette.tickColor },
               grid: { color: 'transparent' },
               border: { display: false }
             }
           }
         }
       });
+
+      this.documentChartReady = true;
 
     }, 0);
 

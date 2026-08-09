@@ -149,3 +149,405 @@
 body.modal-open {
     overflow: hidden;
 }
+
+/* ==========================================================
+   DARK MODE OVERRIDES
+   AdminKit's bundled CSS hardcodes colors on most elements
+   instead of using Bootstrap's CSS variables (same root cause
+   as the modal fix above), so these rules are additive and
+   only fire when [data-bs-theme="dark"] is set on <html> by
+   ThemeService. Light mode is untouched.
+   Sidebar is intentionally NOT overridden — it's already dark
+   navy by default in both themes.
+   ========================================================== */
+
+[data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    --app-bg: #14171c;
+    --app-surface: #1c2028;
+    --app-surface-alt: #232833;
+    --app-border: #2c313c;
+    --app-text: #e4e6eb;
+    --app-text-muted: #9aa0ac;
+}
+
+[data-bs-theme="dark"] body,
+[data-bs-theme="dark"] .main,
+[data-bs-theme="dark"] .content {
+    background-color: var(--app-bg);
+    color: var(--app-text);
+}
+
+/* NAVBAR */
+
+[data-bs-theme="dark"] .navbar-bg {
+    background-color: var(--app-surface);
+    border-bottom: 1px solid var(--app-border);
+}
+
+[data-bs-theme="dark"] .navbar .text-dark {
+    color: var(--app-text) !important;
+}
+
+/* FOOTER */
+
+[data-bs-theme="dark"] .footer {
+    background-color: var(--app-surface);
+    border-top: 1px solid var(--app-border);
+    color: var(--app-text-muted);
+}
+
+[data-bs-theme="dark"] .footer strong {
+    color: var(--app-text);
+}
+
+/* CARDS */
+
+[data-bs-theme="dark"] .card {
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+    color: var(--app-text);
+}
+
+[data-bs-theme="dark"] .card-header,
+[data-bs-theme="dark"] .card-footer {
+    background-color: var(--app-surface-alt);
+    border-color: var(--app-border);
+}
+
+/* TABLES */
+
+[data-bs-theme="dark"] .table {
+    color: var(--app-text);
+    border-color: var(--app-border);
+}
+
+[data-bs-theme="dark"] .table> :not(caption)>*>* {
+    background-color: transparent;
+    color: var(--app-text);
+    border-bottom-color: var(--app-border);
+}
+
+[data-bs-theme="dark"] .table-hover>tbody>tr:hover>* {
+    background-color: var(--app-surface-alt);
+}
+
+/* FORMS */
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--app-surface-alt);
+    border-color: var(--app-border);
+    color: var(--app-text);
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: var(--app-surface-alt);
+    color: var(--app-text);
+}
+
+[data-bs-theme="dark"] .input-group-text {
+    background-color: var(--app-surface-alt);
+    border-color: var(--app-border);
+    color: var(--app-text-muted);
+}
+
+/* DROPDOWNS (navbar notifications / user menu) */
+
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: var(--app-text);
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover,
+[data-bs-theme="dark"] .dropdown-item:focus {
+    background-color: var(--app-surface-alt);
+    color: var(--app-text);
+}
+
+[data-bs-theme="dark"] .dropdown-menu-header,
+[data-bs-theme="dark"] .dropdown-menu-footer {
+    background-color: var(--app-surface-alt);
+    color: var(--app-text-muted);
+}
+
+[data-bs-theme="dark"] .list-group-item {
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+    color: var(--app-text);
+}
+
+[data-bs-theme="dark"] .list-group-item .text-dark {
+    color: var(--app-text) !important;
+}
+
+/* MODALS (extends the fix already above) */
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--app-surface);
+    border-color: var(--app-border);
+    color: var(--app-text);
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+    border-color: var(--app-border);
+}
+
+/* NAV TABS (Administration, User Details) */
+
+[data-bs-theme="dark"] .nav-tabs {
+    border-color: var(--app-border);
+}
+
+[data-bs-theme="dark"] .nav-tabs .nav-link {
+    color: var(--app-text-muted);
+}
+
+[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+    background-color: var(--app-surface);
+    border-color: var(--app-border) var(--app-border) var(--app-surface);
+    color: var(--app-text);
+}
+
+/* TEXT UTILITIES ADMINKIT HARDCODES */
+
+[data-bs-theme="dark"] .text-muted {
+    color: var(--app-text-muted) !important;
+}
+
+
+/* ==========================================================
+   DARK MODE — SEMANTIC COLOR OVERRIDES
+   AdminKit bundles a pre-5.3 Bootstrap with no color-mode-aware
+   CSS variables, so utility classes (badges, -subtle backgrounds,
+   text-* colors, outline buttons) stayed identical to light mode
+   after the toggle — they were tuned for a white card, not a dark
+   one. These redefine the exact utility classes we've reused
+   across Users/User Details/Administration, so every module that
+   follows the same pattern is fixed here, once.
+   ========================================================== */
+
+[data-bs-theme="dark"] .bg-primary-subtle {
+    background-color: rgba(13, 110, 253, 0.18) !important;
+}
+
+[data-bs-theme="dark"] .bg-danger-subtle {
+    background-color: rgba(220, 53, 69, 0.18) !important;
+}
+
+[data-bs-theme="dark"] .bg-info-subtle {
+    background-color: rgba(13, 202, 240, 0.18) !important;
+}
+
+[data-bs-theme="dark"] .bg-secondary-subtle {
+    background-color: rgba(108, 117, 125, 0.25) !important;
+}
+
+[data-bs-theme="dark"] .bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.18) !important;
+}
+
+[data-bs-theme="dark"] .bg-warning-subtle {
+    background-color: rgba(255, 193, 7, 0.18) !important;
+}
+
+[data-bs-theme="dark"] .text-primary {
+    color: #6ea8fe !important;
+}
+
+[data-bs-theme="dark"] .text-danger {
+    color: #ea868f !important;
+}
+
+[data-bs-theme="dark"] .text-info {
+    color: #6edff6 !important;
+}
+
+[data-bs-theme="dark"] .text-secondary,
+[data-bs-theme="dark"] .text-secondary-emphasis {
+    color: #adb5bd !important;
+}
+
+[data-bs-theme="dark"] .text-success {
+    color: #75d29c !important;
+}
+
+[data-bs-theme="dark"] .text-warning {
+    color: #ffda6a !important;
+}
+
+/* OUTLINE BUTTONS — action buttons across Users table, modals, toolbars */
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    color: #adb5bd;
+    border-color: #495057;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    color: #fff;
+    background-color: #495057;
+    border-color: #495057;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+    color: #6ea8fe;
+    border-color: #3d6fd6;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary:hover {
+    color: #fff;
+    background-color: #3d6fd6;
+    border-color: #3d6fd6;
+}
+
+[data-bs-theme="dark"] .btn-outline-success {
+    color: #75d29c;
+    border-color: #157347;
+}
+
+[data-bs-theme="dark"] .btn-outline-success:hover {
+    color: #fff;
+    background-color: #157347;
+    border-color: #157347;
+}
+
+[data-bs-theme="dark"] .btn-outline-warning {
+    color: #ffda6a;
+    border-color: #b38600;
+}
+
+[data-bs-theme="dark"] .btn-outline-warning:hover {
+    color: #111;
+    background-color: #ffda6a;
+    border-color: #ffda6a;
+}
+
+[data-bs-theme="dark"] .btn-outline-info {
+    color: #6edff6;
+    border-color: #0aa2c0;
+}
+
+[data-bs-theme="dark"] .btn-outline-info:hover {
+    color: #111;
+    background-color: #6edff6;
+    border-color: #6edff6;
+}
+
+[data-bs-theme="dark"] .btn-outline-danger {
+    color: #ea868f;
+    border-color: #b02a37;
+}
+
+[data-bs-theme="dark"] .btn-outline-danger:hover {
+    color: #fff;
+    background-color: #b02a37;
+    border-color: #b02a37;
+}
+
+/* ==========================================================
+   DARK MODE — TYPOGRAPHY CATCH-ALL
+   AdminKit's compiled CSS sets an explicit near-black color on
+   headings, <strong>, form labels, and table headers (common in
+   older Bootstrap builds — typography gets its own hardcoded
+   color instead of inheriting from the parent). Light mode never
+   exposed this since black-on-white looks correct by accident.
+   ========================================================== */
+
+[data-bs-theme="dark"] h1,
+[data-bs-theme="dark"] h2,
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] h4,
+[data-bs-theme="dark"] h5,
+[data-bs-theme="dark"] h6,
+[data-bs-theme="dark"] .h1,
+[data-bs-theme="dark"] .h2,
+[data-bs-theme="dark"] .h3,
+[data-bs-theme="dark"] .h4,
+[data-bs-theme="dark"] .h5,
+[data-bs-theme="dark"] .h6,
+[data-bs-theme="dark"] strong,
+[data-bs-theme="dark"] b,
+[data-bs-theme="dark"] label,
+[data-bs-theme="dark"] .form-label,
+[data-bs-theme="dark"] th,
+[data-bs-theme="dark"] .card-title {
+    color: var(--app-text) !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================================
+   SHARED COMPONENT PATTERNS
+   Used across Users, Vehicles, and future modules — kept
+   global instead of duplicated per-component.
+   ========================================================== */
+
+.stat-card .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card .stat-icon i {
+    width: 20px;
+    height: 20px;
+}
+
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.sort-icon {
+    width: 14px;
+    height: 14px;
+    margin-left: 2px;
+    transition: transform 0.15s ease;
+}
+
+.sort-icon.flip {
+    transform: rotate(180deg);
+}
+
+
+.quick-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.quick-info-icon {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    flex-shrink: 0;
+    color: var(--bs-secondary-color);
+}
+
+
+
+img.avatar {
+    object-fit: cover;
+}

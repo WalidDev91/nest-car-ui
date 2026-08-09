@@ -10,6 +10,7 @@ import feather from 'feather-icons';
 import { MissionService } from '../../services/mission.service';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { ToastService } from '../../services/toast.service';
 
 import { Mission } from '../../models/mission';
 import { User } from '../../models/user';
@@ -72,6 +73,11 @@ export class Missions implements OnInit {
   search = signal('');
   statusFilter = signal('ALL');
 
+  hasActiveFilters = computed(() =>
+    this.search().trim().length > 0 ||
+    this.statusFilter() !== 'ALL'
+  );
+
   sortField = signal<keyof Mission>('startDate');
   sortDirection = signal<'asc' | 'desc'>('desc');
 
@@ -83,6 +89,13 @@ export class Missions implements OnInit {
 
   filterStatus(value: string) {
     this.statusFilter.set(value);
+    this.currentPage.set(1);
+    setTimeout(() => feather.replace(), 0);
+  }
+
+  clearFilters() {
+    this.search.set('');
+    this.statusFilter.set('ALL');
     this.currentPage.set(1);
     setTimeout(() => feather.replace(), 0);
   }
@@ -117,25 +130,16 @@ export class Missions implements OnInit {
       const s = this.search().toLowerCase();
 
       data = data.filter(m =>
-
         m.title.toLowerCase().includes(s) ||
-
         m.description.toLowerCase().includes(s) ||
-
         (m.driverName ?? '').toLowerCase().includes(s) ||
-
         (m.vehiclePlateNumber ?? '').toLowerCase().includes(s)
-
       );
 
     }
 
     if (this.statusFilter() !== 'ALL') {
-
-      data = data.filter(
-        m => m.status === this.statusFilter()
-      );
-
+      data = data.filter(m => m.status === this.statusFilter());
     }
 
     data.sort((a: any, b: any) => {
@@ -148,11 +152,8 @@ export class Missions implements OnInit {
       if (typeof v1 === 'string') v1 = v1.toLowerCase();
       if (typeof v2 === 'string') v2 = v2.toLowerCase();
 
-      if (v1 < v2)
-        return this.sortDirection() === 'asc' ? -1 : 1;
-
-      if (v1 > v2)
-        return this.sortDirection() === 'asc' ? 1 : -1;
+      if (v1 < v2) return this.sortDirection() === 'asc' ? -1 : 1;
+      if (v1 > v2) return this.sortDirection() === 'asc' ? 1 : -1;
 
       return 0;
 
@@ -171,34 +172,22 @@ export class Missions implements OnInit {
   currentPage = signal(1);
 
   totalPages = computed(() =>
-    Math.max(
-      1,
-      Math.ceil(
-        this.filteredMissions().length / this.pageSize
-      )
-    )
+    Math.max(1, Math.ceil(this.filteredMissions().length / this.pageSize))
   );
 
   paginatedMissions = computed(() => {
 
-    const start =
-      (this.currentPage() - 1) * this.pageSize;
+    const start = (this.currentPage() - 1) * this.pageSize;
 
-    return this.filteredMissions().slice(
-      start,
-      start + this.pageSize
-    );
+    return this.filteredMissions().slice(start, start + this.pageSize);
 
   });
 
   previousPage() {
 
     if (this.currentPage() > 1) {
-
       this.currentPage.update(v => v - 1);
-
       setTimeout(() => feather.replace(), 0);
-
     }
 
   }
@@ -206,11 +195,8 @@ export class Missions implements OnInit {
   nextPage() {
 
     if (this.currentPage() < this.totalPages()) {
-
       this.currentPage.update(v => v + 1);
-
       setTimeout(() => feather.replace(), 0);
-
     }
 
   }
@@ -244,33 +230,63 @@ export class Missions implements OnInit {
   showModal = false;
   editMode = false;
 
+  submitted = signal(false);
+
   title = '';
   description = '';
   startDate = '';
   endDate = '';
 
-  status:
-    | 'PLANNED'
-    | 'ONGOING'
-    | 'COMPLETED'
-    | 'CANCELLED'
-    = 'PLANNED';
+  status: 'PLANNED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED' = 'PLANNED';
 
   driverId: string | null = null;
   vehicleId: string | null = null;
+
+  // ==========================================================
+  // VALIDATION
+  // ==========================================================
+
+  get titleInvalid(): boolean {
+    return this.submitted() && !this.title.trim();
+  }
+
+  get startDateInvalid(): boolean {
+    return this.submitted() && !this.startDate;
+  }
+
+  get endDateInvalid(): boolean {
+
+    if (!this.submitted()) return false;
+
+    if (!this.endDate) return true;
+
+    if (this.startDate && new Date(this.endDate) <= new Date(this.startDate)) {
+      return true;
+    }
+
+    return false;
+
+  }
+
+  get endDateErrorMessage(): string {
+
+    if (!this.endDate) return 'End date is required.';
+
+    return 'End date must be after the start date.';
+
+  }
 
   constructor(
     private missionService: MissionService,
     private userService: UserService,
     private vehicleService: VehicleService,
+    private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-
     this.loadMissions();
-
   }
 
   // ==========================================================
@@ -282,30 +298,20 @@ export class Missions implements OnInit {
     this.loading.set(true);
 
     forkJoin({
-
       missions: this.missionService.getAll(),
-
       users: this.userService.getAll(),
-
       vehicles: this.vehicleService.getAll()
-
     }).subscribe({
 
       next: ({ missions, users, vehicles }) => {
 
         this.missions.set(missions);
-
         this.users.set(users);
-
         this.vehicles.set(vehicles);
 
         this.loading.set(false);
 
         this.route.queryParams.subscribe(params => {
-
-          // =========================
-          // EDIT
-          // =========================
 
           const editId = params['edit'];
 
@@ -328,10 +334,6 @@ export class Missions implements OnInit {
             return;
 
           }
-
-          // =========================
-          // DELETE
-          // =========================
 
           const deleteId = params['delete'];
 
@@ -365,6 +367,8 @@ export class Missions implements OnInit {
 
         this.loading.set(false);
 
+        this.toastService.error('Failed to load missions');
+
       }
 
     });
@@ -372,9 +376,7 @@ export class Missions implements OnInit {
   }
 
   refresh() {
-
     this.loadMissions();
-
   }
 
   // ==========================================================
@@ -382,9 +384,7 @@ export class Missions implements OnInit {
   // ==========================================================
 
   driversList() {
-    return this.users().filter(
-      u => u.role === 'DRIVER'
-    );
+    return this.users().filter(u => u.role === 'DRIVER');
   }
 
   vehiclesList() {
@@ -403,9 +403,7 @@ export class Missions implements OnInit {
 
     this.resetForm();
 
-    const modal = new bootstrap.Modal(
-      document.getElementById('missionModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('missionModal'));
 
     modal.show();
 
@@ -417,23 +415,17 @@ export class Missions implements OnInit {
 
     this.selectedMission.set(mission);
 
+    this.submitted.set(false);
+
     this.title = mission.title;
-
     this.description = mission.description;
-
     this.startDate = mission.startDate;
-
     this.endDate = mission.endDate;
-
     this.status = mission.status;
+    this.driverId = mission.driverId ?? null;
+    this.vehicleId = mission.vehicleId ?? null;
 
-    this.driverId = mission.driverId ?? '';
-
-    this.vehicleId = mission.vehicleId ?? '';
-
-    const modal = new bootstrap.Modal(
-      document.getElementById('missionModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('missionModal'));
 
     modal.show();
 
@@ -445,9 +437,7 @@ export class Missions implements OnInit {
 
     this.resetForm();
 
-    const modal = bootstrap.Modal.getInstance(
-      document.getElementById('missionModal')
-    );
+    const modal = bootstrap.Modal.getInstance(document.getElementById('missionModal'));
 
     modal?.hide();
 
@@ -459,56 +449,25 @@ export class Missions implements OnInit {
 
   createMission() {
 
+    this.submitted.set(true);
+
+    if (this.titleInvalid || this.startDateInvalid || this.endDateInvalid) {
+      return;
+    }
+
     const request = {
-
       title: this.title,
-
       description: this.description,
-
       startDate: this.startDate,
-
       endDate: this.endDate,
-
       status: this.status,
-
       driverId: this.driverId || null,
-
       vehicleId: this.vehicleId || null
-
     };
 
     if (this.editMode && this.selectedMission()) {
 
-      this.missionService
-
-        .update(
-          this.selectedMission()!.id,
-          request
-        )
-
-        .subscribe({
-
-          next: () => {
-
-            this.loadMissions();
-
-            this.closeModal();
-
-          },
-
-          error: err => console.error(err)
-
-        });
-
-      return;
-
-    }
-
-    this.missionService
-
-      .create(request)
-
-      .subscribe({
+      this.missionService.update(this.selectedMission()!.id, request).subscribe({
 
         next: () => {
 
@@ -516,11 +475,45 @@ export class Missions implements OnInit {
 
           this.closeModal();
 
+          this.toastService.success('Mission updated successfully');
+
         },
 
-        error: err => console.error(err)
+        error: err => {
+
+          console.error(err);
+
+          this.toastService.error('Mission update failed');
+
+        }
 
       });
+
+      return;
+
+    }
+
+    this.missionService.create(request).subscribe({
+
+      next: () => {
+
+        this.loadMissions();
+
+        this.closeModal();
+
+        this.toastService.success('Mission created successfully');
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.toastService.error('Mission creation failed');
+
+      }
+
+    });
 
   }
 
@@ -532,9 +525,7 @@ export class Missions implements OnInit {
 
     this.missionToDeleteId = id;
 
-    const modal = new bootstrap.Modal(
-      document.getElementById('deleteMissionModal')
-    );
+    const modal = new bootstrap.Modal(document.getElementById('deleteMissionModal'));
 
     modal.show();
 
@@ -552,9 +543,9 @@ export class Missions implements OnInit {
 
         this.missionToDeleteId = null;
 
-        bootstrap.Modal
-          .getInstance(document.getElementById('deleteMissionModal'))
-          ?.hide();
+        bootstrap.Modal.getInstance(document.getElementById('deleteMissionModal'))?.hide();
+
+        this.toastService.success('Mission deleted successfully');
 
       },
 
@@ -564,9 +555,9 @@ export class Missions implements OnInit {
 
         this.missionToDeleteId = null;
 
-        bootstrap.Modal
-          .getInstance(document.getElementById('deleteMissionModal'))
-          ?.hide();
+        bootstrap.Modal.getInstance(document.getElementById('deleteMissionModal'))?.hide();
+
+        this.toastService.error('Failed to delete mission');
 
       }
 
@@ -579,12 +570,7 @@ export class Missions implements OnInit {
   // ==========================================================
 
   viewMissionDetails(id: string) {
-
-    this.router.navigate([
-      '/missions',
-      id
-    ]);
-
+    this.router.navigate(['/missions', id]);
   }
 
   // ==========================================================
@@ -594,18 +580,14 @@ export class Missions implements OnInit {
   resetForm() {
 
     this.title = '';
-
     this.description = '';
-
     this.startDate = '';
-
     this.endDate = '';
-
     this.status = 'PLANNED';
+    this.driverId = null;
+    this.vehicleId = null;
 
-    this.driverId = '';
-
-    this.vehicleId = '';
+    this.submitted.set(false);
 
   }
 
@@ -616,22 +598,11 @@ export class Missions implements OnInit {
   getStatusClass(status: string): string {
 
     switch (status) {
-
-      case 'PLANNED':
-        return 'bg-warning';
-
-      case 'ONGOING':
-        return 'bg-primary';
-
-      case 'COMPLETED':
-        return 'bg-success';
-
-      case 'CANCELLED':
-        return 'bg-danger';
-
-      default:
-        return 'bg-secondary';
-
+      case 'PLANNED': return 'bg-warning';
+      case 'ONGOING': return 'bg-primary';
+      case 'COMPLETED': return 'bg-success';
+      case 'CANCELLED': return 'bg-danger';
+      default: return 'bg-secondary';
     }
 
   }
@@ -641,40 +612,27 @@ export class Missions implements OnInit {
   // ==========================================================
 
   trackByMission(index: number, mission: Mission) {
-
     return mission.id;
-
   }
 
   driverName(id: string | null | undefined): string {
 
-    if (!id) {
-
-      return '';
-
-    }
+    if (!id) return '';
 
     const driver = this.users().find(u => u.id === id);
 
-    return driver
-      ? `${driver.firstName} ${driver.lastName}`
-      : '';
+    return driver ? `${driver.firstName} ${driver.lastName}` : '';
 
   }
 
   vehicleName(id: string | null | undefined): string {
 
-    if (!id) {
-
-      return '';
-
-    }
+    if (!id) return '';
 
     const vehicle = this.vehicles().find(v => v.id === id);
 
-    return vehicle
-      ? `${vehicle.plateNumber} • ${vehicle.brand}`
-      : '';
+    return vehicle ? `${vehicle.plateNumber} • ${vehicle.brand}` : '';
 
   }
+
 }

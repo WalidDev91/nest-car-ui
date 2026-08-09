@@ -97,6 +97,12 @@ export class Users implements OnInit {
   // FILTERING
   // ==========================================================
 
+  hasActiveFilters = computed(() =>
+    this.search().trim().length > 0 ||
+    this.selectedRole() !== 'ALL' ||
+    this.selectedStatus() !== 'ALL'
+  );
+
   filteredUsers = computed(() => {
 
     let result = [...this.users()];
@@ -260,6 +266,17 @@ export class Users implements OnInit {
     this.currentPage.set(1);
 
     setTimeout(() => feather.replace(), 0);
+  }
+
+  clearFilters() {
+
+    this.search.set('');
+    this.selectedRole.set('ALL');
+    this.selectedStatus.set('ALL');
+    this.currentPage.set(1);
+
+    setTimeout(() => feather.replace(), 0);
+
   }
 
   // ==========================================================
