@@ -45,9 +45,9 @@
                         <div class="vehicle-gallery-thumbs">
 
                             <button type="button" class="vehicle-thumb" *ngFor="let photo of allPhotos()"
-                                [class.active]="resolvePhotoUrl(photo) === selectedPhoto()"
+                                [class.active]="resolvePhotoUrl(photo.photoUrl) === selectedPhoto()"
                                 (click)="selectPhoto(photo)">
-                                <img [src]="resolvePhotoUrl(photo)" alt="">
+                                <img [src]="resolvePhotoUrl(photo.photoUrl)" alt="">
                             </button>
 
                             <button type="button" class="vehicle-thumb vehicle-thumb-add" (click)="onAddPhotoClick()"
@@ -308,9 +308,10 @@
                                         </td>
                                         <td>{{ doc.year }}</td>
                                         <td class="text-end">
-                                            <button class="btn btn-sm btn-outline-secondary"
-                                                (click)="viewVehicleDocument(doc.id)" title="View">
-                                                <i data-feather="info"></i>
+                                            <button class="btn btn-sm btn-outline-secondary me-1"
+                                                (click)="previewVehicleDocument(doc.id)" title="Preview"
+                                                aria-label="Preview">
+                                                <i data-feather="eye"></i>
                                             </button>
                                         </td>
                                     </tr>

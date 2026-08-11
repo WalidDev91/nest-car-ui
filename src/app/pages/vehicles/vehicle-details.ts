@@ -51,22 +51,16 @@ export class VehicleDetails implements OnInit {
 
     if (!v) return [];
 
-    const list: string[] = [];
-
-    if (v.imageUrl) list.push(v.imageUrl);
-
-    if (v.photos?.length) list.push(...v.photos);
-
-    return list;
+    return v.photos ?? [];
 
   });
 
-  resolvePhotoUrl(filename: string): string {
-    return UPLOADS_BASE + filename;
+  resolvePhotoUrl(photoUrl: string): string {
+    return UPLOADS_BASE + photoUrl;
   }
 
-  selectPhoto(filename: string): void {
-    this.selectedPhoto.set(this.resolvePhotoUrl(filename));
+  selectPhoto(photo: Vehicle['photos'][number]): void {
+    this.selectedPhoto.set(this.resolvePhotoUrl(photo.photoUrl));
   }
 
   onAddPhotoClick(): void {
@@ -148,14 +142,17 @@ export class VehicleDetails implements OnInit {
 
         this.vehicle.set(vehicle);
 
+        const firstPhoto = vehicle.photos?.[0];
+
         this.selectedPhoto.set(
-          vehicle.imageUrl ? this.resolvePhotoUrl(vehicle.imageUrl) : null
+          firstPhoto
+            ? this.resolvePhotoUrl(firstPhoto.photoUrl)
+            : null
         );
 
         this.loading.set(false);
 
         this.loadDocuments(vehicle.id);
-
         this.loadMissions(vehicle.id);
 
         setTimeout(() => feather.replace(), 0);
@@ -276,12 +273,36 @@ export class VehicleDetails implements OnInit {
 
   }
 
-  viewVehicleDocument(id: string) {
-    this.router.navigate(['/documents/vehicle', id]);
-  }
+
 
   viewMissionDetails(id: string): void {
     this.router.navigate(['/missions', id]);
   }
 
+
+  previewVehicleDocument(id: string): void {
+
+    this.vehicleDocumentService.previewVehicleDocument(id).subscribe({
+
+      next: (blob) => {
+
+        const url = URL.createObjectURL(blob);
+
+        window.open(url, '_blank');
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+      },
+
+      error: (error) => {
+
+        console.error('Failed to preview vehicle document', error);
+
+        this.toastService.error('Failed to open document');
+
+      }
+
+    });
+
+  }
 }

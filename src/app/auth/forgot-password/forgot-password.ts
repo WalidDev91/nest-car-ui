@@ -15,30 +15,47 @@ export class ForgotPassword {
 
   email = '';
   submitted = signal(false);
+  formSubmitted = signal(false);
   loading = signal(false);
   error = signal('');
 
   constructor(private http: HttpClient) { }
 
+  get emailInvalid(): boolean {
+    return this.formSubmitted() && !this.email.trim();
+  }
+
   submit() {
-    if (!this.email) return;
-    this.loading.set(true);
+
+    this.formSubmitted.set(true);
     this.error.set('');
+
+    if (this.emailInvalid) return;
+
+    this.loading.set(true);
 
     this.http.post(
       `${environment.apiUrl}/auth/forgot-password`,
       { email: this.email },
       { responseType: 'text' }
     ).subscribe({
+
       next: () => {
         this.submitted.set(true);
         this.loading.set(false);
       },
+
       error: (err) => {
         console.error(err);
-        this.error.set('Email not found or server error.');
+        // NOTE: intentionally generic — see backend TODO on
+        // AuthServiceImpl.forgotPassword to avoid confirming/denying
+        // whether an email exists (account enumeration).
+        this.error.set('Something went wrong. Please try again.');
         this.loading.set(false);
       }
+
     });
+
   }
+
 }

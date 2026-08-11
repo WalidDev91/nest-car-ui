@@ -31,13 +31,11 @@ export class VehicleService {
   }
 
 
-  // CREATE
+  // CREATE — plain JSON, no photos bundled in. Backend endpoint
+  // only accepts application/json, never multipart.
   create(vehicle: any) {
 
-    return this.http.post<Vehicle>(
-      this.baseUrl,
-      vehicle
-    );
+    return this.http.post<Vehicle>(this.baseUrl, vehicle);
 
   }
 
@@ -66,24 +64,27 @@ export class VehicleService {
   // IMAGE MANAGEMENT
   // ==========================================================
 
-  uploadImage(id: string, file: File) {
+  // Backend controller accepts one file per request
+  // (@RequestParam("file") — singular), so this uploads a single
+  // photo. Multiple photos are uploaded by calling this once per
+  // file from the component, not by batching here.
+  uploadPhoto(id: string, file: File) {
 
     const formData = new FormData();
 
     formData.append('file', file);
 
     return this.http.post<Vehicle>(
-      `${this.baseUrl}/${id}/image`,
+      `${this.baseUrl}/${id}/photos`,
       formData
     );
 
   }
 
-
-  deleteImage(id: string) {
+  deletePhoto(vehicleId: string, photoId: string) {
 
     return this.http.delete<Vehicle>(
-      `${this.baseUrl}/${id}/image`
+      `${this.baseUrl}/${vehicleId}/photos/${photoId}`
     );
 
   }

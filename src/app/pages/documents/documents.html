@@ -67,9 +67,68 @@
 
   </div>
 
-  <!-- TABLE (tabs + toolbar live inside) -->
+  <!-- TABLE (toolbar + tabs live inside) -->
   <div class="card">
 
+    <!-- TOOLBAR -->
+    <div class="card-header bg-transparent">
+
+      <div class="row g-2 align-items-center">
+
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent">
+              <i data-feather="search" style="width:16px;height:16px;"></i>
+            </span>
+            <input class="form-control" placeholder="Search documents..." [value]="search()"
+              (input)="onSearch($any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="col-md-3">
+
+          <select *ngIf="selectedTab()==='driver'" class="form-select" [value]="driverStatusFilter()"
+            (change)="filterDriverStatus($any($event.target).value)">
+            <option value="ALL">Any Status</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+
+          <select *ngIf="selectedTab()==='vehicle'" class="form-select" [value]="vehicleTypeFilter()"
+            (change)="filterVehicleType($any($event.target).value)">
+            <option value="ALL">Any Type</option>
+            <option value="LICENSE">License</option>
+            <option value="TECHNICAL_CHECK">Technical Check</option>
+            <option value="INSURANCE">Insurance</option>
+          </select>
+
+        </div>
+
+        <div class="col-md-5 d-flex justify-content-end gap-2">
+
+          <button class="btn btn-outline-secondary" (click)="loadDocuments()">
+            <i data-feather="refresh-cw" class="align-middle me-1"></i>
+            Refresh
+          </button>
+
+          <button *ngIf="hasActiveFilters()" class="btn btn-outline-secondary" (click)="clearFilters()"
+            title="Clear filters">
+            <i data-feather="x"></i>
+          </button>
+
+          <button *ngIf="canUpload()" class="btn btn-primary" (click)="openCreateModalForCurrentTab()">
+            <i data-feather="upload" class="align-middle me-1"></i>
+            Upload Document
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TABS -->
     <div class="card-header">
       <ul class="nav nav-tabs card-header-tabs">
 
@@ -98,57 +157,6 @@
         </li>
 
       </ul>
-    </div>
-
-    <!-- TOOLBAR -->
-    <div class="card-header bg-transparent">
-
-      <div class="d-flex flex-wrap align-items-center gap-2">
-
-        <div class="input-group" style="max-width:280px;">
-          <span class="input-group-text bg-transparent">
-            <i data-feather="search" style="width:16px;height:16px;"></i>
-          </span>
-          <input class="form-control" placeholder="Search documents..." [value]="search()"
-            (input)="onSearch($any($event.target).value)">
-        </div>
-
-        <select *ngIf="selectedTab()==='driver'" class="form-select" style="max-width:180px;"
-          [value]="driverStatusFilter()" (change)="filterDriverStatus($any($event.target).value)">
-          <option value="ALL">Any Status</option>
-          <option value="PENDING">Pending</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
-        </select>
-
-        <select *ngIf="selectedTab()==='vehicle'" class="form-select" style="max-width:200px;"
-          [value]="vehicleTypeFilter()" (change)="filterVehicleType($any($event.target).value)">
-          <option value="ALL">Any Type</option>
-          <option value="LICENSE">License</option>
-          <option value="TECHNICAL_CHECK">Technical Check</option>
-          <option value="INSURANCE">Insurance</option>
-        </select>
-
-        <div class="ms-auto d-flex gap-2">
-
-          <button class="btn btn-outline-secondary" (click)="loadDocuments()" title="Refresh">
-            <i data-feather="refresh-cw"></i>
-          </button>
-
-          <button *ngIf="hasActiveFilters()" class="btn btn-outline-secondary" (click)="clearFilters()"
-            title="Clear filters">
-            <i data-feather="x"></i>
-          </button>
-
-          <button *ngIf="canUpload()" class="btn btn-primary" (click)="openCreateModalForCurrentTab()">
-            <i data-feather="upload" class="align-middle me-1"></i>
-            Upload Document
-          </button>
-
-        </div>
-
-      </div>
-
     </div>
 
     <div class="card-body p-0">

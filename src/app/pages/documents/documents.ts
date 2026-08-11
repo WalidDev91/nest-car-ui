@@ -284,6 +284,8 @@ export class Documents implements OnInit {
 
     this.currentPage.set(1);
 
+    setTimeout(() => feather.replace(), 0);
+
   }
 
   filterVehicleType(value: 'ALL' | 'LICENSE' | 'TECHNICAL_CHECK' | 'INSURANCE') {
@@ -291,6 +293,8 @@ export class Documents implements OnInit {
     this.vehicleTypeFilter.set(value);
 
     this.currentPage.set(1);
+
+    setTimeout(() => feather.replace(), 0);
 
   }
 

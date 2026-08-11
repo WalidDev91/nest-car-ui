@@ -6,6 +6,7 @@ import feather from 'feather-icons';
 
 import { VehicleService } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle';
+import { VehiclePhoto } from '../../models/vehicle-photo';
 import { VehicleDocumentService } from '../../services/vehicle-document.service';
 import { MissionService } from '../../services/mission.service';
 import { ToastService } from '../../services/toast.service';
@@ -73,8 +74,15 @@ export class Vehicles implements OnInit {
   model = '';
   year = new Date().getFullYear();
 
-  selectedImage: File | null = null;
-  imagePreview: string | null = null;
+  // Newly staged files (create or edit) — NOT yet uploaded to the server.
+  selectedPhotos: File[] = [];
+  photoPreviews: string[] = [];
+
+  // Photos already saved on the vehicle (edit mode only). Kept separate
+  // from selectedPhotos/photoPreviews on purpose — mixing the two caused
+  // the array-desync bug where adding a second photo after opening an
+  // already-photographed vehicle for edit would misbehave.
+  existingPhotos = signal<VehiclePhoto[]>([]);
 
   role = localStorage.getItem('role') ?? '';
 
@@ -105,7 +113,7 @@ export class Vehicles implements OnInit {
   }
 
   // ==========================================================
-  // DELETE
+  // DELETE VEHICLE
   // ==========================================================
 
   vehicleToDeleteId = signal<string | null>(null);
@@ -139,35 +147,28 @@ export class Vehicles implements OnInit {
     this.vehicles().length
   );
 
-  // Availability is now purely date-based (see vehicleStatusMap):
-  // a vehicle is "in mission" only while now() falls between an
-  // assigned mission's startDate and endDate, regardless of status.
   vehicleStatusMap = computed(() => {
-
-    const now = new Date();
 
     const activeVehicleIds = new Set(
       this.missions()
-        .filter(m => {
-
-          if (!m.vehicleId) return false;
-
-          const start = new Date(m.startDate);
-          const end = new Date(m.endDate);
-
-          return now >= start && now <= end;
-
-        })
+        .filter(m =>
+          m.vehicleId &&
+          m.status === 'ONGOING'
+        )
         .map(m => m.vehicleId)
     );
 
     const map = new Map<string, 'IN_MISSION' | 'AVAILABLE'>();
 
     this.vehicles().forEach(v => {
+
       map.set(
         v.id,
-        activeVehicleIds.has(v.id) ? 'IN_MISSION' : 'AVAILABLE'
+        activeVehicleIds.has(v.id)
+          ? 'IN_MISSION'
+          : 'AVAILABLE'
       );
+
     });
 
     return map;
@@ -385,6 +386,8 @@ export class Vehicles implements OnInit {
 
     this.currentPage.set(1);
 
+    setTimeout(() => feather.replace(), 0);
+
   }
 
   clearFilters() {
@@ -394,6 +397,8 @@ export class Vehicles implements OnInit {
     this.availabilityFilter.set('ALL');
 
     this.currentPage.set(1);
+
+    setTimeout(() => feather.replace(), 0);
 
   }
 
@@ -437,24 +442,78 @@ export class Vehicles implements OnInit {
   }
 
   // ==========================================================
-  // IMAGE
+  // PHOTOS — new/staged files
   // ==========================================================
 
-  onImageSelected(event: Event) {
+  onPhotosSelected(event: Event) {
 
     const input = event.target as HTMLInputElement;
 
     if (!input.files?.length) return;
 
-    this.selectedImage = input.files[0];
+    const newFiles = Array.from(input.files);
 
-    const reader = new FileReader();
+    newFiles.forEach(file => {
 
-    reader.onload = () => {
-      this.imagePreview = reader.result as string;
-    };
+      const alreadySelected = this.selectedPhotos.some(
+        existing =>
+          existing.name === file.name &&
+          existing.size === file.size &&
+          existing.lastModified === file.lastModified
+      );
 
-    reader.readAsDataURL(this.selectedImage);
+      if (alreadySelected) return;
+
+      this.selectedPhotos.push(file);
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        this.photoPreviews.push(reader.result as string);
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+    // Reset the input so selecting the same file again still
+    // triggers the change event.
+    input.value = '';
+
+  }
+
+  removeSelectedPhoto(index: number) {
+
+    this.selectedPhotos.splice(index, 1);
+    this.photoPreviews.splice(index, 1);
+
+  }
+
+  // ==========================================================
+  // PHOTOS — already saved on the vehicle (edit mode)
+  // ==========================================================
+
+  removeExistingPhoto(vehicleId: string, photoId: string): void {
+
+    this.vehicleService.deletePhoto(vehicleId, photoId).subscribe({
+
+      next: (updatedVehicle) => {
+
+        this.existingPhotos.set(updatedVehicle.photos ?? []);
+
+        this.toastService.success('Photo removed successfully');
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to remove photo');
+
+      }
+
+    });
 
   }
 
@@ -462,7 +521,7 @@ export class Vehicles implements OnInit {
   // SAVE VEHICLE (CREATE / UPDATE)
   // ==========================================================
 
-  createVehicle() {
+  saveVehicle() {
 
     this.submitted.set(true);
 
@@ -488,34 +547,62 @@ export class Vehicles implements OnInit {
 
         next: (createdVehicle) => {
 
-          if (this.selectedImage) {
+          if (this.selectedPhotos.length > 0) {
 
-            this.vehicleService.uploadImage(createdVehicle.id, this.selectedImage).subscribe({
+            const uploads = this.selectedPhotos.map(photo =>
+              this.vehicleService.uploadPhoto(createdVehicle.id, photo)
+            );
 
-              next: () => this.loadVehicles(),
+            forkJoin(uploads).subscribe({
+
+              next: () => {
+
+                this.toastService.success('Vehicle created successfully');
+
+                this.resetForm();
+
+                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+
+                this.loadVehicles();
+
+              },
 
               error: err => {
+
                 console.error(err);
-                this.toastService.error('Vehicle created, but image upload failed');
+
+                this.toastService.error('Vehicle created, but some photos failed to upload');
+
+                this.resetForm();
+
+                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+
+                this.loadVehicles();
+
               }
 
             });
 
           } else {
+
+            this.toastService.success('Vehicle created successfully');
+
+            this.resetForm();
+
+            bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+
             this.loadVehicles();
+
           }
-
-          this.toastService.success('Vehicle created successfully');
-
-          this.resetForm();
-
-          bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
 
         },
 
         error: err => {
+
           console.error(err);
+
           this.toastService.error('Vehicle creation failed');
+
         }
 
       });
@@ -526,37 +613,62 @@ export class Vehicles implements OnInit {
 
         next: (updatedVehicle) => {
 
-          if (this.selectedImage) {
+          if (this.selectedPhotos.length > 0) {
 
-            this.vehicleService.uploadImage(updatedVehicle.id, this.selectedImage).subscribe({
+            const uploads = this.selectedPhotos.map(photo =>
+              this.vehicleService.uploadPhoto(updatedVehicle.id, photo)
+            );
 
-              next: () => this.loadVehicles(),
+            forkJoin(uploads).subscribe({
+
+              next: () => {
+
+                this.toastService.success('Vehicle updated successfully');
+
+                this.resetForm();
+
+                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+
+                this.loadVehicles();
+
+              },
 
               error: err => {
+
                 console.error(err);
-                this.toastService.error('Vehicle updated, but image upload failed');
+
+                this.toastService.error('Vehicle updated, but some photos failed to upload');
+
+                this.resetForm();
+
+                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+
+                this.loadVehicles();
+
               }
 
             });
 
           } else {
+
+            this.toastService.success('Vehicle updated successfully');
+
+            this.resetForm();
+
+            bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+
             this.loadVehicles();
+
           }
-
-          this.toastService.success('Vehicle updated successfully');
-
-          this.resetForm();
-
-          this.editMode = false;
-          this.editingVehicleId = null;
-
-          bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
 
         },
 
         error: err => {
+
           console.error(err);
+
           this.toastService.error('Vehicle update failed');
+
         }
 
       });
@@ -576,15 +688,17 @@ export class Vehicles implements OnInit {
     this.model = '';
     this.year = new Date().getFullYear();
 
-    this.selectedImage = null;
-    this.imagePreview = null;
+    this.selectedPhotos = [];
+    this.photoPreviews = [];
+
+    this.existingPhotos.set([]);
 
     this.editMode = false;
     this.editingVehicleId = null;
 
     this.submitted.set(false);
 
-    const input = document.getElementById('vehicleImageInput') as HTMLInputElement;
+    const input = document.getElementById('vehiclePhotosInput') as HTMLInputElement;
 
     if (input) {
       input.value = '';
@@ -620,11 +734,10 @@ export class Vehicles implements OnInit {
     this.model = vehicle.model;
     this.year = vehicle.year;
 
-    this.imagePreview = vehicle.imageUrl
-      ? 'http://localhost:8080/uploads/vehicles/' + vehicle.imageUrl
-      : null;
+    this.selectedPhotos = [];
+    this.photoPreviews = [];
 
-    this.selectedImage = null;
+    this.existingPhotos.set(vehicle.photos ?? []);
 
     const modal = new bootstrap.Modal(document.getElementById('vehicleModal'));
 
@@ -633,7 +746,7 @@ export class Vehicles implements OnInit {
   }
 
   // ==========================================================
-  // DELETE
+  // DELETE VEHICLE
   // ==========================================================
 
   deleteVehicle(id: string) {

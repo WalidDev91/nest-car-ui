@@ -5,7 +5,7 @@ import { UserService } from '../../services/user.service';
 import { User } from '../../models/user';
 import { DriverDocument } from '../../models/driver-document';
 import { DriverDocumentService } from '../../services/driver-document.service';
-
+import { ToastService } from '../../services/toast.service';
 import feather from 'feather-icons';
 
 
@@ -56,7 +56,8 @@ export class UserDetails implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
-    private driverDocumentService: DriverDocumentService
+    private driverDocumentService: DriverDocumentService,
+    private toastService: ToastService,
   ) { }
 
 
@@ -376,6 +377,36 @@ export class UserDetails implements OnInit {
       error: err => {
         console.error(err);
         alert('Deactivate failed');
+      }
+
+    });
+
+  }
+
+  viewVehicleDocument(id: string) {
+    this.router.navigate(['/documents/vehicle', id]);
+  }
+
+  previewDriverDocument(id: string): void {
+
+    this.driverDocumentService.previewDriverDocument(id).subscribe({
+
+      next: (blob) => {
+
+        const url = URL.createObjectURL(blob);
+
+        window.open(url, '_blank');
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+      },
+
+      error: (error) => {
+
+        console.error('Failed to preview driver document', error);
+
+        this.toastService.error('Failed to open document');
+
       }
 
     });
