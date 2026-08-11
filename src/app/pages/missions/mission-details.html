@@ -414,20 +414,17 @@
                             <div class="col-6 col-md-4 col-xl-3"
                                 *ngFor="let photo of mission.vehicleInspection!.photos">
 
-                                <div class="inspection-photo-card">
+                                <div class="position-relative">
 
-                                    <img [src]="photoUrl(photo.photoUrl)" alt="Inspection photo">
+                                    <img [src]="photoUrl(photo.photoUrl)" alt="Inspection photo"
+                                        class="rounded shadow-sm w-100"
+                                        style="height: 180px; object-fit: cover;">
 
-                                    <div class="inspection-photo-caption">
-
-                                        <small class="text-muted">{{ photo.takenAt | date:'dd/MM/yyyy' }}</small>
-
-                                        <button type="button" class="photo-delete-btn" (click)="deletePhoto(photo.id)"
-                                            title="Delete">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
-
-                                    </div>
+                                    <button type="button"
+                                        class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+                                        (click)="deletePhoto(photo.id)" title="Delete photo">
+                                        <i data-feather="trash-2"></i>
+                                    </button>
 
                                 </div>
 

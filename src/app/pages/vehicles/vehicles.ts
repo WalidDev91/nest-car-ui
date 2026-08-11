@@ -75,13 +75,13 @@ export class Vehicles implements OnInit {
   year = new Date().getFullYear();
 
   // Newly staged files (create or edit) — NOT yet uploaded to the server.
-  selectedPhotos: File[] = [];
-  photoPreviews: string[] = [];
+  // Signals, not plain arrays: FileReader.onload fires async, and a plain
+  // array mutated there never triggers a re-render under this app's
+  // change detection — same class of bug we keep finding elsewhere.
+  selectedPhotos = signal<File[]>([]);
+  photoPreviews = signal<string[]>([]);
 
-  // Photos already saved on the vehicle (edit mode only). Kept separate
-  // from selectedPhotos/photoPreviews on purpose — mixing the two caused
-  // the array-desync bug where adding a second photo after opening an
-  // already-photographed vehicle for edit would misbehave.
+  // Photos already saved on the vehicle (edit mode only).
   existingPhotos = signal<VehiclePhoto[]>([]);
 
   role = localStorage.getItem('role') ?? '';
@@ -455,7 +455,7 @@ export class Vehicles implements OnInit {
 
     newFiles.forEach(file => {
 
-      const alreadySelected = this.selectedPhotos.some(
+      const alreadySelected = this.selectedPhotos().some(
         existing =>
           existing.name === file.name &&
           existing.size === file.size &&
@@ -464,28 +464,31 @@ export class Vehicles implements OnInit {
 
       if (alreadySelected) return;
 
-      this.selectedPhotos.push(file);
+      this.selectedPhotos.update(list => [...list, file]);
 
       const reader = new FileReader();
 
       reader.onload = () => {
-        this.photoPreviews.push(reader.result as string);
+
+        this.photoPreviews.update(list => [...list, reader.result as string]);
+
+        setTimeout(() => feather.replace(), 0);
+
       };
 
       reader.readAsDataURL(file);
 
     });
 
-    // Reset the input so selecting the same file again still
-    // triggers the change event.
     input.value = '';
 
   }
 
   removeSelectedPhoto(index: number) {
 
-    this.selectedPhotos.splice(index, 1);
-    this.photoPreviews.splice(index, 1);
+    this.selectedPhotos.update(list => list.filter((_, i) => i !== index));
+    this.photoPreviews.update(list => list.filter((_, i) => i !== index));
+    setTimeout(() => feather.replace(), 0);
 
   }
 
@@ -547,9 +550,11 @@ export class Vehicles implements OnInit {
 
         next: (createdVehicle) => {
 
-          if (this.selectedPhotos.length > 0) {
+          const photos = this.selectedPhotos();
 
-            const uploads = this.selectedPhotos.map(photo =>
+          if (photos.length > 0) {
+
+            const uploads = photos.map(photo =>
               this.vehicleService.uploadPhoto(createdVehicle.id, photo)
             );
 
@@ -613,9 +618,11 @@ export class Vehicles implements OnInit {
 
         next: (updatedVehicle) => {
 
-          if (this.selectedPhotos.length > 0) {
+          const photos = this.selectedPhotos();
 
-            const uploads = this.selectedPhotos.map(photo =>
+          if (photos.length > 0) {
+
+            const uploads = photos.map(photo =>
               this.vehicleService.uploadPhoto(updatedVehicle.id, photo)
             );
 
@@ -688,8 +695,8 @@ export class Vehicles implements OnInit {
     this.model = '';
     this.year = new Date().getFullYear();
 
-    this.selectedPhotos = [];
-    this.photoPreviews = [];
+    this.selectedPhotos.set([]);
+    this.photoPreviews.set([]);
 
     this.existingPhotos.set([]);
 
@@ -734,8 +741,8 @@ export class Vehicles implements OnInit {
     this.model = vehicle.model;
     this.year = vehicle.year;
 
-    this.selectedPhotos = [];
-    this.photoPreviews = [];
+    this.selectedPhotos.set([]);
+    this.photoPreviews.set([]);
 
     this.existingPhotos.set(vehicle.photos ?? []);
 
