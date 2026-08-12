@@ -504,7 +504,7 @@ export class Vehicles implements OnInit {
 
         this.existingPhotos.set(updatedVehicle.photos ?? []);
 
-        this.toastService.success('Photo removed successfully');
+       // this.toastService.success('Photo removed successfully');
 
       },
 
@@ -512,7 +512,7 @@ export class Vehicles implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to remove photo');
+        // this.toastService.error('Failed to remove photo');
 
       }
 
@@ -562,7 +562,7 @@ export class Vehicles implements OnInit {
 
               next: () => {
 
-                this.toastService.success('Vehicle created successfully');
+               // this.toastService.success('Vehicle created successfully');
 
                 this.resetForm();
 
@@ -590,7 +590,7 @@ export class Vehicles implements OnInit {
 
           } else {
 
-            this.toastService.success('Vehicle created successfully');
+           // this.toastService.success('Vehicle created successfully');
 
             this.resetForm();
 
@@ -630,7 +630,7 @@ export class Vehicles implements OnInit {
 
               next: () => {
 
-                this.toastService.success('Vehicle updated successfully');
+             //   this.toastService.success('Vehicle updated successfully');
 
                 this.resetForm();
 
@@ -658,7 +658,7 @@ export class Vehicles implements OnInit {
 
           } else {
 
-            this.toastService.success('Vehicle updated successfully');
+           // this.toastService.success('Vehicle updated successfully');
 
             this.resetForm();
 
