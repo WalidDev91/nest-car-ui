@@ -20,6 +20,14 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 sh 'docker build -t fleet-management-frontend:latest .'
