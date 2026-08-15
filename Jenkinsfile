@@ -39,13 +39,32 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh 'docker build -t fleet-management-frontend:latest .'
+                sh "docker tag fleet-management-frontend:latest ghcr.io/waliddev91/fleet-management-frontend:build-${env.BUILD_NUMBER}"
+                sh 'docker tag fleet-management-frontend:latest ghcr.io/waliddev91/fleet-management-frontend:latest'
+            }
+        }
+
+        stage('Push to GHCR') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-ghcr',
+                    usernameVariable: 'GHCR_USERNAME',
+                    passwordVariable: 'GHCR_TOKEN'
+                )]) {
+                    sh '''
+                        echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+                        docker push ghcr.io/waliddev91/fleet-management-frontend:build-${BUILD_NUMBER}
+                        docker push ghcr.io/waliddev91/fleet-management-frontend:latest
+                        docker logout ghcr.io
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Frontend CI completed successfully.'
+            echo 'Frontend CI completed successfully and Docker images were pushed to GHCR.'
         }
 
         failure {
