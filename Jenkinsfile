@@ -16,6 +16,11 @@ pipeline {
                 sh 'npm run build'
             }
         }
+        stage('Test & Coverage') {
+            steps {
+                sh 'npm test -- --watch=false --coverage'
+            }
+        }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
