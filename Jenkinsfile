@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Test & Coverage') {
             steps {
-                sh 'npm test -- --watch=false --coverage'
+                sh 'npm run test:coverage'
             }
         }
         stage('SonarQube Analysis') {
