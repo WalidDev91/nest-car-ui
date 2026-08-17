@@ -7,10 +7,14 @@ pipeline {
             }
         }
         stage('Install Dependencies') {
-            steps {
-                sh 'npm ci'
-            }
-        }
+    steps {
+        sh '''
+            node --version
+            npm --version
+            npm ci
+        '''
+    }
+}
         stage('Build') {
             steps {
                 sh 'npm run build'
