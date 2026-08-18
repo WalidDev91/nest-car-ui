@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
@@ -9,7 +9,43 @@ describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
 
+  const storage = new Map<string, string>();
+
+  const localStorageMock = {
+    getItem: (key: string): string | null => {
+      return storage.has(key) ? storage.get(key)! : null;
+    },
+
+    setItem: (key: string, value: string): void => {
+      storage.set(key, value);
+    },
+
+    removeItem: (key: string): void => {
+      storage.delete(key);
+    },
+
+    clear: (): void => {
+      storage.clear();
+    },
+
+    key: (index: number): string | null => {
+      return Array.from(storage.keys())[index] ?? null;
+    },
+
+    get length(): number {
+      return storage.size;
+    }
+  };
+
   beforeEach(() => {
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: localStorageMock,
+      configurable: true,
+      writable: true
+    });
+
+    localStorageMock.clear();
+
     TestBed.resetTestingModule();
 
     TestBed.configureTestingModule({
@@ -26,12 +62,9 @@ describe('AuthService', () => {
 
   afterEach(() => {
     httpMock.verify();
-
+    localStorageMock.clear();
     TestBed.resetTestingModule();
-
-    if (typeof localStorage !== 'undefined') {
-      localStorage.clear();
-    }
+    vi.restoreAllMocks();
   });
 
   it('should be created', () => {
@@ -116,24 +149,22 @@ describe('AuthService', () => {
   });
 
   it('should remove authentication data on logout', () => {
-    const storage = globalThis.localStorage;
-
-    storage.setItem('token', 'fake-token');
-    storage.setItem('role', 'DRIVER');
-    storage.setItem('email', 'test@example.com');
-    storage.setItem('firstName', 'Test');
-    storage.setItem('lastName', 'User');
-    storage.setItem('userId', '123');
-    storage.setItem('imageUrl', '/uploads/test.jpg');
+    localStorage.setItem('token', 'fake-token');
+    localStorage.setItem('role', 'DRIVER');
+    localStorage.setItem('email', 'test@example.com');
+    localStorage.setItem('firstName', 'Test');
+    localStorage.setItem('lastName', 'User');
+    localStorage.setItem('userId', '123');
+    localStorage.setItem('imageUrl', '/uploads/test.jpg');
 
     service.logout();
 
-    expect(storage.getItem('token')).toBeNull();
-    expect(storage.getItem('role')).toBeNull();
-    expect(storage.getItem('email')).toBeNull();
-    expect(storage.getItem('firstName')).toBeNull();
-    expect(storage.getItem('lastName')).toBeNull();
-    expect(storage.getItem('userId')).toBeNull();
-    expect(storage.getItem('imageUrl')).toBeNull();
+    expect(localStorage.getItem('token')).toBeNull();
+    expect(localStorage.getItem('role')).toBeNull();
+    expect(localStorage.getItem('email')).toBeNull();
+    expect(localStorage.getItem('firstName')).toBeNull();
+    expect(localStorage.getItem('lastName')).toBeNull();
+    expect(localStorage.getItem('userId')).toBeNull();
+    expect(localStorage.getItem('imageUrl')).toBeNull();
   });
 });
