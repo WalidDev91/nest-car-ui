@@ -111,7 +111,7 @@ describe('AuthService', () => {
     );
 
     expect(req.request.method).toBe('POST');
-    expect(req.request.body instanceof FormData).toBe(true);
+    expect(req.request.body).toBeInstanceOf(FormData);
 
     const formData = req.request.body as FormData;
 
@@ -137,6 +137,7 @@ describe('AuthService', () => {
     );
 
     expect(req.request.method).toBe('POST');
+    expect(req.request.body).toBeInstanceOf(FormData);
 
     const formData = req.request.body as FormData;
 
