@@ -7,6 +7,7 @@ import { DriverDocument } from '../../models/driver-document';
 import { DriverDocumentService } from '../../services/driver-document.service';
 import { ToastService } from '../../services/toast.service';
 import feather from 'feather-icons';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -51,6 +52,7 @@ export class UserDetails implements OnInit {
   userId = '';
 
 
+  uploadsUrl = environment.uploadsUrl;
 
   constructor(
     private route: ActivatedRoute,

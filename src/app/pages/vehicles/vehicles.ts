@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import feather from 'feather-icons';
+import { environment } from '../../../environments/environment';
 
 import { VehicleService } from '../../services/vehicle.service';
 import { Vehicle } from '../../models/vehicle';
@@ -85,6 +86,9 @@ export class Vehicles implements OnInit {
   existingPhotos = signal<VehiclePhoto[]>([]);
 
   role = localStorage.getItem('role') ?? '';
+
+
+  uploadsUrl = environment.uploadsUrl;
 
   get isDriver() {
     return this.role === 'DRIVER';

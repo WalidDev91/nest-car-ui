@@ -2,6 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import feather from 'feather-icons';
+import { environment } from '../../../environments/environment';
 
 import { VehicleService } from '../../services/vehicle.service';
 import { VehicleDocumentService } from '../../services/vehicle-document.service';
@@ -12,7 +13,7 @@ import { Vehicle } from '../../models/vehicle';
 import { VehicleDocument } from '../../models/vehicle-document';
 import { Mission } from '../../models/mission';
 
-const UPLOADS_BASE = 'http://localhost:8080/uploads/vehicles/';
+const UPLOADS_BASE = environment.uploadsUrl + '/uploads/vehicles/';
 
 @Component({
   selector: 'app-vehicle-details',

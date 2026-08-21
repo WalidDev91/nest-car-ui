@@ -39,7 +39,7 @@
 
           <div class="mb-3">
             <img
-              [src]="user.imageUrl ? 'http://localhost:8080/uploads/users/' + user.imageUrl : 'assets/adminkit/img/avatars/avatar.jpg'"
+              [src]="user.imageUrl ? uploadsUrl + '/uploads/users/' + user.imageUrl : 'assets/adminkit/img/avatars/avatar.jpg'"
               class="rounded-circle border shadow-sm" width="120" height="120" alt="User photo">
           </div>
 

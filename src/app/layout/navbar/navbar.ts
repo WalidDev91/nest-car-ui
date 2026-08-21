@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ThemeService } from '../../services/theme.service';
 import feather from 'feather-icons';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-navbar',
@@ -52,7 +53,7 @@ export class Navbar {
   }
 
   get avatarUrl(): string {
-    return 'http://localhost:8080/uploads/users/' + localStorage.getItem('imageUrl');
+    return environment.uploadsUrl + '/uploads/users/' + localStorage.getItem('imageUrl');
   }
 
   isDarkMode(): boolean {
