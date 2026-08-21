@@ -10,7 +10,7 @@ describe('DashboardLayout', () => {
     await TestBed.configureTestingModule({
       imports: [DashboardLayout]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DashboardLayout);
     component = fixture.componentInstance;
