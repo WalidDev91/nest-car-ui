@@ -79,8 +79,8 @@
                         <span class="input-group-text bg-transparent">
                             <i data-feather="search" style="width:16px;height:16px;"></i>
                         </span>
-                        <input class="form-control" placeholder="Search title, driver, vehicle..." [value]="search()"
-                            (input)="onSearch($any($event.target).value)">
+                        <input class="form-control" placeholder="Search title, location, driver, vehicle..."
+                            [value]="search()" (input)="onSearch($any($event.target).value)">
                     </div>
                 </div>
 
@@ -132,6 +132,18 @@
                                 [class.flip]="sortDirection()==='desc'"></i>
                         </th>
 
+                        <th class="sortable" (click)="sort('departureLocation')">
+                            Departure
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='departureLocation'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
+
+                        <th class="sortable" (click)="sort('destinationLocation')">
+                            Destination
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='destinationLocation'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
+
                         <th class="sortable" (click)="sort('startDate')">
                             Start Date
                             <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='startDate'"
@@ -161,7 +173,7 @@
                 <tbody>
 
                     <tr *ngIf="loading()">
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <div class="spinner-border spinner-border-sm me-2"></div>
                             Loading missions...
                         </td>
@@ -170,6 +182,9 @@
                     <tr *ngFor="let mission of paginatedMissions(); trackBy: trackByMission">
 
                         <td><strong>{{ mission.title }}</strong></td>
+
+                        <td>{{ mission.departureLocation || '—' }}</td>
+                        <td>{{ mission.destinationLocation || '—' }}</td>
 
                         <td>{{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}</td>
                         <td>{{ mission.endDate | date:'dd/MM/yyyy HH:mm' }}</td>
@@ -206,7 +221,7 @@
 
                     <!-- EMPTY: no missions at all -->
                     <tr *ngIf="!loading() && paginatedMissions().length===0 && !hasActiveFilters()">
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i data-feather="map" class="mb-2" style="width:32px;height:32px;"></i>
                             <div>No missions yet.</div>
                         </td>
@@ -214,7 +229,7 @@
 
                     <!-- EMPTY: filters/search excluded everyone -->
                     <tr *ngIf="!loading() && paginatedMissions().length===0 && hasActiveFilters()">
-                        <td colspan="7" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
                             <div>No missions match your filters.</div>
                             <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
@@ -298,6 +313,20 @@
                     <div class="col-12">
                         <label class="form-label">Description</label>
                         <textarea rows="4" class="form-control" [(ngModel)]="description"></textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Departure Location *</label>
+                        <input class="form-control" [class.is-invalid]="departureLocationInvalid"
+                            [(ngModel)]="departureLocation">
+                        <div class="invalid-feedback">Departure location can't be empty.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Destination Location *</label>
+                        <input class="form-control" [class.is-invalid]="destinationLocationInvalid"
+                            [(ngModel)]="destinationLocation">
+                        <div class="invalid-feedback">Destination location can't be empty.</div>
                     </div>
 
                     <div class="col-md-6">

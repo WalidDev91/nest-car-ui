@@ -54,6 +54,23 @@ export class MissionService {
 
   }
 
+  getByDepartureLocation(departureLocation: string) {
+
+    return this.http.get<Mission[]>(
+      `${this.baseUrl}/departure/${departureLocation}`
+    );
+
+  }
+
+
+
+  getByDestinationLocation(destinationLocation: string) {
+
+    return this.http.get<Mission[]>(
+      `${this.baseUrl}/destination/${destinationLocation}`
+    );
+
+  }
 
 
   create(data: any) {

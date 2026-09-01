@@ -13,6 +13,10 @@ export interface Mission {
 
   description: string;
 
+  departureLocation: string;
+
+  destinationLocation: string;
+
   startDate: string;
 
   endDate: string;

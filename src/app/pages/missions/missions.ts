@@ -132,6 +132,8 @@ export class Missions implements OnInit {
       data = data.filter(m =>
         m.title.toLowerCase().includes(s) ||
         m.description.toLowerCase().includes(s) ||
+        (m.departureLocation ?? '').toLowerCase().includes(s) ||
+        (m.destinationLocation ?? '').toLowerCase().includes(s) ||
         (m.driverName ?? '').toLowerCase().includes(s) ||
         (m.vehiclePlateNumber ?? '').toLowerCase().includes(s)
       );
@@ -234,6 +236,8 @@ export class Missions implements OnInit {
 
   title = '';
   description = '';
+  departureLocation = '';
+  destinationLocation = '';
   startDate = '';
   endDate = '';
 
@@ -248,6 +252,14 @@ export class Missions implements OnInit {
 
   get titleInvalid(): boolean {
     return this.submitted() && !this.title.trim();
+  }
+
+  get departureLocationInvalid(): boolean {
+    return this.submitted() && !this.departureLocation.trim();
+  }
+
+  get destinationLocationInvalid(): boolean {
+    return this.submitted() && !this.destinationLocation.trim();
   }
 
   get startDateInvalid(): boolean {
@@ -419,6 +431,8 @@ export class Missions implements OnInit {
 
     this.title = mission.title;
     this.description = mission.description;
+    this.departureLocation = mission.departureLocation;
+    this.destinationLocation = mission.destinationLocation;
     this.startDate = mission.startDate;
     this.endDate = mission.endDate;
     this.status = mission.status;
@@ -451,13 +465,15 @@ export class Missions implements OnInit {
 
     this.submitted.set(true);
 
-    if (this.titleInvalid || this.startDateInvalid || this.endDateInvalid) {
+    if (this.titleInvalid || this.departureLocationInvalid || this.destinationLocationInvalid || this.startDateInvalid || this.endDateInvalid) {
       return;
     }
 
     const request = {
       title: this.title,
       description: this.description,
+      departureLocation: this.departureLocation,
+      destinationLocation: this.destinationLocation,
       startDate: this.startDate,
       endDate: this.endDate,
       status: this.status,
@@ -581,6 +597,8 @@ export class Missions implements OnInit {
 
     this.title = '';
     this.description = '';
+    this.departureLocation = '';
+    this.destinationLocation = '';
     this.startDate = '';
     this.endDate = '';
     this.status = 'PLANNED';
