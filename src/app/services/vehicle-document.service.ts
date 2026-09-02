@@ -58,26 +58,21 @@ export class VehicleDocumentService {
     file: File,
     title: string,
     type: string,
-    year: number,
+    expiryDate: string,
     vehicleId: string
   ) {
-
     const formData = new FormData();
-
 
     formData.append('file', file);
     formData.append('title', title);
     formData.append('type', type);
-    formData.append('year', year.toString());
+    formData.append('expiryDate', expiryDate);
     formData.append('vehicleId', vehicleId);
-
-
 
     return this.http.post<VehicleDocument>(
       `${this.baseUrl}/upload`,
       formData
     );
-
   }
 
 
@@ -111,15 +106,12 @@ export class VehicleDocumentService {
   update(id: string, request: {
     title: string;
     type: string;
-    year: number;
-  }
-  ) {
-
+    expiryDate: string;
+  }) {
     return this.http.put<VehicleDocument>(
       `${this.baseUrl}/${id}`,
       request
     );
-
   }
 
   previewVehicleDocument(id: string) {

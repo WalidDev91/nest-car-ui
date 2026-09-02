@@ -48,6 +48,7 @@ export class DriverDocumentService {
   upload(
     file: File,
     title: string,
+    expiryDate: string,
     type: string,
     driverId: string
   ) {
@@ -56,6 +57,7 @@ export class DriverDocumentService {
 
     formData.append('file', file);
     formData.append('title', title);
+    formData.append('expiryDate', expiryDate);
     formData.append('type', type);
     formData.append('driverId', driverId);
 
@@ -125,6 +127,7 @@ export class DriverDocumentService {
     request: {
       title: string;
       type: string;
+      expiryDate: string;
     }
   ) {
 

@@ -180,6 +180,7 @@
               <th>Type</th>
               <th>Driver</th>
               <th>Status</th>
+              <th>Expiry Date</th>
               <th>Uploaded</th>
               <th class="text-end">Actions</th>
             </tr>
@@ -203,6 +204,10 @@
                 }">
                   {{ doc.status }}
                 </span>
+              </td>
+
+              <td>
+                {{ doc.expiryDate | date:'dd/MM/yyyy' }}
               </td>
 
               <td>{{ doc.uploadedAt | date:'dd/MM/yyyy' }}</td>
@@ -256,14 +261,14 @@
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
-              <td colspan="6" class="text-center py-5 text-muted">
+              <td colspan="7" class="text-center py-5 text-muted">
                 <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No driver documents yet.</div>
               </td>
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
-              <td colspan="6" class="text-center py-5 text-muted">
+              <td colspan="7" class="text-center py-5 text-muted">
                 <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No documents match your filters.</div>
                 <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
@@ -289,7 +294,8 @@
               <th>Title</th>
               <th>Type</th>
               <th>Vehicle</th>
-              <th>Year</th>
+              <th>Expiry Date</th>
+              <th>Uploaded By</th>
               <th>Created</th>
               <th class="text-end">Actions</th>
             </tr>
@@ -305,7 +311,11 @@
 
               <td>{{ doc.vehiclePlateNumber || '—' }}</td>
 
-              <td>{{ doc.year }}</td>
+              <td>
+                {{ doc.expiryDate | date:'dd/MM/yyyy' }}
+              </td>
+
+              <td>{{ doc.uploadedByName || '—' }}</td>
 
               <td>{{ doc.createdAt | date:'dd/MM/yyyy' }}</td>
 
@@ -338,14 +348,14 @@
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
-              <td colspan="6" class="text-center py-5 text-muted">
+              <td colspan="7" class="text-center py-5 text-muted">
                 <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No vehicle documents yet.</div>
               </td>
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
-              <td colspan="6" class="text-center py-5 text-muted">
+              <td colspan="7" class="text-center py-5 text-muted">
                 <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No documents match your filters.</div>
                 <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
@@ -370,6 +380,7 @@
             <tr>
               <th>Title</th>
               <th>Mission</th>
+              <th>Uploaded By</th>
               <th>Created</th>
               <th class="text-end">Actions</th>
             </tr>
@@ -382,6 +393,8 @@
               <td><strong>{{ doc.title }}</strong></td>
 
               <td>{{ doc.missionTitle || '—' }}</td>
+
+              <td>{{ doc.uploadedByName || '—' }}</td>
 
               <td>{{ doc.createdAt | date:'dd/MM/yyyy' }}</td>
 
@@ -414,14 +427,14 @@
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
-              <td colspan="4" class="text-center py-5 text-muted">
+              <td colspan="5" class="text-center py-5 text-muted">
                 <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No mission documents yet.</div>
               </td>
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
-              <td colspan="4" class="text-center py-5 text-muted">
+              <td colspan="5" class="text-center py-5 text-muted">
                 <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No documents match your filters.</div>
                 <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
@@ -502,6 +515,13 @@
             <div class="invalid-feedback">Please select a document type.</div>
           </div>
 
+          <div class="col-md-6">
+            <label class="form-label">Expiry Date *</label>
+            <input type="date" class="form-control" [class.is-invalid]="driverExpiryDateError"
+              [(ngModel)]="uploadDriverExpiryDate">
+            <div class="invalid-feedback">Expiry date is required.</div>
+          </div>
+
           <div class="col-12" *ngIf="!editDriverMode">
             <label class="form-label">File *</label>
             <input id="driverFileInput" type="file" class="form-control" [class.is-invalid]="driverFileError"
@@ -572,10 +592,10 @@
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Year *</label>
-            <input type="number" class="form-control" [class.is-invalid]="vehicleYearError"
-              [(ngModel)]="uploadVehicleYear">
-            <div class="invalid-feedback">Year is required.</div>
+            <label class="form-label">Expiry Date *</label>
+            <input type="date" class="form-control" [class.is-invalid]="vehicleExpiryDateError"
+              [(ngModel)]="uploadVehicleExpiryDate">
+            <div class="invalid-feedback">Expiry date is required.</div>
           </div>
 
           <div class="col-12" *ngIf="!editVehicleMode">

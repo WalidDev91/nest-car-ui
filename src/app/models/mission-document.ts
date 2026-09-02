@@ -10,6 +10,8 @@ export interface MissionDocument {
 
   missionTitle: string;
 
+  uploadedByName: string;
+
   createdAt: string;
 
   updatedAt: string;

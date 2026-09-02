@@ -150,9 +150,11 @@ export class Documents implements OnInit {
   selectedDriverFile: File | null = null;
   uploadDriverTitle = '';
   uploadDriverType = '';
+  uploadDriverExpiryDate = '';
 
   driverTitleError = false;
   driverTypeError = false;
+  driverExpiryDateError = false;
   driverFileError = false;
 
   selectedDriverDocument = signal<any | null>(null);
@@ -177,15 +179,15 @@ export class Documents implements OnInit {
 
   selectedVehicleFile: File | null = null;
   uploadVehicleTitle = '';
+  uploadVehicleType = '';
+  uploadVehicleExpiryDate = '';
 
   vehicleTitleError = false;
   vehicleTypeError = false;
-  vehicleYearError = false;
+  vehicleExpiryDateError = false;
   vehicleIdError = false;
   vehicleFileError = false;
 
-  uploadVehicleType = '';
-  uploadVehicleYear = new Date().getFullYear();
   uploadVehicleId = '';
 
   // ==========================
@@ -495,14 +497,17 @@ export class Documents implements OnInit {
 
     this.uploadDriverTitle = '';
     this.uploadDriverType = '';
+    this.uploadDriverExpiryDate = '';
     this.selectedDriverFile = null;
 
     this.driverTitleError = false;
     this.driverTypeError = false;
+    this.driverExpiryDateError = false;
     this.driverFileError = false;
 
-    new bootstrap.Modal(document.getElementById('uploadDriverDocumentModal')).show();
-
+    new bootstrap.Modal(
+      document.getElementById('uploadDriverDocumentModal')
+    ).show();
   }
 
   openCreateVehicleDocumentModal(): void {
@@ -512,18 +517,19 @@ export class Documents implements OnInit {
 
     this.uploadVehicleTitle = '';
     this.uploadVehicleType = '';
-    this.uploadVehicleYear = new Date().getFullYear();
+    this.uploadVehicleExpiryDate = '';
     this.uploadVehicleId = '';
     this.selectedVehicleFile = null;
 
     this.vehicleTitleError = false;
     this.vehicleTypeError = false;
-    this.vehicleYearError = false;
+    this.vehicleExpiryDateError = false;
     this.vehicleIdError = false;
     this.vehicleFileError = false;
 
-    new bootstrap.Modal(document.getElementById('uploadVehicleDocumentModal')).show();
-
+    new bootstrap.Modal(
+      document.getElementById('uploadVehicleDocumentModal')
+    ).show();
   }
 
   openCreateMissionDocumentModal(): void {
@@ -630,49 +636,56 @@ export class Documents implements OnInit {
 
       this.vehicleTitleError = !this.uploadVehicleTitle.trim();
       this.vehicleTypeError = !this.uploadVehicleType;
-      this.vehicleYearError = !this.uploadVehicleYear;
+      this.vehicleExpiryDateError = !this.uploadVehicleExpiryDate;
 
-      if (this.vehicleTitleError || this.vehicleTypeError || this.vehicleYearError) return;
+      if (
+        this.vehicleTitleError ||
+        this.vehicleTypeError ||
+        this.vehicleExpiryDateError
+      ) {
+        return;
+      }
 
       this.vehicleDocumentService.update(
         this.editingVehicleDocumentId,
-        { title: this.uploadVehicleTitle, type: this.uploadVehicleType, year: this.uploadVehicleYear }
+        {
+          title: this.uploadVehicleTitle,
+          type: this.uploadVehicleType,
+          expiryDate: this.uploadVehicleExpiryDate
+        }
       ).subscribe({
 
         next: () => {
-
           this.loadDocuments();
-
           this.resetVehicleModal();
-
           this.toastService.success('Document updated successfully');
-
         },
 
         error: err => {
-
           console.error(err);
-
           this.toastService.error('Failed to update document');
-
         }
 
       });
 
       return;
-
     }
 
     this.vehicleTitleError = !this.uploadVehicleTitle.trim();
     this.vehicleTypeError = !this.uploadVehicleType;
-    this.vehicleYearError = !this.uploadVehicleYear;
+    this.vehicleExpiryDateError = !this.uploadVehicleExpiryDate;
     this.vehicleIdError = !this.uploadVehicleId;
     this.vehicleFileError = !this.selectedVehicleFile;
 
     if (
-      this.vehicleTitleError || this.vehicleTypeError ||
-      this.vehicleYearError || this.vehicleIdError || this.vehicleFileError
-    ) return;
+      this.vehicleTitleError ||
+      this.vehicleTypeError ||
+      this.vehicleExpiryDateError ||
+      this.vehicleIdError ||
+      this.vehicleFileError
+    ) {
+      return;
+    }
 
     if (!this.validateFile(this.selectedVehicleFile!)) return;
 
@@ -680,30 +693,22 @@ export class Documents implements OnInit {
       this.selectedVehicleFile!,
       this.uploadVehicleTitle,
       this.uploadVehicleType,
-      this.uploadVehicleYear,
+      this.uploadVehicleExpiryDate,
       this.uploadVehicleId
     ).subscribe({
 
       next: () => {
-
         this.loadDocuments();
-
         this.resetVehicleModal();
-
         this.toastService.success('Document uploaded successfully');
-
       },
 
       error: err => {
-
         console.error(err);
-
         this.toastService.error('Vehicle document upload failed');
-
       }
 
     });
-
   }
 
   // ==========================
@@ -714,38 +719,41 @@ export class Documents implements OnInit {
 
     this.driverTitleError = !this.uploadDriverTitle.trim();
     this.driverTypeError = !this.uploadDriverType;
+    this.driverExpiryDateError = !this.uploadDriverExpiryDate;
 
-    if (this.driverTitleError || this.driverTypeError) return;
+    if (
+      this.driverTitleError ||
+      this.driverTypeError ||
+      this.driverExpiryDateError
+    ) {
+      return;
+    }
 
     if (this.editDriverMode && this.editingDriverDocumentId) {
 
       this.driverDocumentService.update(
         this.editingDriverDocumentId,
-        { title: this.uploadDriverTitle, type: this.uploadDriverType }
+        {
+          title: this.uploadDriverTitle,
+          type: this.uploadDriverType,
+          expiryDate: this.uploadDriverExpiryDate
+        }
       ).subscribe({
 
         next: () => {
-
           this.loadDocuments();
-
           this.resetDriverModal();
-
           this.toastService.success('Document updated successfully');
-
         },
 
         error: err => {
-
           console.error(err);
-
           this.toastService.error('Failed to update document');
-
         }
 
       });
 
       return;
-
     }
 
     this.driverFileError = !this.selectedDriverFile;
@@ -757,30 +765,23 @@ export class Documents implements OnInit {
     this.driverDocumentService.upload(
       this.selectedDriverFile!,
       this.uploadDriverTitle,
+      this.uploadDriverExpiryDate,
       this.uploadDriverType,
       this.currentUserId
     ).subscribe({
 
       next: () => {
-
         this.loadDocuments();
-
         this.resetDriverModal();
-
         this.toastService.success('Document uploaded successfully');
-
       },
 
       error: err => {
-
         console.error(err);
-
         this.toastService.error('Driver document upload failed');
-
       }
 
     });
-
   }
 
   // ==========================
@@ -791,44 +792,54 @@ export class Documents implements OnInit {
 
     this.editDriverMode = false;
     this.editingDriverDocumentId = null;
+
     this.uploadDriverTitle = '';
     this.uploadDriverType = '';
+    this.uploadDriverExpiryDate = '';
     this.selectedDriverFile = null;
 
     this.driverTitleError = false;
     this.driverTypeError = false;
+    this.driverExpiryDateError = false;
     this.driverFileError = false;
 
-    const input = document.getElementById('driverFileInput') as HTMLInputElement;
+    const input = document.getElementById(
+      'driverFileInput'
+    ) as HTMLInputElement;
 
     if (input) input.value = '';
 
-    bootstrap.Modal.getInstance(document.getElementById('uploadDriverDocumentModal'))?.hide();
-
+    bootstrap.Modal
+      .getInstance(document.getElementById('uploadDriverDocumentModal'))
+      ?.hide();
   }
 
   resetVehicleModal(): void {
 
     this.editVehicleMode = false;
     this.editingVehicleDocumentId = null;
+
     this.uploadVehicleTitle = '';
     this.uploadVehicleType = '';
-    this.uploadVehicleYear = new Date().getFullYear();
+    this.uploadVehicleExpiryDate = '';
     this.uploadVehicleId = '';
     this.selectedVehicleFile = null;
 
     this.vehicleTitleError = false;
     this.vehicleTypeError = false;
-    this.vehicleYearError = false;
+    this.vehicleExpiryDateError = false;
     this.vehicleIdError = false;
     this.vehicleFileError = false;
 
-    const input = document.getElementById('vehicleFileInput') as HTMLInputElement;
+    const input = document.getElementById(
+      'vehicleFileInput'
+    ) as HTMLInputElement;
 
     if (input) input.value = '';
 
-    bootstrap.Modal.getInstance(document.getElementById('uploadVehicleDocumentModal'))?.hide();
-
+    bootstrap.Modal
+      .getInstance(document.getElementById('uploadVehicleDocumentModal'))
+      ?.hide();
   }
 
   resetMissionModal(): void {
@@ -855,35 +866,43 @@ export class Documents implements OnInit {
 
     this.editDriverMode = true;
     this.editingDriverDocumentId = doc.id;
+
     this.uploadDriverTitle = doc.title;
     this.uploadDriverType = doc.type;
+    this.uploadDriverExpiryDate = doc.expiryDate;
+
     this.selectedDriverFile = null;
 
     this.driverTitleError = false;
     this.driverTypeError = false;
+    this.driverExpiryDateError = false;
     this.driverFileError = false;
 
-    new bootstrap.Modal(document.getElementById('uploadDriverDocumentModal')).show();
-
+    new bootstrap.Modal(
+      document.getElementById('uploadDriverDocumentModal')
+    ).show();
   }
 
   openEditVehicleDocumentModal(doc: VehicleDocument): void {
 
     this.editVehicleMode = true;
     this.editingVehicleDocumentId = doc.id;
+
     this.uploadVehicleTitle = doc.title;
     this.uploadVehicleType = doc.type;
-    this.uploadVehicleYear = doc.year;
+    this.uploadVehicleExpiryDate = doc.expiryDate;
+
     this.selectedVehicleFile = null;
 
     this.vehicleTitleError = false;
     this.vehicleTypeError = false;
-    this.vehicleYearError = false;
+    this.vehicleExpiryDateError = false;
     this.vehicleIdError = false;
     this.vehicleFileError = false;
 
-    new bootstrap.Modal(document.getElementById('uploadVehicleDocumentModal')).show();
-
+    new bootstrap.Modal(
+      document.getElementById('uploadVehicleDocumentModal')
+    ).show();
   }
 
   openEditMissionDocumentModal(doc: MissionDocument): void {
