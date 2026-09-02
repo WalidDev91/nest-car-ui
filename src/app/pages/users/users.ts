@@ -342,23 +342,6 @@ export class Users implements OnInit {
 
   }
 
-  // ==========================================================
-  // ACTIONS
-  // (backend next)
-  // ==========================================================
-
-  createUser() {
-
-    console.log('create user');
-
-  }
-
-  editUser(user: User) {
-
-    console.log(user);
-
-  }
-
   openStatusModal(user: User) {
 
     this.selectedUser = user;

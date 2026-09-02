@@ -21,7 +21,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (error.status === 401) {
 
-        console.log('Unauthorized - logging out...');
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('email');
