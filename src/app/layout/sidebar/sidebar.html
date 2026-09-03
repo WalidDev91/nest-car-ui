@@ -80,6 +80,18 @@
 
       </li>
 
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
+
+        <a class="sidebar-link" routerLink="/drivers">
+
+          <i data-feather="user-check"></i>
+
+          <span>Drivers</span>
+
+        </a>
+
+      </li>
+
 
 
       <!-- MANAGEMENT -->
@@ -102,7 +114,7 @@
 
       </li>
 
-      <!-- Administration *ngIf="isSuperAdmin" --> 
+      <!-- Administration *ngIf="isSuperAdmin" -->
       <li class="sidebar-item" routerLinkActive="active">
 
         <a class="sidebar-link" routerLink="/administration">

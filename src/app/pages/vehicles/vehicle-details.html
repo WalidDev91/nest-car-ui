@@ -300,10 +300,12 @@
                                             <span class="badge" [ngClass]="{
                         'bg-primary': doc.type === 'LICENSE',
                         'bg-warning': doc.type === 'TECHNICAL_CHECK',
-                        'bg-success': doc.type === 'INSURANCE'
+                        'bg-success': doc.type === 'INSURANCE',
+                        'bg-info': doc.type === 'VEHICLE_TAX',
+                        'bg-secondary': doc.type === 'OTHER'
                       }">
                                                 {{ doc.type === 'LICENSE' ? 'License' : doc.type === 'TECHNICAL_CHECK' ?
-                                                'Technical Check' : 'Insurance' }}
+                                                'Technical Check' : doc.type === 'INSURANCE' ? 'Insurance' : doc.type === 'VEHICLE_TAX' ? 'Vehicle Tax' : 'Other' }}
                                             </span>
                                         </td>
                                         <td>{{ doc.expiryDate }}</td>

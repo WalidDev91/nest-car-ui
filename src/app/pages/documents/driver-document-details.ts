@@ -9,7 +9,6 @@ import { DriverDocument } from '../../models/driver-document';
 
 @Component({
   selector: 'app-driver-document-details',
-  standalone: true,
   imports: [
     CommonModule
   ],

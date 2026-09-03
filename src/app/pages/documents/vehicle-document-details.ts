@@ -9,7 +9,6 @@ import { VehicleDocument } from '../../models/vehicle-document';
 
 @Component({
   selector: 'app-vehicle-document-details',
-  standalone: true,
   imports: [
     CommonModule
   ],

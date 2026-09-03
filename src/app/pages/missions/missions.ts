@@ -20,7 +20,6 @@ declare var bootstrap: any;
 
 @Component({
   selector: 'app-missions',
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule

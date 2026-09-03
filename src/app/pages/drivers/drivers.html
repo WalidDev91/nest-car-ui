@@ -1,0 +1,267 @@
+<div class="container-fluid p-0">
+
+    <!-- PAGE HEADER -->
+    <div class="mb-3">
+        <h4 class="mb-0">Drivers</h4>
+        <small class="text-muted">Track driver availability, missions and document eligibility.</small>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="row g-3 mb-3">
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-secondary-subtle text-secondary">
+                        <i data-feather="users"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">Total Drivers</h6>
+                        <h3 class="mb-0">{{ totalDrivers() }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i data-feather="check-circle"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">Available</h6>
+                        <h3 class="mb-0">{{ availableCount() }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i data-feather="navigation"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">On Mission</h6>
+                        <h3 class="mb-0">{{ onMissionCount() }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card stat-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-danger-subtle text-danger">
+                        <i data-feather="alert-triangle"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 text-muted">Ineligible</h6>
+                        <h3 class="mb-0">{{ ineligibleCount() }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLE (filters live inside as a toolbar) -->
+    <div class="card">
+
+        <div class="card-header bg-transparent">
+
+            <div class="row g-2 align-items-center">
+
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent">
+                            <i data-feather="search" style="width:16px;height:16px;"></i>
+                        </span>
+                        <input class="form-control" placeholder="Search name, email, phone..." [value]="search()"
+                            (input)="onSearch($any($event.target).value)">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select" [value]="availabilityFilter()"
+                        (change)="filterAvailability($any($event.target).value)">
+                        <option value="ALL">All Availability</option>
+                        <option value="AVAILABLE">Available</option>
+                        <option value="ON_MISSION">On Mission</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <select class="form-select" [value]="eligibilityFilter()"
+                        (change)="filterEligibility($any($event.target).value)">
+                        <option value="ALL">All Eligibility</option>
+                        <option value="ELIGIBLE">Eligible</option>
+                        <option value="INELIGIBLE">Ineligible</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex justify-content-end gap-2">
+
+                    <button class="btn btn-outline-secondary flex-fill" (click)="refresh()" title="Refresh">
+                        <i data-feather="refresh-cw" class="align-middle me-1"></i>
+                        Refresh
+                    </button>
+
+                    <button *ngIf="hasActiveFilters()" class="btn btn-outline-secondary" (click)="clearFilters()"
+                        title="Clear filters">
+                        <i data-feather="x"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+
+                    <tr>
+
+                        <th class="sortable" (click)="sort('name')">
+                            Name
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='name'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
+
+                        <th>Email</th>
+                        <th>Phone</th>
+
+                        <th class="sortable" (click)="sort('availability')">
+                            Availability
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='availability'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
+
+                        <th>Current Mission</th>
+
+                        <th class="sortable" (click)="sort('nextMission')">
+                            Next Mission In
+                            <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='nextMission'"
+                                [class.flip]="sortDirection()==='desc'"></i>
+                        </th>
+
+                        <th>Eligibility</th>
+                        <th class="text-end">Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr *ngIf="loading()">
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <div class="spinner-border spinner-border-sm me-2"></div>
+                            Loading drivers...
+                        </td>
+                    </tr>
+
+                    <tr *ngFor="let driver of paginatedDrivers(); trackBy: trackByDriver">
+
+                        <td><strong>{{ driver.firstName }} {{ driver.lastName }}</strong></td>
+
+                        <td>{{ driver.email }}</td>
+
+                        <td>{{ driver.phone || '—' }}</td>
+
+                        <td>
+                            <span class="badge" [ngClass]="getAvailabilityClass(driver)">
+                                {{ getAvailabilityLabel(driver) }}
+                            </span>
+                        </td>
+
+                        <td>{{ getCurrentMission(driver)?.title || '—' }}</td>
+
+                        <td>
+                            <ng-container *ngIf="getNextMission(driver) as next; else noNext">
+                                {{ next.title }}
+                                <small class="text-muted d-block">
+                                    {{ next.startDate | date:'dd/MM/yyyy HH:mm' }}
+                                </small>
+                            </ng-container>
+                            <ng-template #noNext>—</ng-template>
+                        </td>
+
+                        <td>
+                            <span class="badge" [ngClass]="isEligible(driver) ? 'bg-success' : 'bg-danger'"
+                                [title]="eligibilityReason(driver)">
+                                {{ isEligible(driver) ? 'Eligible' : 'Ineligible' }}
+                            </span>
+                        </td>
+
+                        <td class="text-end">
+
+                            <button class="btn btn-sm btn-outline-secondary" (click)="viewDetails(driver.id)"
+                                title="View">
+                                <i data-feather="info"></i>
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    <!-- EMPTY: no drivers at all -->
+                    <tr *ngIf="!loading() && paginatedDrivers().length===0 && !hasActiveFilters()">
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i data-feather="users" class="mb-2" style="width:32px;height:32px;"></i>
+                            <div>No drivers yet.</div>
+                        </td>
+                    </tr>
+
+                    <!-- EMPTY: filters/search excluded everyone -->
+                    <tr *ngIf="!loading() && paginatedDrivers().length===0 && hasActiveFilters()">
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
+                            <div>No drivers match your filters.</div>
+                            <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="card-footer bg-transparent">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <small class="text-muted">
+                    Displaying {{ paginatedDrivers().length }} of {{ filteredDrivers().length }} drivers
+                </small>
+
+                <div>
+
+                    <button class="btn btn-outline-secondary btn-sm me-2" [disabled]="currentPage()===1"
+                        (click)="previousPage()">
+                        Previous
+                    </button>
+
+                    <span class="mx-2">Page {{ currentPage() }} / {{ totalPages() || 1 }}</span>
+
+                    <button class="btn btn-outline-secondary btn-sm" [disabled]="currentPage()>=totalPages()"
+                        (click)="nextPage()">
+                        Next
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

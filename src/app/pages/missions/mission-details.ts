@@ -18,7 +18,6 @@ declare var bootstrap: any;
 
 @Component({
   selector: 'app-mission-details',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './mission-details.html',
   styleUrl: './mission-details.css',

@@ -21,7 +21,6 @@ declare var bootstrap: any;
 
 @Component({
   selector: 'app-documents',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './documents.html',
   styleUrl: './documents.css'
@@ -54,7 +53,7 @@ export class Documents implements OnInit {
   search = signal('');
 
   driverStatusFilter = signal<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
-  vehicleTypeFilter = signal<'ALL' | 'LICENSE' | 'TECHNICAL_CHECK' | 'INSURANCE'>('ALL');
+  vehicleTypeFilter = signal<'ALL' | 'LICENSE' | 'TECHNICAL_CHECK' | 'INSURANCE' | 'VEHICLE_TAX' | 'OTHER'>('ALL');
 
   hasActiveFilters = computed(() => {
 
@@ -290,7 +289,7 @@ export class Documents implements OnInit {
 
   }
 
-  filterVehicleType(value: 'ALL' | 'LICENSE' | 'TECHNICAL_CHECK' | 'INSURANCE') {
+  filterVehicleType(value: 'ALL' | 'LICENSE' | 'TECHNICAL_CHECK' | 'INSURANCE' | 'VEHICLE_TAX' | 'OTHER') {
 
     this.vehicleTypeFilter.set(value);
 

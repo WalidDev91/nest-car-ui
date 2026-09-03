@@ -75,6 +75,8 @@ export class VehicleDetails implements OnInit {
   hasInsurance = signal(false);
   hasLicense = signal(false);
   hasTechnicalCheck = signal(false);
+  hasVehicleTax = signal(false);
+  hasOtherDocument = signal(false);
 
   // Availability — date-based, identical logic to the Vehicles
   // list page: a vehicle is "in mission" only while now() falls
@@ -191,6 +193,10 @@ export class VehicleDetails implements OnInit {
         this.hasInsurance.set(docs.some(d => d.type === 'INSURANCE'));
 
         this.hasTechnicalCheck.set(docs.some(d => d.type === 'TECHNICAL_CHECK'));
+
+        this.hasVehicleTax.set(docs.some(d => d.type === 'VEHICLE_TAX'));
+
+        this.hasOtherDocument.set(docs.some(d => d.type === 'OTHER'));
 
       },
 

@@ -9,7 +9,6 @@ import { MissionDocument } from '../../models/mission-document';
 
 @Component({
   selector: 'app-mission-document-details',
-  standalone: true,
   imports: [
     CommonModule
   ],

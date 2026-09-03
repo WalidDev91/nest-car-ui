@@ -1,0 +1,832 @@
+<div class="container-fluid p-0">
+
+    <!-- HEADER -->
+    <div class="mb-3">
+        <h1 class="h3 mb-1">My Profile</h1>
+        <p class="text-muted mb-0">
+            Manage your personal information, security, documents, and requests.
+        </p>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-3 text-muted">Loading your profile...</p>
+    </div>
+
+    <!-- ERROR -->
+    <div *ngIf="error()" class="alert alert-danger">
+        {{ error() }}
+    </div>
+
+    <!-- CONTENT -->
+    <div class="row g-3" *ngIf="user() as user">
+
+        <!-- =========================================
+         LEFT COLUMN
+    ========================================== -->
+        <div class="col-12 col-md-4">
+
+            <!-- PROFILE CARD -->
+            <div class="card">
+                <div class="card-body text-center">
+
+                    <div class="mb-3">
+                        <img [src]="user.imageUrl
+                ? (user.imageUrl.startsWith('blob:')
+                    ? user.imageUrl
+                    : uploadsUrl + '/uploads/users/' + user.imageUrl)
+                : 'assets/adminkit/img/avatars/avatar.jpg'" class="rounded-circle border shadow-sm" width="140"
+                            height="140" alt="Profile picture">
+                    </div>
+
+                    <h4 class="mb-2">
+                        {{ user.firstName }} {{ user.lastName }}
+                    </h4>
+
+                    <!-- ROLE + STATUS -->
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+
+                        <span class="badge fs-6" [ngClass]="{
+                'bg-danger': user.role === 'SUPER_ADMIN',
+                'bg-primary': user.role === 'ADMIN',
+                'bg-info': user.role === 'FLEET_MANAGER',
+                'bg-secondary': user.role === 'DRIVER'
+              }">
+                            {{ user.role }}
+                        </span>
+
+                        <span class="badge fs-6" [ngClass]="user.isValidate ? 'bg-success' : 'bg-danger'">
+                            {{ user.isValidate ? 'Active' : 'Inactive' }}
+                        </span>
+
+                    </div>
+
+                    <!-- CHANGE PICTURE -->
+                    <button type="button" class="btn btn-outline-primary btn-sm" (click)="openPictureSelector()">
+
+                        <i data-feather="camera" class="me-1"></i>
+                        Change Picture
+
+                    </button>
+
+                    <input #profilePictureInput type="file" class="d-none" accept="image/*"
+                        (change)="onProfilePictureSelected($event)">
+
+                </div>
+            </div>
+
+
+            <!-- QUICK INFORMATION -->
+            <div class="card mt-3">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i data-feather="user" class="me-1"></i>
+                        Quick Information
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="quick-info-row">
+
+                        <i data-feather="mail" class="quick-info-icon"></i>
+
+                        <div>
+                            <div class="text-muted small">Email</div>
+                            <div>{{ user.email }}</div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-info-row">
+
+                        <i data-feather="phone" class="quick-info-icon"></i>
+
+                        <div>
+                            <div class="text-muted small">Phone</div>
+                            <div>{{ user.phone || '—' }}</div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-info-row">
+
+                        <i data-feather="user-check" class="quick-info-icon"></i>
+
+                        <div>
+                            <div class="text-muted small">Supervisor</div>
+                            <div>{{ user.adminName || '—' }}</div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-info-row mb-0">
+
+                        <i data-feather="calendar" class="quick-info-icon"></i>
+
+                        <div>
+                            <div class="text-muted small">Member Since</div>
+
+                            <div>
+                                {{ user.createdAt
+                                ? (user.createdAt | date:'dd/MM/yyyy')
+                                : '—' }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+         RIGHT COLUMN
+    ========================================== -->
+        <div class="col-12 col-md-8">
+
+            <div class="card">
+
+                <!-- TABS -->
+                <div class="card-header">
+
+                    <ul class="nav nav-tabs card-header-tabs">
+
+                        <!-- INFORMATION -->
+                        <li class="nav-item">
+
+                            <button type="button" class="nav-link" [class.active]="selectedTab() === 'info'"
+                                (click)="selectTab('info')">
+
+                                <i data-feather="info" class="me-1"></i>
+                                Information
+
+                            </button>
+
+                        </li>
+
+
+                        <!-- SECURITY -->
+                        <li class="nav-item">
+
+                            <button type="button" class="nav-link" [class.active]="selectedTab() === 'security'"
+                                (click)="selectTab('security')">
+
+                                <i data-feather="lock" class="me-1"></i>
+                                Security
+
+                            </button>
+
+                        </li>
+
+
+                        <!-- DOCUMENTS - DRIVER ONLY -->
+                        <li class="nav-item" *ngIf="isDriver()">
+
+                            <button type="button" class="nav-link" [class.active]="selectedTab() === 'documents'"
+                                (click)="selectTab('documents')">
+
+                                <i data-feather="file-text" class="me-1"></i>
+                                Documents
+
+                            </button>
+
+                        </li>
+
+
+                        <!-- REQUESTS -->
+                        <li class="nav-item">
+
+                            <button type="button" class="nav-link" [class.active]="selectedTab() === 'requests'"
+                                (click)="selectTab('requests')">
+
+                                <i data-feather="message-square" class="me-1"></i>
+                                My Requests
+
+                            </button>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <div class="card-body">
+
+
+                    <!-- =========================================
+               INFORMATION
+          ========================================== -->
+                    <div *ngIf="selectedTab() === 'info'">
+
+                        <div class="mb-4">
+
+                            <h5 class="card-title mb-1">
+                                Personal Information
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                View and update the personal information associated with your account.
+                            </p>
+
+                        </div>
+
+
+                        <form (ngSubmit)="saveProfile()">
+
+                            <div class="row">
+
+                                <!-- FIRST NAME -->
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        First Name
+                                    </label>
+
+                                    <input type="text" class="form-control" [(ngModel)]="editForm.firstName"
+                                        name="firstName" required>
+
+                                </div>
+
+
+                                <!-- LAST NAME -->
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Last Name
+                                    </label>
+
+                                    <input type="text" class="form-control" [(ngModel)]="editForm.lastName"
+                                        name="lastName" required>
+
+                                </div>
+
+
+                                <!-- EMAIL -->
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Email
+                                    </label>
+
+                                    <input type="email" class="form-control" [(ngModel)]="editForm.email" name="email"
+                                        required>
+
+                                </div>
+
+
+                                <!-- PHONE -->
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="form-label">
+                                        Phone
+                                    </label>
+
+                                    <input type="text" class="form-control" [(ngModel)]="editForm.phone" name="phone">
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACCOUNT DATA -->
+                            <div class="border-top pt-3 mt-2">
+
+                                <div class="row">
+
+                                    <!-- ROLE -->
+                                    <div class="col-md-6 mb-3">
+
+                                        <label class="form-label">
+                                            Role
+                                        </label>
+
+                                        <input type="text" class="form-control" [value]="user.role" disabled>
+
+                                    </div>
+
+
+                                    <!-- STATUS -->
+                                    <div class="col-md-6 mb-3">
+
+                                        <label class="form-label">
+                                            Account Status
+                                        </label>
+
+                                        <input type="text" class="form-control"
+                                            [value]="user.isValidate ? 'Active' : 'Inactive'" disabled>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+                            <div class="d-flex justify-content-end gap-2">
+
+                                <button type="button" class="btn btn-outline-secondary" (click)="resetProfileForm()">
+
+                                    Cancel
+
+                                </button>
+
+                                <button type="submit" class="btn btn-primary">
+
+                                    <i data-feather="save" class="me-1"></i>
+                                    Save Changes
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+
+                    <!-- =========================================
+               SECURITY
+          ========================================== -->
+                    <div *ngIf="selectedTab() === 'security'">
+
+                        <div class="mb-4">
+
+                            <h5 class="card-title mb-1">
+                                Account Security
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Change your password and keep your account secure.
+                            </p>
+
+                        </div>
+
+
+                        <form (ngSubmit)="changePassword()">
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Current Password
+                                </label>
+
+                                <input type="password" class="form-control" [(ngModel)]="passwordForm.currentPassword"
+                                    name="currentPassword" required>
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    New Password
+                                </label>
+
+                                <input type="password" class="form-control" [(ngModel)]="passwordForm.newPassword"
+                                    name="newPassword" required>
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Confirm New Password
+                                </label>
+
+                                <input type="password" class="form-control" [(ngModel)]="passwordForm.confirmPassword"
+                                    name="confirmPassword" required>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-end">
+
+                                <button type="submit" class="btn btn-primary">
+
+                                    <i data-feather="lock" class="me-1"></i>
+                                    Change Password
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+
+                    <!-- =========================================
+               DOCUMENTS
+          ========================================== -->
+                    <div *ngIf="selectedTab() === 'documents' && isDriver()">
+
+                        <div class="mb-4">
+
+                            <h5 class="card-title mb-1">
+                                My Driver Documents
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Review the documents associated with your driver account.
+                            </p>
+
+                        </div>
+
+
+                        <!-- DOCUMENT SUMMARY -->
+                        <div class="row g-3">
+
+                            <!-- LICENSE -->
+                            <div class="col-md-6">
+
+                                <div class="card border">
+
+                                    <div class="card-body text-center">
+
+                                        <i data-feather="credit-card" class="text-primary mb-3"
+                                            style="width:40px;height:40px;">
+                                        </i>
+
+                                        <h5>Driver License</h5>
+
+                                        <span class="badge" [ngClass]="hasLicense() ? 'bg-success' : 'bg-danger'">
+
+                                            {{ hasLicense() ? 'Uploaded' : 'Missing' }}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ID CARD -->
+                            <div class="col-md-6">
+
+                                <div class="card border">
+
+                                    <div class="card-body text-center">
+
+                                        <i data-feather="file-text" class="text-primary mb-3"
+                                            style="width:40px;height:40px;">
+                                        </i>
+
+                                        <h5>Identity Card</h5>
+
+                                        <span class="badge" [ngClass]="hasIdCard() ? 'bg-success' : 'bg-danger'">
+
+                                            {{ hasIdCard() ? 'Uploaded' : 'Missing' }}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- DOCUMENT STATUS -->
+                        <div class="alert mt-4" [ngClass]="hasCompleteDocuments()
+                ? 'alert-success'
+                : 'alert-warning'">
+
+                            <i data-feather="info" class="me-1"></i>
+
+                            <span *ngIf="hasCompleteDocuments()">
+                                All required driver documents are uploaded.
+                            </span>
+
+                            <span *ngIf="!hasCompleteDocuments()">
+                                Your driver documents are incomplete.
+                            </span>
+
+                        </div>
+
+
+                        <!-- DOCUMENT LIST -->
+                        <div class="mt-4">
+
+                            <table class="table table-hover" *ngIf="driverDocs().length > 0">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Expiry Date</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    <tr *ngFor="let doc of driverDocs()">
+
+                                        <td>
+                                            {{ doc.title }}
+                                        </td>
+
+                                        <td>
+                                            {{ doc.type === 'DRIVER_LICENSE'
+                                            ? 'Driver License'
+                                            : 'ID Card' }}
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge" [ngClass]="{
+                          'bg-warning': doc.status === 'PENDING',
+                          'bg-success': doc.status === 'APPROVED',
+                          'bg-danger': doc.status === 'REJECTED'
+                        }">
+
+                                                {{ doc.status }}
+
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+                                            {{ doc.expiryDate
+                                            ? (doc.expiryDate | date:'dd/MM/yyyy')
+                                            : '—' }}
+                                        </td>
+
+                                        <td class="text-end">
+
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                (click)="previewDriverDocument(doc.id)" title="Preview"
+                                                aria-label="Preview">
+
+                                                <i data-feather="eye"></i>
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+
+                            <!-- EMPTY -->
+                            <div *ngIf="driverDocs().length === 0" class="text-center text-muted py-4">
+
+                                <i data-feather="file" style="width:40px;height:40px;">
+                                </i>
+
+                                <p class="mt-2 mb-0">
+                                    No documents uploaded yet.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =========================================
+               REQUESTS
+          ========================================== -->
+                    <div *ngIf="selectedTab() === 'requests'">
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+
+                            <div>
+
+                                <h5 class="card-title mb-1">
+                                    My Requests
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Submit a request or report an issue to the administration.
+                                </p>
+
+                            </div>
+
+
+                            <button type="button" class="btn btn-primary" (click)="openRequestForm()">
+
+                                <i data-feather="plus" class="me-1"></i>
+                                New Request
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- REQUEST FORM -->
+                        <div *ngIf="showRequestForm()" class="card border mb-4">
+
+                            <div class="card-body">
+
+                                <h6 class="mb-3">
+
+                                    <i data-feather="edit-3" class="me-1"></i>
+                                    Submit a Request
+
+                                </h6>
+
+
+                                <form (ngSubmit)="submitRequest()">
+
+                                    <!-- TYPE -->
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Request Type
+                                        </label>
+
+                                        <select class="form-select" [(ngModel)]="requestForm.type" name="requestType"
+                                            required>
+
+                                            <option value="">
+                                                Select a type
+                                            </option>
+
+                                            <option value="PROFILE_CHANGE">
+                                                Profile Change
+                                            </option>
+
+                                            <option value="ROLE_REQUEST">
+                                                Role Request
+                                            </option>
+
+                                            <option value="DOCUMENT_PROBLEM">
+                                                Document Problem
+                                            </option>
+
+                                            <option value="TECHNICAL_PROBLEM">
+                                                Technical Problem
+                                            </option>
+
+                                            <option value="FLEET_PROBLEM">
+                                                Fleet / Mission Problem
+                                            </option>
+
+                                            <option value="OTHER">
+                                                Other
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <!-- SUBJECT -->
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Subject
+                                        </label>
+
+                                        <input type="text" class="form-control" [(ngModel)]="requestForm.subject"
+                                            name="requestSubject" placeholder="Enter a short subject" required>
+
+                                    </div>
+
+
+                                    <!-- DESCRIPTION -->
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Description
+                                        </label>
+
+                                        <textarea class="form-control" rows="4" [(ngModel)]="requestForm.description"
+                                            name="requestDescription" placeholder="Describe your request or problem..."
+                                            required>
+                    </textarea>
+
+                                    </div>
+
+
+                                    <!-- ACTIONS -->
+                                    <div class="d-flex justify-content-end gap-2">
+
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            (click)="closeRequestForm()">
+
+                                            Cancel
+
+                                        </button>
+
+                                        <button type="submit" class="btn btn-primary">
+
+                                            <i data-feather="send" class="me-1"></i>
+                                            Submit Request
+
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- REQUEST LIST -->
+                        <div *ngIf="requests().length > 0">
+
+                            <div *ngFor="let request of requests()" class="border rounded p-3 mb-3">
+
+                                <div class="d-flex justify-content-between align-items-start">
+
+                                    <div>
+
+                                        <h6 class="mb-1">
+                                            {{ request.subject }}
+                                        </h6>
+
+                                        <div class="text-muted small">
+                                            {{ request.type }} ·
+                                            {{ request.createdAt
+                                            ? (request.createdAt | date:'dd/MM/yyyy HH:mm')
+                                            : '—' }}
+                                        </div>
+
+                                    </div>
+
+
+                                    <span class="badge" [ngClass]="{
+                      'bg-warning': request.status === 'PENDING',
+                      'bg-info': request.status === 'IN_PROGRESS',
+                      'bg-success': request.status === 'RESOLVED',
+                      'bg-danger': request.status === 'REJECTED'
+                    }">
+
+                                        {{ request.status }}
+
+                                    </span>
+
+                                </div>
+
+
+                                <p class="mb-2 mt-3">
+                                    {{ request.description }}
+                                </p>
+
+
+                                <!-- ADMIN RESPONSE -->
+                                <div *ngIf="request.adminResponse" class="alert alert-light mb-0">
+
+                                    <strong>
+                                        Administration Response:
+                                    </strong>
+
+                                    {{ request.adminResponse }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- EMPTY -->
+                        <div *ngIf="requests().length === 0 && !showRequestForm()" class="text-center text-muted py-5">
+
+                            <i data-feather="message-square" style="width:40px;height:40px;">
+                            </i>
+
+                            <p class="mt-2 mb-0">
+                                You have not submitted any requests yet.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

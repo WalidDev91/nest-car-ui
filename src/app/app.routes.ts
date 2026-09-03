@@ -3,6 +3,8 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Users } from './pages/users/users';
 import { UserDetails } from './pages/users/user-details';
 import { Vehicles } from './pages/vehicles/vehicles';
+import { Drivers} from './pages/drivers/drivers';
+import { Profile } from './pages/profile/profile';
 import { VehicleDetails } from './pages/vehicles/vehicle-details';
 import { Missions } from './pages/missions/missions';
 import { Documents } from './pages/documents/documents';
@@ -38,6 +40,10 @@ export const routes: Routes = [
 
       { path: 'missions', component: Missions },
       { path: 'missions/:id', component: MissionDetails },
+
+      { path: 'drivers', component: Drivers },
+
+      { path: 'profile', component: Profile },
 
       { path: 'documents', component: Documents },
       // { path: 'documents/driver/:id', component: DriverDocumentDetails },
