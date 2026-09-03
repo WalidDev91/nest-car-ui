@@ -181,7 +181,7 @@
               <th>Driver</th>
               <th>Status</th>
               <th>Expiry Date</th>
-              <th>Uploaded</th>
+              <th>Upload Date</th>
               <th class="text-end">Actions</th>
             </tr>
           </thead>
@@ -210,7 +210,7 @@
                 {{ doc.expiryDate | date:'dd/MM/yyyy' }}
               </td>
 
-              <td>{{ doc.uploadedAt | date:'dd/MM/yyyy' }}</td>
+              <td>{{ doc.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</td>
 
               <td class="text-end">
 
@@ -296,7 +296,7 @@
               <th>Vehicle</th>
               <th>Expiry Date</th>
               <th>Uploaded By</th>
-              <th>Created</th>
+              <th>Upload Date</th>
               <th class="text-end">Actions</th>
             </tr>
           </thead>
@@ -317,7 +317,7 @@
 
               <td>{{ doc.uploadedByName || '—' }}</td>
 
-              <td>{{ doc.createdAt | date:'dd/MM/yyyy' }}</td>
+              <td>{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
 
               <td class="text-end">
 
@@ -381,7 +381,7 @@
               <th>Title</th>
               <th>Mission</th>
               <th>Uploaded By</th>
-              <th>Created</th>
+              <th>Upload Date</th>
               <th class="text-end">Actions</th>
             </tr>
           </thead>
@@ -396,7 +396,7 @@
 
               <td>{{ doc.uploadedByName || '—' }}</td>
 
-              <td>{{ doc.createdAt | date:'dd/MM/yyyy' }}</td>
+              <td>{{ doc.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
 
               <td class="text-end">
 
