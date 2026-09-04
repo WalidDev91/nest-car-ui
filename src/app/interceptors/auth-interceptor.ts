@@ -5,10 +5,13 @@ import { catchError, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
-  const token = localStorage.getItem('token');
   const router = inject(Router);
+  const token = localStorage.getItem('token');
 
-  if (token) {
+  // Do not attach JWT to public authentication endpoints.
+  const isAuthRequest = req.url.includes('/auth/');
+
+  if (token && !isAuthRequest) {
     req = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
@@ -31,5 +34,4 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       return throwError(() => error);
     })
   );
-
 };
