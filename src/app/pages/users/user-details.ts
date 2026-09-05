@@ -357,7 +357,6 @@ export class UserDetails implements OnInit {
 
       error: err => {
         console.error(err);
-        alert('Activate failed');
       }
 
     });
@@ -378,7 +377,6 @@ export class UserDetails implements OnInit {
 
       error: err => {
         console.error(err);
-        alert('Deactivate failed');
       }
 
     });

@@ -479,8 +479,6 @@ export class Users implements OnInit {
 
           console.error(err);
 
-          alert('Role update failed');
-
         }
 
       });
@@ -498,13 +496,11 @@ export class Users implements OnInit {
     this.userService.delete(user.id).subscribe({
 
       next: () => {
-        alert('User deleted');
         this.loadUsers();
       },
 
       error: (err) => {
         console.error(err);
-        alert('Delete failed');
       }
 
     });
@@ -529,12 +525,10 @@ export class Users implements OnInit {
   saveSupervisor() {
 
     if (!this.selectedUser) {
-      alert('No user selected');
       return;
     }
 
     if (!this.selectedSupervisorId) {
-      alert('Please select a supervisor');
       return;
     }
 
@@ -559,9 +553,6 @@ export class Users implements OnInit {
       error: err => {
 
         console.error(err);
-
-        alert('Failed to update supervisor');
-
       }
 
     });

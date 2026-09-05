@@ -139,8 +139,6 @@ export class Administration implements OnInit {
 
         this.savingSettings.set(false);
 
-        alert('Settings saved successfully');
-
       },
 
       error: err => {
@@ -148,8 +146,6 @@ export class Administration implements OnInit {
         console.error(err);
 
         this.savingSettings.set(false);
-
-        alert('Failed to save settings');
 
       }
 

@@ -1,9 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { User } from '../../models/user';
 import { DriverDocument } from '../../models/driver-document';
+import { UserRequest } from '../../models/user-request';
+import { UserService } from '../../services/user.service';
+import { DriverDocumentService } from '../../services/driver-document.service';
+import { UserRequestService } from '../../services/user-request.service';
+import { ToastService } from '../../services/toast.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -14,7 +20,7 @@ import { DriverDocument } from '../../models/driver-document';
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
-export class Profile {
+export class Profile implements OnInit {
 
   @ViewChild('profilePictureInput')
   profilePictureInput!: ElementRef<HTMLInputElement>;
@@ -26,15 +32,17 @@ export class Profile {
   loading = signal(false);
   error = signal<string | null>(null);
 
-  selectedTab = signal<
-    'info' | 'security' | 'documents' | 'requests'
-  >('info');
+  selectedTab = signal<'info' | 'security' | 'documents' | 'requests'>('info');
 
   // ==========================
   // CURRENT USER
   // ==========================
 
   user = signal<User | null>(null);
+
+  userId = localStorage.getItem('userId') ?? '';
+
+  uploadsUrl = environment.uploadsUrl;
 
   // ==========================
   // PROFILE FORM
@@ -67,7 +75,9 @@ export class Profile {
   // REQUESTS
   // ==========================
 
-  requests = signal<any[]>([]);
+  requests = signal<UserRequest[]>([]);
+
+  loadingRequests = signal(false);
 
   showRequestForm = signal(false);
 
@@ -77,37 +87,80 @@ export class Profile {
     description: ''
   };
 
+  constructor(
+    private userService: UserService,
+    private driverDocumentService: DriverDocumentService,
+    private userRequestService: UserRequestService,
+    private toastService: ToastService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadUser();
+    this.loadMyRequests();
+  }
+
   // ==========================
-  // UPLOADS
+  // LOAD CURRENT USER
   // ==========================
 
-  uploadsUrl = '';
+  loadUser(): void {
+
+    if (!this.userId) {
+      this.error.set('Unable to identify the current user.');
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.userService.getById(this.userId).subscribe({
+
+      next: user => {
+
+        this.user.set(user);
+
+        this.resetProfileForm();
+
+        this.loading.set(false);
+
+        if (this.isDriver()) {
+          this.loadDriverDocs(user.id);
+        }
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.error.set('Unable to load your profile.');
+
+        this.loading.set(false);
+
+      }
+
+    });
+
+  }
 
   // ==========================
-  // INITIALIZATION
+  // DRIVER DOCUMENTS
   // ==========================
 
-  constructor() {
-    // Temporary data until we connect
-    // the component to the authenticated user.
-    const temporaryUser: User = {
-      id: '',
-      firstName: 'Walid',
-      lastName: 'Boulima',
-      email: 'user@example.com',
-      phone: '',
-      role: 'ADMIN',
-      isValidate: true,
-      adminId: '',
-      adminName: '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      imageUrl: null
-    };
+  loadDriverDocs(driverId: string): void {
 
-    this.user.set(temporaryUser);
+    this.driverDocumentService.getByDriverId(driverId).subscribe({
 
-    this.resetProfileForm();
+      next: docs => {
+        this.driverDocs.set(docs);
+      },
+
+      error: err => {
+        console.error('Driver documents error:', err);
+      }
+
+    });
+
   }
 
   // ==========================
@@ -137,6 +190,7 @@ export class Profile {
   }
 
   onProfilePictureSelected(event: Event): void {
+
     const input = event.target as HTMLInputElement;
 
     if (!input.files || input.files.length === 0) {
@@ -146,20 +200,30 @@ export class Profile {
     const file = input.files[0];
 
     if (!file.type.startsWith('image/')) {
+      this.toastService.error('Please select an image file');
       return;
     }
 
-    const currentUser = this.user();
+    this.userService.uploadImage(this.userId, file).subscribe({
 
-    if (!currentUser) {
-      return;
-    }
+      next: updatedUser => {
 
-    this.user.set({
-      ...currentUser,
-      imageUrl: URL.createObjectURL(file),
-      updatedAt: new Date().toISOString()
+        this.user.set(updatedUser);
+
+        this.toastService.success('Profile picture updated');
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to update profile picture');
+
+      }
+
     });
+
   }
 
   // ==========================
@@ -167,6 +231,7 @@ export class Profile {
   // ==========================
 
   resetProfileForm(): void {
+
     const currentUser = this.user();
 
     if (!currentUser) {
@@ -179,23 +244,40 @@ export class Profile {
       email: currentUser.email,
       phone: currentUser.phone ?? ''
     };
+
   }
 
   saveProfile(): void {
-    const currentUser = this.user();
 
-    if (!currentUser) {
+    if (
+      !this.editForm.firstName.trim() ||
+      !this.editForm.lastName.trim() ||
+      !this.editForm.email.trim()
+    ) {
+      this.toastService.error('First name, last name and email are required');
       return;
     }
 
-    this.user.set({
-      ...currentUser,
-      firstName: this.editForm.firstName,
-      lastName: this.editForm.lastName,
-      email: this.editForm.email,
-      phone: this.editForm.phone,
-      updatedAt: new Date().toISOString()
+    this.userService.updateProfile(this.editForm).subscribe({
+
+      next: updatedUser => {
+
+        this.user.set(updatedUser);
+
+        this.toastService.success('Profile updated successfully');
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to update profile');
+
+      }
+
     });
+
   }
 
   // ==========================
@@ -203,6 +285,7 @@ export class Profile {
   // ==========================
 
   changePassword(): void {
+
     if (
       !this.passwordForm.currentPassword ||
       !this.passwordForm.newPassword ||
@@ -212,24 +295,44 @@ export class Profile {
       return;
     }
 
-    if (
-      this.passwordForm.newPassword !==
-      this.passwordForm.confirmPassword
-    ) {
+    if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
       this.error.set('New passwords do not match.');
       return;
     }
 
-    // Temporary implementation.
-    // Connect to the backend change-password endpoint later.
-
-    this.passwordForm = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    };
-
     this.error.set(null);
+
+    this.userService.changePassword({
+      currentPassword: this.passwordForm.currentPassword,
+      newPassword: this.passwordForm.newPassword
+    }).subscribe({
+
+      next: () => {
+
+        this.passwordForm = {
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        };
+
+        this.toastService.success('Password changed successfully');
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        if (err.status === 401) {
+          this.error.set('Current password is incorrect.');
+        } else {
+          this.toastService.error('Failed to change password');
+        }
+
+      }
+
+    });
+
   }
 
   // ==========================
@@ -237,15 +340,11 @@ export class Profile {
   // ==========================
 
   hasLicense(): boolean {
-    return this.driverDocs().some(
-      doc => doc.type === 'DRIVER_LICENSE'
-    );
+    return this.driverDocs().some(doc => doc.type === 'DRIVER_LICENSE');
   }
 
   hasIdCard(): boolean {
-    return this.driverDocs().some(
-      doc => doc.type === 'ID_CARD'
-    );
+    return this.driverDocs().some(doc => doc.type === 'ID_CARD');
   }
 
   hasCompleteDocuments(): boolean {
@@ -253,18 +352,67 @@ export class Profile {
   }
 
   previewDriverDocument(id: string): void {
-  
+
+    this.driverDocumentService.previewDriverDocument(id).subscribe({
+
+      next: blob => {
+
+        const url = URL.createObjectURL(blob);
+
+        window.open(url, '_blank');
+
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to open document');
+
+      }
+
+    });
+
   }
 
   // ==========================
   // REQUESTS
   // ==========================
 
+  loadMyRequests(): void {
+
+    this.loadingRequests.set(true);
+
+    this.userRequestService.getMine().subscribe({
+
+      next: requests => {
+
+        this.requests.set(requests);
+
+        this.loadingRequests.set(false);
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.loadingRequests.set(false);
+
+      }
+
+    });
+
+  }
+
   openRequestForm(): void {
     this.showRequestForm.set(true);
   }
 
   closeRequestForm(): void {
+
     this.showRequestForm.set(false);
 
     this.requestForm = {
@@ -272,9 +420,11 @@ export class Profile {
       subject: '',
       description: ''
     };
+
   }
 
   submitRequest(): void {
+
     if (
       !this.requestForm.type ||
       !this.requestForm.subject ||
@@ -283,22 +433,28 @@ export class Profile {
       return;
     }
 
-    // Temporary implementation.
-    // Later replace with UserRequest model/service.
+    this.userRequestService.create(this.requestForm).subscribe({
 
-    this.requests.update(requests => [
-      {
-        id: crypto.randomUUID(),
-        type: this.requestForm.type,
-        subject: this.requestForm.subject,
-        description: this.requestForm.description,
-        status: 'PENDING',
-        adminResponse: null,
-        createdAt: new Date().toISOString()
+      next: () => {
+
+        this.loadMyRequests();
+
+        this.closeRequestForm();
+
+        this.toastService.success('Request submitted successfully');
+
       },
-      ...requests
-    ]);
 
-    this.closeRequestForm();
+      error: err => {
+
+        console.error(err);
+
+        this.toastService.error('Failed to submit request');
+
+      }
+
+    });
+
   }
+
 }

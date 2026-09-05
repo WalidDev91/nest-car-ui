@@ -749,8 +749,15 @@
                         </div>
 
 
+                        <!-- LOADING -->
+                        <div *ngIf="loadingRequests()" class="text-center py-5 text-muted">
+                            <div class="spinner-border spinner-border-sm me-2"></div>
+                            Loading requests...
+                        </div>
+
+
                         <!-- REQUEST LIST -->
-                        <div *ngIf="requests().length > 0">
+                        <div *ngIf="!loadingRequests() && requests().length > 0">
 
                             <div *ngFor="let request of requests()" class="border rounded p-3 mb-3">
 
@@ -808,7 +815,8 @@
 
 
                         <!-- EMPTY -->
-                        <div *ngIf="requests().length === 0 && !showRequestForm()" class="text-center text-muted py-5">
+                        <div *ngIf="!loadingRequests() && requests().length === 0 && !showRequestForm()"
+                            class="text-center text-muted py-5">
 
                             <i data-feather="message-square" style="width:40px;height:40px;">
                             </i>

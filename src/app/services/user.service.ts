@@ -149,4 +149,35 @@ export class UserService {
     );
 
   }
+
+
+  // ==========================================================
+  // SELF-SERVICE PROFILE
+  // ==========================================================
+
+  updateProfile(request: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  }): Observable<User> {
+
+    return this.http.patch<User>(
+      `${this.baseUrl}/me/profile`,
+      request
+    );
+
+  }
+
+  changePassword(request: {
+    currentPassword: string;
+    newPassword: string;
+  }): Observable<void> {
+
+    return this.http.patch<void>(
+      `${this.baseUrl}/me/password`,
+      request
+    );
+
+  }
 }
