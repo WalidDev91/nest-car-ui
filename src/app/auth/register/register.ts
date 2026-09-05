@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
 
 interface CountryOption {
@@ -49,7 +50,8 @@ export class Register {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) { }
 
   // ==========================================================
@@ -78,7 +80,7 @@ export class Register {
 
     if (!this.submitted()) return false;
 
-    if (!this.phoneNumber.trim()) return false; // phone stays optional
+    if (!this.phoneNumber.trim()) return false;
 
     return !/^\d{6,14}$/.test(this.phoneNumber.trim());
 
@@ -179,6 +181,8 @@ export class Register {
         localStorage.setItem('lastName', response.lastName);
         localStorage.setItem('userId', response.id);
         localStorage.setItem('imageUrl', response.imageUrl ?? '');
+
+        this.themeService.reloadForCurrentUser();
 
         this.router.navigate(['/dashboard']);
 

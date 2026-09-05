@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -21,7 +22,8 @@ export class Login {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) { }
 
   get emailInvalid(): boolean {
@@ -55,6 +57,8 @@ export class Login {
         localStorage.setItem('lastName', response.lastName);
         localStorage.setItem('userId', response.id);
         localStorage.setItem('imageUrl', response.imageUrl ?? '');
+
+        this.themeService.reloadForCurrentUser();
 
         this.router.navigate(['/dashboard']);
 

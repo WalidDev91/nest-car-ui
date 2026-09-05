@@ -1,11 +1,15 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdministrationService } from '../../services/administration.service';
-import { AppSettings } from '../../models/app-settings';
-import { AuditLog } from '../../models/audit-log';
-import { ThemeService } from '../../services/theme.service';
+
+import { UserRequestService } from '../../services/user-request.service';
+import { ToastService } from '../../services/toast.service';
+
+import { UserRequest } from '../../models/user-request';
+
 import feather from 'feather-icons';
+
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-administration',
@@ -16,43 +20,40 @@ import feather from 'feather-icons';
 export class Administration implements OnInit {
 
   // ==========================
-  // STATE
+  // TABS
   // ==========================
 
-  pendingRequests = signal<any[]>([]);
+  selectedTab = signal<'requests'>('requests');
+  // Settings tab removed — dark mode already lives in the navbar toggle,
+  // and language switching was dropped (too large an i18n effort for now).
+  // Audit tab intentionally left commented below for a future perspective.
 
-  auditLogs = signal<AuditLog[]>([]);
+  // ==========================
+  // REQUESTS
+  // ==========================
 
-  auditSearch = signal('');
+  requests = signal<UserRequest[]>([]);
 
-  loadingSettings = signal(false);
+  loadingRequests = signal(false);
 
-  savingSettings = signal(false);
+  selectedRequest = signal<UserRequest | null>(null);
 
-  loadingAudit = signal(false);
+  reviewStatus: 'PENDING' | 'IN_PROGRESS' | 'RESOLVED' | 'REJECTED' = 'PENDING';
 
-  selectedTab = signal<'requests' | 'settings' | 'audit'>('requests');
-
-  settings: AppSettings = {
-    applicationName: '',
-    language: 'EN',
-    sessionTimeout: 30
-  };
+  reviewResponse = '';
 
   constructor(
-    private administrationService: AdministrationService,
-    public themeService: ThemeService
+    private userRequestService: UserRequestService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
 
-    this.loadPendingRequests();
-    this.loadSettings();
-    this.loadAuditLogs();
+    this.loadRequests();
 
   }
 
-  selectTab(tab: 'requests' | 'settings' | 'audit') {
+  selectTab(tab: 'requests') {
 
     this.selectedTab.set(tab);
 
@@ -61,59 +62,22 @@ export class Administration implements OnInit {
   }
 
   // ==========================
-  // ACCOUNT REQUESTS
-  // (left as-is — pending supervisor decision)
+  // REQUESTS
   // ==========================
 
-  loadPendingRequests(): void {
+  loadRequests(): void {
 
-    this.administrationService.getPendingRequests().subscribe({
+    this.loadingRequests.set(true);
 
-      next: data => {
+    this.userRequestService.getVisible().subscribe({
 
-        this.pendingRequests.set(data);
+      next: requests => {
+
+        this.requests.set(requests);
+
+        this.loadingRequests.set(false);
 
         setTimeout(() => feather.replace(), 0);
-
-      },
-
-      error: err => console.error(err)
-
-    });
-
-  }
-
-  approveRequest(userId: string): void {
-
-    this.administrationService.approveRequest(userId).subscribe({
-      next: () => this.loadPendingRequests()
-    });
-
-  }
-
-  rejectRequest(userId: string): void {
-
-    this.administrationService.rejectRequest(userId).subscribe({
-      next: () => this.loadPendingRequests()
-    });
-
-  }
-
-  // ==========================
-  // SETTINGS
-  // ==========================
-
-  loadSettings(): void {
-
-    this.loadingSettings.set(true);
-
-    this.administrationService.getSettings().subscribe({
-
-      next: settings => {
-
-        this.settings = settings;
-
-        this.loadingSettings.set(false);
 
       },
 
@@ -121,7 +85,9 @@ export class Administration implements OnInit {
 
         console.error(err);
 
-        this.loadingSettings.set(false);
+        this.loadingRequests.set(false);
+
+        this.toastService.error('Failed to load requests');
 
       }
 
@@ -129,15 +95,38 @@ export class Administration implements OnInit {
 
   }
 
-  saveSettings(): void {
+  openReviewModal(request: UserRequest): void {
 
-    this.savingSettings.set(true);
+    this.selectedRequest.set(request);
 
-    this.administrationService.saveSettings(this.settings).subscribe({
+    this.reviewStatus = request.status;
+
+    this.reviewResponse = request.adminResponse ?? '';
+
+    new bootstrap.Modal(document.getElementById('reviewRequestModal')).show();
+
+  }
+
+  submitReview(): void {
+
+    const request = this.selectedRequest();
+
+    if (!request) return;
+
+    this.userRequestService.review(request.id, {
+      status: this.reviewStatus,
+      adminResponse: this.reviewResponse
+    }).subscribe({
 
       next: () => {
 
-        this.savingSettings.set(false);
+        bootstrap.Modal.getInstance(document.getElementById('reviewRequestModal'))?.hide();
+
+        this.selectedRequest.set(null);
+
+        this.loadRequests();
+
+        this.toastService.success('Request updated successfully');
 
       },
 
@@ -145,7 +134,7 @@ export class Administration implements OnInit {
 
         console.error(err);
 
-        this.savingSettings.set(false);
+        this.toastService.error('Failed to update request');
 
       }
 
@@ -153,69 +142,55 @@ export class Administration implements OnInit {
 
   }
 
-  // ==========================
-  // APPEARANCE
-  // ==========================
+  getStatusClass(status: string): string {
 
-  isDarkMode = computed(() => this.themeService.theme() === 'dark');
-
-  toggleTheme(): void {
-
-    this.themeService.toggle();
-
-  }
-
-  // ==========================
-  // AUDIT LOG
-  // ==========================
-
-  filteredAuditLogs = computed(() => {
-
-    const keyword = this.auditSearch().trim().toLowerCase();
-
-    if (!keyword) {
-      return this.auditLogs();
+    switch (status) {
+      case 'PENDING': return 'bg-warning text-dark';
+      case 'IN_PROGRESS': return 'bg-info';
+      case 'RESOLVED': return 'bg-success';
+      case 'REJECTED': return 'bg-danger';
+      default: return 'bg-secondary';
     }
 
-    return this.auditLogs().filter(log =>
-      (log.user ?? '').toLowerCase().includes(keyword) ||
-      (log.action ?? '').toLowerCase().includes(keyword)
-    );
-
-  });
-
-  loadAuditLogs(): void {
-
-    this.loadingAudit.set(true);
-
-    this.administrationService.getAuditLogs().subscribe({
-
-      next: logs => {
-
-        this.auditLogs.set(logs);
-
-        this.loadingAudit.set(false);
-
-        setTimeout(() => feather.replace(), 0);
-
-      },
-
-      error: err => {
-
-        console.error(err);
-
-        this.loadingAudit.set(false);
-
-      }
-
-    });
-
   }
 
-  onAuditSearch(value: string): void {
+  // ==========================
+  // AUDIT LOG — commented out for now, kept as a future perspective.
+  // Uncomment the block below (and re-add 'audit' to selectedTab's type,
+  // plus re-inject AdministrationService if the audit endpoint is restored)
+  // to bring it back later.
+  // ==========================
 
-    this.auditSearch.set(value);
-
-  }
+  // auditLogs = signal<AuditLog[]>([]);
+  // auditSearch = signal('');
+  // loadingAudit = signal(false);
+  //
+  // filteredAuditLogs = computed(() => {
+  //   const keyword = this.auditSearch().trim().toLowerCase();
+  //   if (!keyword) return this.auditLogs();
+  //   return this.auditLogs().filter(log =>
+  //     (log.user ?? '').toLowerCase().includes(keyword) ||
+  //     (log.action ?? '').toLowerCase().includes(keyword)
+  //   );
+  // });
+  //
+  // loadAuditLogs(): void {
+  //   this.loadingAudit.set(true);
+  //   this.administrationService.getAuditLogs().subscribe({
+  //     next: logs => {
+  //       this.auditLogs.set(logs);
+  //       this.loadingAudit.set(false);
+  //       setTimeout(() => feather.replace(), 0);
+  //     },
+  //     error: err => {
+  //       console.error(err);
+  //       this.loadingAudit.set(false);
+  //     }
+  //   });
+  // }
+  //
+  // onAuditSearch(value: string): void {
+  //   this.auditSearch.set(value);
+  // }
 
 }

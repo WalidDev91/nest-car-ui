@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root',
@@ -8,7 +9,10 @@ import { environment } from '../../environments/environment';
 export class AuthService {
   private baseUrl = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private themeService: ThemeService
+  ) { }
 
   login(credentials: any) {
     return this.http.post(`${this.baseUrl}/login`, credentials);
@@ -32,6 +36,7 @@ export class AuthService {
   }
 
   logout() {
+
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('email');
@@ -39,5 +44,8 @@ export class AuthService {
     localStorage.removeItem('lastName');
     localStorage.removeItem('userId');
     localStorage.removeItem('imageUrl');
+
+    this.themeService.reloadForCurrentUser();
+
   }
 }

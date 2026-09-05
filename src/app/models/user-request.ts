@@ -2,6 +2,8 @@ export interface UserRequest {
 
   id: string;
 
+  requestNumber: number;
+
   type:
   | 'PROFILE_CHANGE'
   | 'ROLE_REQUEST'
