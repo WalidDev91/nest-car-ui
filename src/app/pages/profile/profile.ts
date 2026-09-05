@@ -8,7 +8,6 @@ import { UserRequest } from '../../models/user-request';
 import { UserService } from '../../services/user.service';
 import { DriverDocumentService } from '../../services/driver-document.service';
 import { UserRequestService } from '../../services/user-request.service';
-import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -90,8 +89,7 @@ export class Profile implements OnInit {
   constructor(
     private userService: UserService,
     private driverDocumentService: DriverDocumentService,
-    private userRequestService: UserRequestService,
-    private toastService: ToastService
+    private userRequestService: UserRequestService
   ) { }
 
   ngOnInit(): void {
@@ -200,7 +198,7 @@ export class Profile implements OnInit {
     const file = input.files[0];
 
     if (!file.type.startsWith('image/')) {
-      this.toastService.error('Please select an image file');
+
       return;
     }
 
@@ -210,7 +208,7 @@ export class Profile implements OnInit {
 
         this.user.set(updatedUser);
 
-        this.toastService.success('Profile picture updated');
+
 
       },
 
@@ -218,7 +216,7 @@ export class Profile implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to update profile picture');
+
 
       }
 
@@ -254,7 +252,7 @@ export class Profile implements OnInit {
       !this.editForm.lastName.trim() ||
       !this.editForm.email.trim()
     ) {
-      this.toastService.error('First name, last name and email are required');
+
       return;
     }
 
@@ -264,7 +262,7 @@ export class Profile implements OnInit {
 
         this.user.set(updatedUser);
 
-        this.toastService.success('Profile updated successfully');
+
 
       },
 
@@ -272,7 +270,7 @@ export class Profile implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to update profile');
+
 
       }
 
@@ -315,7 +313,7 @@ export class Profile implements OnInit {
           confirmPassword: ''
         };
 
-        this.toastService.success('Password changed successfully');
+
 
       },
 
@@ -326,7 +324,7 @@ export class Profile implements OnInit {
         if (err.status === 401) {
           this.error.set('Current password is incorrect.');
         } else {
-          this.toastService.error('Failed to change password');
+
         }
 
       }
@@ -369,7 +367,7 @@ export class Profile implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to open document');
+
 
       }
 
@@ -441,7 +439,6 @@ export class Profile implements OnInit {
 
         this.closeRequestForm();
 
-        this.toastService.success('Request submitted successfully');
 
       },
 
@@ -449,7 +446,6 @@ export class Profile implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to submit request');
 
       }
 

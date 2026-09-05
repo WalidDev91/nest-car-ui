@@ -7,7 +7,6 @@ import { environment } from '../../../environments/environment';
 import { VehicleService } from '../../services/vehicle.service';
 import { VehicleDocumentService } from '../../services/vehicle-document.service';
 import { MissionService } from '../../services/mission.service';
-import { ToastService } from '../../services/toast.service';
 
 import { Vehicle } from '../../models/vehicle';
 import { VehicleDocument } from '../../models/vehicle-document';
@@ -65,7 +64,7 @@ export class VehicleDetails implements OnInit {
   }
 
   onAddPhotoClick(): void {
-    this.toastService.info('Multiple photo uploads will be available once backend support is added.');
+
   }
 
   // ==========================================================
@@ -109,8 +108,7 @@ export class VehicleDetails implements OnInit {
     private router: Router,
     private vehicleService: VehicleService,
     private vehicleDocumentService: VehicleDocumentService,
-    private missionService: MissionService,
-    private toastService: ToastService
+    private missionService: MissionService
   ) { }
 
   // ==========================================================
@@ -202,7 +200,7 @@ export class VehicleDetails implements OnInit {
 
       error: err => {
         console.error(err);
-        this.toastService.error('Failed to load vehicle documents');
+
       }
 
     });
@@ -223,7 +221,6 @@ export class VehicleDetails implements OnInit {
 
       error: err => {
         console.error(err);
-        this.toastService.error('Failed to load vehicle missions');
       }
 
     });
@@ -305,7 +302,7 @@ export class VehicleDetails implements OnInit {
 
         console.error('Failed to preview vehicle document', error);
 
-        this.toastService.error('Failed to open document');
+
 
       }
 

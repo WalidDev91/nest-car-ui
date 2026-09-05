@@ -8,7 +8,6 @@ import feather from 'feather-icons';
 import { UserService } from '../../services/user.service';
 import { MissionService } from '../../services/mission.service';
 import { DriverDocumentService } from '../../services/driver-document.service';
-import { ToastService } from '../../services/toast.service';
 
 import { User } from '../../models/user';
 import { Mission } from '../../models/mission';
@@ -222,7 +221,6 @@ export class Drivers implements OnInit {
     private userService: UserService,
     private missionService: MissionService,
     private driverDocumentService: DriverDocumentService,
-    private toastService: ToastService,
     private router: Router
   ) { }
 
@@ -257,8 +255,6 @@ export class Drivers implements OnInit {
         console.error(err);
 
         this.loading.set(false);
-
-        this.toastService.error('Failed to load drivers');
 
       }
 

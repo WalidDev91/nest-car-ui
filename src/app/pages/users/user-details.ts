@@ -5,7 +5,6 @@ import { UserService } from '../../services/user.service';
 import { User } from '../../models/user';
 import { DriverDocument } from '../../models/driver-document';
 import { DriverDocumentService } from '../../services/driver-document.service';
-import { ToastService } from '../../services/toast.service';
 import feather from 'feather-icons';
 import { environment } from '../../../environments/environment';
 
@@ -58,8 +57,7 @@ export class UserDetails implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
-    private driverDocumentService: DriverDocumentService,
-    private toastService: ToastService,
+    private driverDocumentService: DriverDocumentService
   ) { }
 
 
@@ -404,8 +402,6 @@ export class UserDetails implements OnInit {
       error: (error) => {
 
         console.error('Failed to preview driver document', error);
-
-        this.toastService.error('Failed to open document');
 
       }
 

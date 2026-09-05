@@ -11,7 +11,6 @@ import { MissionDocumentService } from '../../services/mission-document.service'
 
 import { VehicleService } from '../../services/vehicle.service';
 import { MissionService } from '../../services/mission.service';
-import { ToastService } from '../../services/toast.service';
 
 import { DriverDocument } from '../../models/driver-document';
 import { VehicleDocument } from '../../models/vehicle-document';
@@ -207,7 +206,6 @@ export class Documents implements OnInit {
     private missionDocumentService: MissionDocumentService,
     private vehicleService: VehicleService,
     private missionService: MissionService,
-    private toastService: ToastService,
     private router: Router
   ) { }
 
@@ -251,7 +249,6 @@ export class Documents implements OnInit {
 
         this.loading.set(false);
 
-        this.toastService.error('Failed to load documents');
 
       }
 
@@ -346,7 +343,6 @@ export class Documents implements OnInit {
 
     if (!allowed.includes(file.type)) {
 
-      this.toastService.error('Only PDF and image files are allowed');
 
       return false;
 
@@ -354,7 +350,6 @@ export class Documents implements OnInit {
 
     if (file.size > 10_000_000) {
 
-      this.toastService.error('Maximum file size is 10MB');
 
       return false;
 
@@ -433,7 +428,6 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to download document');
 
       }
 
@@ -451,8 +445,6 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to download document');
-
       }
 
     });
@@ -469,7 +461,6 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to download document');
 
       }
 
@@ -571,15 +562,11 @@ export class Documents implements OnInit {
 
           this.resetMissionModal();
 
-          this.toastService.success('Document updated successfully');
-
         },
 
         error: err => {
 
           console.error(err);
-
-          this.toastService.error('Failed to update document');
 
         }
 
@@ -609,7 +596,7 @@ export class Documents implements OnInit {
 
         this.resetMissionModal();
 
-        this.toastService.success('Document uploaded successfully');
+
 
       },
 
@@ -617,7 +604,6 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Mission document upload failed');
 
       }
 
@@ -657,12 +643,12 @@ export class Documents implements OnInit {
         next: () => {
           this.loadDocuments();
           this.resetVehicleModal();
-          this.toastService.success('Document updated successfully');
+
         },
 
         error: err => {
           console.error(err);
-          this.toastService.error('Failed to update document');
+
         }
 
       });
@@ -699,12 +685,12 @@ export class Documents implements OnInit {
       next: () => {
         this.loadDocuments();
         this.resetVehicleModal();
-        this.toastService.success('Document uploaded successfully');
+
       },
 
       error: err => {
         console.error(err);
-        this.toastService.error('Vehicle document upload failed');
+
       }
 
     });
@@ -742,12 +728,12 @@ export class Documents implements OnInit {
         next: () => {
           this.loadDocuments();
           this.resetDriverModal();
-          this.toastService.success('Document updated successfully');
+
         },
 
         error: err => {
           console.error(err);
-          this.toastService.error('Failed to update document');
+
         }
 
       });
@@ -772,12 +758,12 @@ export class Documents implements OnInit {
       next: () => {
         this.loadDocuments();
         this.resetDriverModal();
-        this.toastService.success('Document uploaded successfully');
+
       },
 
       error: err => {
         console.error(err);
-        this.toastService.error('Driver document upload failed');
+
       }
 
     });
@@ -945,15 +931,11 @@ export class Documents implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deleteDriverDocumentModal'))?.hide();
 
-        this.toastService.success('Document deleted successfully');
-
       },
 
       error: err => {
 
         console.error(err);
-
-        this.toastService.error('Failed to delete document');
 
       }
 
@@ -987,15 +969,13 @@ export class Documents implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deleteVehicleDocumentModal'))?.hide();
 
-        this.toastService.success('Document deleted successfully');
-
       },
 
       error: err => {
 
         console.error(err);
 
-        this.toastService.error('Failed to delete document');
+
 
       }
 
@@ -1029,7 +1009,7 @@ export class Documents implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deleteMissionDocumentModal'))?.hide();
 
-        this.toastService.success('Document deleted successfully');
+
 
       },
 
@@ -1037,7 +1017,6 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to delete document');
 
       }
 
@@ -1067,7 +1046,6 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to open document');
 
       }
 
@@ -1093,7 +1071,7 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to open document');
+
 
       }
 
@@ -1119,7 +1097,7 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to open document');
+
 
       }
 
@@ -1139,15 +1117,12 @@ export class Documents implements OnInit {
 
         this.loadDocuments();
 
-        this.toastService.success('Document approved');
 
       },
 
       error: err => {
 
         console.error(err);
-
-        this.toastService.error('Failed to approve document');
 
       }
 
@@ -1163,7 +1138,6 @@ export class Documents implements OnInit {
 
         this.loadDocuments();
 
-        this.toastService.success('Document rejected');
 
       },
 
@@ -1171,7 +1145,6 @@ export class Documents implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to reject document');
 
       }
 
@@ -1205,15 +1178,12 @@ export class Documents implements OnInit {
 
         this.loadDocuments();
 
-        this.toastService.success('Validation status updated');
-
       },
 
       error: err => {
 
         console.error(err);
 
-        this.toastService.error('Failed to update validation status');
 
       }
 

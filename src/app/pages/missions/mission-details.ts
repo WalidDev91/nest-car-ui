@@ -12,7 +12,6 @@ import { User } from '../../models/user';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { MissionDocumentService } from '../../services/mission-document.service';
-import { ToastService } from '../../services/toast.service';
 
 declare var bootstrap: any;
 
@@ -94,7 +93,6 @@ export class MissionDetails implements OnInit {
     private userService: UserService,
     private vehicleService: VehicleService,
     private missionDocumentService: MissionDocumentService,
-    private toastService: ToastService,
     private router: Router
   ) { }
 
@@ -160,7 +158,6 @@ export class MissionDetails implements OnInit {
 
         this.loading.set(false);
 
-        this.toastService.error('Failed to load mission');
 
       }
 
@@ -273,7 +270,7 @@ export class MissionDetails implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('assignmentModal'))?.hide();
 
-        this.toastService.success('Assignment updated successfully');
+
 
       },
 
@@ -281,7 +278,6 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to update assignment');
 
       }
 
@@ -308,7 +304,7 @@ export class MissionDetails implements OnInit {
         this.documentsVerified.set(updatedMission.documentsVerified ?? false);
         this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
 
-        this.toastService.success('Documents validated');
+
 
         setTimeout(() => feather.replace(), 0);
 
@@ -318,7 +314,7 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to validate documents');
+
 
       }
 
@@ -341,7 +337,7 @@ export class MissionDetails implements OnInit {
         this.documentsVerified.set(updatedMission.documentsVerified ?? false);
         this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
 
-        this.toastService.success('Documents marked as not verified');
+
 
         setTimeout(() => feather.replace(), 0);
 
@@ -351,7 +347,7 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to update documents');
+
 
       }
 
@@ -401,7 +397,7 @@ export class MissionDetails implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('changeValidationModal'))?.hide();
 
-        this.toastService.success('Verification status updated');
+
 
         setTimeout(() => feather.replace(), 0);
 
@@ -411,7 +407,7 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to update verification status');
+
 
       }
 
@@ -453,7 +449,7 @@ export class MissionDetails implements OnInit {
 
         this.loadMission(current.id);
 
-        this.toastService.success('Inspection saved successfully');
+
 
         setTimeout(() => feather.replace(), 0);
 
@@ -463,7 +459,7 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to save inspection');
+
 
       }
 
@@ -485,7 +481,7 @@ export class MissionDetails implements OnInit {
 
         this.loadMission(mission.id);
 
-        this.toastService.success('Inspection deleted successfully');
+
 
         setTimeout(() => feather.replace(), 0);
 
@@ -495,7 +491,7 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to delete inspection');
+
 
       }
 
@@ -546,7 +542,7 @@ export class MissionDetails implements OnInit {
 
         this.loadMission(current.id);
 
-        this.toastService.success('Photo uploaded successfully');
+
 
         setTimeout(() => feather.replace(), 0);
 
@@ -566,7 +562,7 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to upload photo');
+
 
       }
 
@@ -602,7 +598,7 @@ export class MissionDetails implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deletePhotoModal'))?.hide();
 
-        this.toastService.success('Photo deleted successfully');
+
 
         setTimeout(() => feather.replace(), 0);
 
@@ -616,7 +612,7 @@ export class MissionDetails implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deletePhotoModal'))?.hide();
 
-        this.toastService.error('Failed to delete photo');
+
 
       }
 
@@ -646,7 +642,7 @@ export class MissionDetails implements OnInit {
 
         console.error('Failed to preview mission document', error);
 
-        this.toastService.error('Failed to open document');
+
 
       }
 

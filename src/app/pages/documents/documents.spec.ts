@@ -9,7 +9,6 @@ import { VehicleDocumentService } from '../../services/vehicle-document.service'
 import { MissionDocumentService } from '../../services/mission-document.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { MissionService } from '../../services/mission.service';
-import { ToastService } from '../../services/toast.service';
 
 describe('Documents', () => {
 
@@ -21,7 +20,6 @@ describe('Documents', () => {
   let missionDocumentService: any;
   let vehicleService: any;
   let missionService: any;
-  let toastService: any;
 
   beforeEach(async () => {
 
@@ -61,10 +59,7 @@ describe('Documents', () => {
       getAll: () => of([])
     };
 
-    toastService = {
-      success: () => { },
-      error: () => { }
-    };
+    
 
     await TestBed.configureTestingModule({
       imports: [Documents],
@@ -88,10 +83,6 @@ describe('Documents', () => {
         {
           provide: MissionService,
           useValue: missionService
-        },
-        {
-          provide: ToastService,
-          useValue: toastService
         },
         {
           provide: Router,
@@ -279,10 +270,6 @@ describe('Documents', () => {
 
     expect(component.validateFile(file)).toBe(false);
 
-    expect(toastService.error)
-      .toHaveBeenCalledWith(
-        'Only PDF and image files are allowed'
-      );
   });
 
   // ============================================================

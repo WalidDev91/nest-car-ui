@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { UserRequestService } from '../../services/user-request.service';
-import { ToastService } from '../../services/toast.service';
 
 import { UserRequest } from '../../models/user-request';
 
@@ -43,9 +42,7 @@ export class Administration implements OnInit {
   reviewResponse = '';
 
   constructor(
-    private userRequestService: UserRequestService,
-    private toastService: ToastService
-  ) { }
+    private userRequestService: UserRequestService) { }
 
   ngOnInit(): void {
 
@@ -87,8 +84,6 @@ export class Administration implements OnInit {
 
         this.loadingRequests.set(false);
 
-        this.toastService.error('Failed to load requests');
-
       }
 
     });
@@ -126,7 +121,6 @@ export class Administration implements OnInit {
 
         this.loadRequests();
 
-        this.toastService.success('Request updated successfully');
 
       },
 
@@ -134,7 +128,6 @@ export class Administration implements OnInit {
 
         console.error(err);
 
-        this.toastService.error('Failed to update request');
 
       }
 

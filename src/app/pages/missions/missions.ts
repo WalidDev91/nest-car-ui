@@ -10,7 +10,6 @@ import feather from 'feather-icons';
 import { MissionService } from '../../services/mission.service';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
-import { ToastService } from '../../services/toast.service';
 
 import { Mission } from '../../models/mission';
 import { User } from '../../models/user';
@@ -293,7 +292,6 @@ export class Missions implements OnInit {
     private missionService: MissionService,
     private userService: UserService,
     private vehicleService: VehicleService,
-    private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
@@ -380,7 +378,7 @@ export class Missions implements OnInit {
 
         this.loading.set(false);
 
-        this.toastService.error('Failed to load missions');
+
 
       }
 
@@ -492,7 +490,7 @@ export class Missions implements OnInit {
 
           this.closeModal();
 
-          this.toastService.success('Mission updated successfully');
+
 
         },
 
@@ -504,7 +502,7 @@ export class Missions implements OnInit {
             return;
           }
 
-          this.toastService.error('Mission update failed');
+
 
         }
 
@@ -522,7 +520,7 @@ export class Missions implements OnInit {
 
         this.closeModal();
 
-        this.toastService.success('Mission created successfully');
+
 
       },
 
@@ -534,7 +532,7 @@ export class Missions implements OnInit {
           return;
         }
 
-        this.toastService.error('Mission creation failed');
+
 
       }
 
@@ -611,7 +609,7 @@ export class Missions implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deleteMissionModal'))?.hide();
 
-        this.toastService.success('Mission deleted successfully');
+
 
       },
 
@@ -623,7 +621,6 @@ export class Missions implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deleteMissionModal'))?.hide();
 
-        this.toastService.error('Failed to delete mission');
 
       }
 

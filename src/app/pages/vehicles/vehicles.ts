@@ -10,7 +10,6 @@ import { Vehicle } from '../../models/vehicle';
 import { VehiclePhoto } from '../../models/vehicle-photo';
 import { VehicleDocumentService } from '../../services/vehicle-document.service';
 import { MissionService } from '../../services/mission.service';
-import { ToastService } from '../../services/toast.service';
 import { forkJoin } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
@@ -276,7 +275,6 @@ export class Vehicles implements OnInit {
     private vehicleService: VehicleService,
     private missionService: MissionService,
     private vehicleDocumentService: VehicleDocumentService,
-    private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute
   ) { }
@@ -362,7 +360,7 @@ export class Vehicles implements OnInit {
 
         this.loading.set(false);
 
-        this.toastService.error('Failed to load vehicles');
+
 
       }
 
@@ -508,7 +506,7 @@ export class Vehicles implements OnInit {
 
         this.existingPhotos.set(updatedVehicle.photos ?? []);
 
-        // this.toastService.success('Photo removed successfully');
+
 
       },
 
@@ -516,7 +514,7 @@ export class Vehicles implements OnInit {
 
         console.error(err);
 
-        // this.toastService.error('Failed to remove photo');
+
 
       }
 
@@ -566,7 +564,7 @@ export class Vehicles implements OnInit {
 
               next: () => {
 
-                // this.toastService.success('Vehicle created successfully');
+
 
                 this.resetForm();
 
@@ -580,7 +578,7 @@ export class Vehicles implements OnInit {
 
                 console.error(err);
 
-                this.toastService.error('Vehicle created, but some photos failed to upload');
+
 
                 this.resetForm();
 
@@ -594,7 +592,7 @@ export class Vehicles implements OnInit {
 
           } else {
 
-            // this.toastService.success('Vehicle created successfully');
+
 
             this.resetForm();
 
@@ -610,7 +608,7 @@ export class Vehicles implements OnInit {
 
           console.error(err);
 
-          this.toastService.error('Vehicle creation failed');
+
 
         }
 
@@ -634,7 +632,6 @@ export class Vehicles implements OnInit {
 
               next: () => {
 
-                //   this.toastService.success('Vehicle updated successfully');
 
                 this.resetForm();
 
@@ -648,7 +645,7 @@ export class Vehicles implements OnInit {
 
                 console.error(err);
 
-                this.toastService.error('Vehicle updated, but some photos failed to upload');
+
 
                 this.resetForm();
 
@@ -662,7 +659,7 @@ export class Vehicles implements OnInit {
 
           } else {
 
-            // this.toastService.success('Vehicle updated successfully');
+
 
             this.resetForm();
 
@@ -678,7 +675,7 @@ export class Vehicles implements OnInit {
 
           console.error(err);
 
-          this.toastService.error('Vehicle update failed');
+
 
         }
 
@@ -786,7 +783,6 @@ export class Vehicles implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deleteVehicleModal'))?.hide();
 
-        this.toastService.success('Vehicle deleted successfully');
 
       },
 
@@ -796,7 +792,7 @@ export class Vehicles implements OnInit {
 
         bootstrap.Modal.getInstance(document.getElementById('deleteVehicleModal'))?.hide();
 
-        this.toastService.error('Failed to delete vehicle');
+
 
         this.vehicleToDeleteId.set(null);
 
