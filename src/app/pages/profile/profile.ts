@@ -253,7 +253,7 @@ export class Profile {
   }
 
   previewDriverDocument(id: string): void {
-    console.log('Preview driver document:', id);
+  
   }
 
   // ==========================

@@ -242,6 +242,8 @@ export class Missions implements OnInit {
 
   status: 'PLANNED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED' = 'PLANNED';
 
+  availabilityError = signal<'DRIVER' | 'VEHICLE' | 'BOTH' | null>(null);
+
   driverId: string | null = null;
   vehicleId: string | null = null;
 
@@ -498,6 +500,10 @@ export class Missions implements OnInit {
 
           console.error(err);
 
+          if (this.handleAvailabilityError(err)) {
+            return;
+          }
+
           this.toastService.error('Mission update failed');
 
         }
@@ -524,12 +530,57 @@ export class Missions implements OnInit {
 
         console.error(err);
 
+        if (this.handleAvailabilityError(err)) {
+          return;
+        }
+
         this.toastService.error('Mission creation failed');
 
       }
 
     });
 
+  }
+
+
+  handleAvailabilityError(err: any): boolean {
+
+    const message = err.error?.message;
+
+    if (message === 'Driver and vehicle are not available during this period') {
+
+      this.availabilityError.set('BOTH');
+
+      new bootstrap.Modal(
+        document.getElementById('availabilityModal')
+      ).show();
+
+      return true;
+    }
+
+    if (message === 'Driver is not available during this period') {
+
+      this.availabilityError.set('DRIVER');
+
+      new bootstrap.Modal(
+        document.getElementById('availabilityModal')
+      ).show();
+
+      return true;
+    }
+
+    if (message === 'Vehicle is not available during this period') {
+
+      this.availabilityError.set('VEHICLE');
+
+      new bootstrap.Modal(
+        document.getElementById('availabilityModal')
+      ).show();
+
+      return true;
+    }
+
+    return false;
   }
 
   // ==========================================================
