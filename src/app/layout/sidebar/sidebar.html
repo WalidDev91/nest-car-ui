@@ -114,8 +114,9 @@
 
       </li>
 
-      <!-- Administration *ngIf="isSuperAdmin" -->
-      <li class="sidebar-item" routerLinkActive="active">
+      <!-- ADMINISTRATION -->
+
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
 
         <a class="sidebar-link" routerLink="/administration">
 
