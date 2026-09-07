@@ -4,240 +4,399 @@
     Welcome back, <strong>{{ loggedInName }}</strong> 👋
   </h1>
 
-  <!-- ========================================= -->
-  <!-- HERO ROW — 2x2 cards + Recent Activity chart -->
-  <!-- ========================================= -->
+  <!-- ========================================================= -->
+  <!-- DRIVER VIEW — personalized content only.                  -->
+  <!-- No fleet-wide numbers, no other drivers, no charts.        -->
+  <!-- ========================================================= -->
 
-  <div class="row">
+  <div *ngIf="isDriver()">
 
-    <div class="col-xl-6 col-xxl-5 d-flex">
-      <div class="w-100">
-        <div class="row">
+    <div class="row g-3 mb-3">
 
-          <div class="col-sm-6">
+      <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
 
-            <div class="card stat-card">
-              <div class="card-body">
-
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <h6 class="text-muted mb-0">Active Missions</h6>
-                  <div class="stat-icon bg-primary-subtle text-primary">
-                    <i data-feather="navigation"></i>
-                  </div>
-                </div>
-
-                <h1 class="mb-1">{{ activeMissions() }}</h1>
-
-                <div class="mb-0">
-                  <span [ngClass]="activeMissionsDelta() >= 0 ? 'text-success' : 'text-danger'">
-                    {{ activeMissionsDelta() >= 0 ? '+' : '' }}{{ activeMissionsDelta() }}%
-                  </span>
-                  <span class="text-muted">vs last month</span>
-                </div>
-
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="text-muted mb-0">Current Mission</h6>
+              <div class="stat-icon bg-primary-subtle text-primary">
+                <i data-feather="navigation"></i>
               </div>
             </div>
 
-            <div class="card stat-card">
-              <div class="card-body">
+            <h5 class="mb-1" *ngIf="myCurrentMission() as mission">{{ mission.title }}</h5>
+            <h5 class="mb-1 text-muted" *ngIf="!myCurrentMission()">None</h5>
 
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <h6 class="text-muted mb-0">Drivers</h6>
-                  <div class="stat-icon bg-warning-subtle text-warning">
-                    <i data-feather="user"></i>
-                  </div>
-                </div>
-
-                <h1 class="mb-1">{{ totalDrivers() }}</h1>
-
-                <div class="mb-0">
-                  <span class="text-muted">Total registered drivers</span>
-                </div>
-
-              </div>
+            <div class="mb-0" *ngIf="myCurrentMission() as mission">
+              <span class="text-muted">{{ mission.departureLocation }} → {{ mission.destinationLocation }}</span>
             </div>
 
           </div>
+        </div>
+      </div>
 
-          <div class="col-sm-6">
+      <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
 
-            <div class="card stat-card">
-              <div class="card-body">
-
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <h6 class="text-muted mb-0">Vehicles</h6>
-                  <div class="stat-icon bg-success-subtle text-success">
-                    <i data-feather="truck"></i>
-                  </div>
-                </div>
-
-                <h1 class="mb-1">{{ totalVehicles() }}</h1>
-
-                <div class="mb-0">
-                  <span class="text-muted">Total vehicles in fleet</span>
-                </div>
-
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="text-muted mb-0">Next Mission</h6>
+              <div class="stat-icon bg-warning-subtle text-warning">
+                <i data-feather="clock"></i>
               </div>
             </div>
 
-            <div class="card stat-card">
-              <div class="card-body">
+            <h5 class="mb-1" *ngIf="myNextMission() as mission">{{ mission.title }}</h5>
+            <h5 class="mb-1 text-muted" *ngIf="!myNextMission()">None scheduled</h5>
 
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <h6 class="text-muted mb-0">Pending Documents</h6>
-                  <div class="stat-icon bg-info-subtle text-info">
-                    <i data-feather="clock"></i>
-                  </div>
-                </div>
-
-                <h1 class="mb-1">{{ pendingDocuments() }}</h1>
-
-                <div class="mb-0">
-                  <span class="text-muted">Awaiting approval</span>
-                </div>
-
-              </div>
+            <div class="mb-0" *ngIf="myNextMission() as mission">
+              <span class="text-muted">{{ mission.startDate | date:'dd/MM/yyyy HH:mm' }}</span>
             </div>
 
           </div>
-
         </div>
       </div>
-    </div>
 
-    <div class="col-xl-6 col-xxl-7">
-      <div class="card flex-fill w-100">
-        <div class="card-header">
-          <h5 class="card-title mb-0">
-            <i data-feather="activity" class="me-1"></i>
-            Recent Activity
-          </h5>
-        </div>
-        <div class="card-body py-3">
-          <div class="chart chart-sm" style="height: 250px;">
-            <canvas #missionsTrendChart></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+      <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
 
-  </div>
-
-  <!-- ========================================= -->
-  <!-- TABLE + STATUS CHART -->
-  <!-- ========================================= -->
-
-  <div class="row">
-
-    <div class="col-12 col-lg-8 col-xxl-9 d-flex">
-      <div class="card flex-fill">
-        <div class="card-header">
-          <h5 class="card-title mb-0">
-            <i data-feather="map" class="me-1"></i>
-            Recent Missions
-          </h5>
-        </div>
-        <table class="table table-hover my-0">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Driver</th>
-              <th class="d-none d-md-table-cell">Vehicle</th>
-              <th class="d-none d-xl-table-cell">Start Date</th>
-              <th class="d-none d-xl-table-cell">End Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-
-            <tr *ngFor="let mission of recentMissions()">
-              <td>{{ mission.title }}</td>
-              <td>{{ mission.driverName }}</td>
-              <td class="d-none d-md-table-cell">{{ mission.vehiclePlateNumber }}</td>
-              <td class="d-none d-xl-table-cell">{{ mission.startDate | date:'dd/MM/yyyy' }}</td>
-              <td class="d-none d-xl-table-cell">{{ mission.endDate | date:'dd/MM/yyyy' }}</td>
-              <td>
-                <span class="badge" [ngClass]="{
-                  'bg-warning':  mission.status === 'PLANNED',
-                  'bg-primary':  mission.status === 'ONGOING',
-                  'bg-success':  mission.status === 'COMPLETED',
-                  'bg-danger':   mission.status === 'CANCELLED'
-                }">
-                  {{ mission.status }}
-                </span>
-              </td>
-            </tr>
-
-            <tr *ngIf="dataLoaded && recentMissions().length === 0">
-              <td colspan="6" class="text-center py-4 text-muted">No missions yet.</td>
-            </tr>
-
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="col-12 col-lg-4 col-xxl-3 d-flex">
-      <div class="card flex-fill w-100">
-        <div class="card-header">
-          <h5 class="card-title mb-0">
-            <i data-feather="pie-chart" class="me-1"></i>
-            Missions by Status
-          </h5>
-        </div>
-        <div class="card-body d-flex">
-          <div class="align-self-center w-100">
-
-            <div class="py-3">
-              <div class="chart chart-xs" style="height: 180px;">
-                <canvas #missionStatusChart></canvas>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="text-muted mb-0">Upcoming Missions</h6>
+              <div class="stat-icon bg-info-subtle text-info">
+                <i data-feather="calendar"></i>
               </div>
             </div>
 
-            <table class="table mb-0">
-              <tbody>
-                <tr *ngFor="let s of missionStatusCounts()">
-                  <td>
-                    <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px;"
-                      [style.background]="s.color">
+            <h1 class="mb-1">{{ myUpcomingMissionsCount() }}</h1>
+
+            <div class="mb-0">
+              <span class="text-muted">Planned ahead</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-xl-3">
+        <div class="card stat-card h-100">
+          <div class="card-body">
+
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="text-muted mb-0">Completed Missions</h6>
+              <div class="stat-icon bg-success-subtle text-success">
+                <i data-feather="check-circle"></i>
+              </div>
+            </div>
+
+            <h1 class="mb-1">{{ myCompletedMissionsCount() }}</h1>
+
+            <div class="mb-0">
+              <span class="text-muted">All time</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i data-feather="file-text" class="me-1"></i>
+              My Document Status
+            </h5>
+          </div>
+          <div class="card-body">
+
+            <div class="row g-3">
+
+              <div class="col-md-6">
+                <div class="d-flex align-items-center justify-content-between border rounded p-3">
+                  <div>
+                    <h6 class="mb-1">Driver License</h6>
+                    <span class="text-muted small" *ngIf="myLicenseDoc()">
+                      Expires {{ myLicenseDoc()!.expiryDate | date:'dd/MM/yyyy' }}
                     </span>
-                    {{ s.label }}
-                  </td>
-                  <td class="text-end">{{ s.count }}</td>
-                </tr>
-              </tbody>
-            </table>
+                    <span class="text-muted small" *ngIf="!myLicenseDoc()">Not uploaded</span>
+                  </div>
+                  <span class="badge" [ngClass]="isDocValid(myLicenseDoc()) ? 'bg-success' : 'bg-danger'">
+                    {{ isDocValid(myLicenseDoc()) ? 'Valid' : 'Action needed' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="d-flex align-items-center justify-content-between border rounded p-3">
+                  <div>
+                    <h6 class="mb-1">Identity Card</h6>
+                    <span class="text-muted small" *ngIf="myIdCardDoc()">
+                      Expires {{ myIdCardDoc()!.expiryDate | date:'dd/MM/yyyy' }}
+                    </span>
+                    <span class="text-muted small" *ngIf="!myIdCardDoc()">Not uploaded</span>
+                  </div>
+                  <span class="badge" [ngClass]="isDocValid(myIdCardDoc()) ? 'bg-success' : 'bg-danger'">
+                    {{ isDocValid(myIdCardDoc()) ? 'Valid' : 'Action needed' }}
+                  </span>
+                </div>
+              </div>
+
+            </div>
 
           </div>
         </div>
       </div>
+
     </div>
 
   </div>
 
-  <!-- ========================================= -->
-  <!-- DOCUMENT STATUS -->
-  <!-- ========================================= -->
-  <!--
-  <div class="row">
+  <!-- ========================================================= -->
+  <!-- FLEET MANAGER / ADMIN / SUPER ADMIN VIEW — full dashboard  -->
+  <!-- ========================================================= -->
 
-    <div class="col-12">
-      <div class="card flex-fill w-100">
-        <div class="card-header">
-          <h5 class="card-title mb-0">
-            <i data-feather="file-text" class="me-1"></i>
-            Document Status
-          </h5>
-        </div>
-        <div class="card-body py-3">
-          <div class="chart chart-sm" style="height: 200px;">
-            <canvas #documentStatusChart></canvas>
+  <div *ngIf="!isDriver()">
+
+    <!-- ========================================= -->
+    <!-- HERO ROW — 2x2 cards + Recent Activity chart -->
+    <!-- ========================================= -->
+
+    <div class="row">
+
+      <div class="col-xl-6 col-xxl-5 d-flex">
+        <div class="w-100">
+          <div class="row">
+
+            <div class="col-sm-6">
+
+              <div class="card stat-card">
+                <div class="card-body">
+
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="text-muted mb-0">Active Missions</h6>
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                      <i data-feather="navigation"></i>
+                    </div>
+                  </div>
+
+                  <h1 class="mb-1">{{ activeMissions() }}</h1>
+
+                  <div class="mb-0">
+                    <span [ngClass]="activeMissionsDelta() >= 0 ? 'text-success' : 'text-danger'">
+                      {{ activeMissionsDelta() >= 0 ? '+' : '' }}{{ activeMissionsDelta() }}%
+                    </span>
+                    <span class="text-muted">vs last month</span>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="card stat-card">
+                <div class="card-body">
+
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="text-muted mb-0">Drivers</h6>
+                    <div class="stat-icon bg-warning-subtle text-warning">
+                      <i data-feather="user"></i>
+                    </div>
+                  </div>
+
+                  <h1 class="mb-1">{{ totalDrivers() }}</h1>
+
+                  <div class="mb-0">
+                    <span class="text-muted">Total registered drivers</span>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+            <div class="col-sm-6">
+
+              <div class="card stat-card">
+                <div class="card-body">
+
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="text-muted mb-0">Vehicles</h6>
+                    <div class="stat-icon bg-success-subtle text-success">
+                      <i data-feather="truck"></i>
+                    </div>
+                  </div>
+
+                  <h1 class="mb-1">{{ totalVehicles() }}</h1>
+
+                  <div class="mb-0">
+                    <span class="text-muted">Total vehicles in fleet</span>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="card stat-card">
+                <div class="card-body">
+
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="text-muted mb-0">Pending Documents</h6>
+                    <div class="stat-icon bg-info-subtle text-info">
+                      <i data-feather="clock"></i>
+                    </div>
+                  </div>
+
+                  <h1 class="mb-1">{{ pendingDocuments() }}</h1>
+
+                  <div class="mb-0">
+                    <span class="text-muted">Awaiting approval</span>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
           </div>
         </div>
       </div>
+
+      <div class="col-xl-6 col-xxl-7">
+        <div class="card flex-fill w-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i data-feather="activity" class="me-1"></i>
+              Recent Activity
+            </h5>
+          </div>
+          <div class="card-body py-3">
+            <div class="chart chart-sm" style="height: 250px;">
+              <canvas #missionsTrendChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
+    <!-- ========================================= -->
+    <!-- TABLE + STATUS CHART -->
+    <!-- ========================================= -->
+
+    <div class="row">
+
+      <div class="col-12 col-lg-8 col-xxl-9 d-flex">
+        <div class="card flex-fill">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i data-feather="map" class="me-1"></i>
+              Recent Missions
+            </h5>
+          </div>
+          <table class="table table-hover my-0">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Driver</th>
+                <th class="d-none d-md-table-cell">Vehicle</th>
+                <th class="d-none d-xl-table-cell">Start Date</th>
+                <th class="d-none d-xl-table-cell">End Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr *ngFor="let mission of recentMissions()">
+                <td>{{ mission.title }}</td>
+                <td>{{ mission.driverName }}</td>
+                <td class="d-none d-md-table-cell">{{ mission.vehiclePlateNumber }}</td>
+                <td class="d-none d-xl-table-cell">{{ mission.startDate | date:'dd/MM/yyyy' }}</td>
+                <td class="d-none d-xl-table-cell">{{ mission.endDate | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-warning':  mission.status === 'PLANNED',
+                    'bg-primary':  mission.status === 'ONGOING',
+                    'bg-success':  mission.status === 'COMPLETED',
+                    'bg-danger':   mission.status === 'CANCELLED'
+                  }">
+                    {{ mission.status }}
+                  </span>
+                </td>
+              </tr>
+
+              <tr *ngIf="dataLoaded && recentMissions().length === 0">
+                <td colspan="6" class="text-center py-4 text-muted">No missions yet.</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4 col-xxl-3 d-flex">
+        <div class="card flex-fill w-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i data-feather="pie-chart" class="me-1"></i>
+              Missions by Status
+            </h5>
+          </div>
+          <div class="card-body d-flex">
+            <div class="align-self-center w-100">
+
+              <div class="py-3">
+                <div class="chart chart-xs" style="height: 180px;">
+                  <canvas #missionStatusChart></canvas>
+                </div>
+              </div>
+
+              <table class="table mb-0">
+                <tbody>
+                  <tr *ngFor="let s of missionStatusCounts()">
+                    <td>
+                      <span class="d-inline-block rounded-circle me-2" style="width: 10px; height: 10px;"
+                        [style.background]="s.color">
+                      </span>
+                      {{ s.label }}
+                    </td>
+                    <td class="text-end">{{ s.count }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- DOCUMENT STATUS -->
+    <!-- ========================================= -->
+    <!--
+    <div class="row">
+
+      <div class="col-12">
+        <div class="card flex-fill w-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i data-feather="file-text" class="me-1"></i>
+              Document Status
+            </h5>
+          </div>
+          <div class="card-body py-3">
+            <div class="chart chart-sm" style="height: 200px;">
+              <canvas #documentStatusChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    -->
+
   </div>
-  -->
 
 </div>

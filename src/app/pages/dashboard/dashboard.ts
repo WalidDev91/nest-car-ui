@@ -6,6 +6,7 @@ import { MissionService } from '../../services/mission.service';
 import { DriverDocumentService } from '../../services/driver-document.service';
 import { ThemeService } from '../../services/theme.service';
 import { Mission } from '../../models/mission';
+import { DriverDocument } from '../../models/driver-document';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -42,12 +43,40 @@ export class Dashboard implements OnInit, AfterViewInit {
   recentMissions = signal<Mission[]>([]);
 
   allMissions: Mission[] = [];
-  allDocuments: any[] = [];
+  allDocuments: DriverDocument[] = [];
 
   loggedInName =
     `${localStorage.getItem('firstName') ?? ''} ${localStorage.getItem('lastName') ?? ''}`.trim() || 'User';
 
   dataLoaded = false;
+
+  // ==========================================================
+  // ROLE — driver gets a personalized view instead of fleet-wide stats.
+  // ==========================================================
+
+  role = localStorage.getItem('role') ?? '';
+
+  userId = localStorage.getItem('userId') ?? '';
+
+  isDriver(): boolean {
+    return this.role === 'DRIVER';
+  }
+
+  // ==========================================================
+  // DRIVER — PERSONALIZED CONTENT
+  // ==========================================================
+
+  myCurrentMission = signal<Mission | null>(null);
+
+  myNextMission = signal<Mission | null>(null);
+
+  myCompletedMissionsCount = signal<number>(0);
+
+  myUpcomingMissionsCount = signal<number>(0);
+
+  myLicenseDoc = signal<DriverDocument | null>(null);
+
+  myIdCardDoc = signal<DriverDocument | null>(null);
 
   // ==========================================================
   // CHART INSTANCES — kept so we can destroy() before rebuilding,
@@ -91,6 +120,11 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
 
+    if (this.isDriver()) {
+      this.loadDriverView();
+      return;
+    }
+
     this.vehicleService.getAll().subscribe({
       next: (data) => {
         this.totalVehicles.set(data.length);
@@ -127,6 +161,68 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void { }
+
+  // ==========================================================
+  // DRIVER VIEW — personal missions + document status only.
+  // No fleet-wide numbers, no other drivers, no charts.
+  // ==========================================================
+
+  loadDriverView(): void {
+
+    const now = new Date();
+
+    this.missionService.getAll().subscribe({
+
+      next: (data) => {
+
+        const myMissions = data.filter(m => m.driverId === this.userId);
+
+        const current = myMissions.find(m =>
+          m.status !== 'CANCELLED' &&
+          new Date(m.startDate) <= now &&
+          new Date(m.endDate) >= now
+        );
+
+        const upcoming = myMissions
+          .filter(m => m.status === 'PLANNED' && new Date(m.startDate) > now)
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+        this.myCurrentMission.set(current ?? null);
+        this.myNextMission.set(upcoming[0] ?? null);
+        this.myUpcomingMissionsCount.set(upcoming.length);
+        this.myCompletedMissionsCount.set(
+          myMissions.filter(m => m.status === 'COMPLETED').length
+        );
+
+        this.dataLoaded = true;
+
+      },
+
+      error: (err) => {
+        console.error(err);
+        this.dataLoaded = true;
+      }
+
+    });
+
+    this.driverDocumentService.getByDriverId(this.userId).subscribe({
+
+      next: (docs) => {
+
+        this.myLicenseDoc.set(docs.find(d => d.type === 'DRIVER_LICENSE') ?? null);
+        this.myIdCardDoc.set(docs.find(d => d.type === 'ID_CARD') ?? null);
+
+      },
+
+      error: (err) => console.error(err)
+
+    });
+
+  }
+
+  isDocValid(doc: DriverDocument | null): boolean {
+    return !!doc && doc.status === 'APPROVED' && new Date(doc.expiryDate) >= new Date();
+  }
 
   // ==========================================================
   // DELTAS — this month vs last month, based on startDate

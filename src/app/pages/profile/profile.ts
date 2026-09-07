@@ -453,4 +453,8 @@ export class Profile implements OnInit {
 
   }
 
+  isSuperAdmin(): boolean {
+    return this.user()?.role === 'SUPER_ADMIN';
+  }
+
 }

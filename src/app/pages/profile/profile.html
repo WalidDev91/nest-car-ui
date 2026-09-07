@@ -203,7 +203,7 @@
 
 
                         <!-- REQUESTS -->
-                        <li class="nav-item">
+                        <li class="nav-item" *ngIf="!isSuperAdmin()">
 
                             <button type="button" class="nav-link" [class.active]="selectedTab() === 'requests'"
                                 (click)="selectTab('requests')">
@@ -610,7 +610,7 @@
                     <!-- =========================================
                REQUESTS
           ========================================== -->
-                    <div *ngIf="selectedTab() === 'requests'">
+                    <div *ngIf="selectedTab() === 'requests' && !isSuperAdmin()">
 
                         <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -765,11 +765,11 @@
 
                                     <div>
 
+
                                         <h6 class="mb-1">
-                                            <h6 class="mb-1">
-                                                #{{ request.requestNumber }} — {{ request.subject }}
-                                            </h6>
+                                            #{{ request.requestNumber }} — {{ request.subject }}
                                         </h6>
+
 
                                         <div class="text-muted small">
                                             {{ request.type }} ·
