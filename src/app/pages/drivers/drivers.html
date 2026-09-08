@@ -146,7 +146,7 @@
                         <th>Current Mission</th>
 
                         <th class="sortable" (click)="sort('nextMission')">
-                            Next Mission In
+                            Next Mission
                             <i data-feather="chevron-down" class="sort-icon" *ngIf="sortField()==='nextMission'"
                                 [class.flip]="sortDirection()==='desc'"></i>
                         </th>
@@ -185,11 +185,16 @@
 
                         <td>
                             <ng-container *ngIf="getNextMission(driver) as next; else noNext">
-                                {{ next.title }}
-                                <small class="text-muted d-block">
+
+                                <div class="text-muted mb-1">
                                     {{ next.startDate | date:'dd/MM/yyyy HH:mm' }}
-                                </small>
+                                </div>
+
+                                <strong>
+                                    {{ next.title }}
+                                </strong>
                             </ng-container>
+
                             <ng-template #noNext>—</ng-template>
                         </td>
 

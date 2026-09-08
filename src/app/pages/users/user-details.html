@@ -43,7 +43,9 @@
               class="rounded-circle border shadow-sm" width="120" height="120" alt="User photo">
           </div>
 
-          <h4 class="mb-2">{{ user.firstName }} {{ user.lastName }}</h4>
+          <h4 class="mb-2">
+            {{ user.firstName }} {{ user.lastName }}
+          </h4>
 
           <!-- Role + status, side by side -->
           <div class="d-flex justify-content-center gap-2">
@@ -66,6 +68,7 @@
         </div>
       </div>
 
+
       <!-- QUICK SUMMARY -->
 
       <div class="card mt-3">
@@ -80,33 +83,43 @@
         <div class="card-body">
 
           <div class="quick-info-row">
+
             <i data-feather="mail" class="quick-info-icon"></i>
+
             <div>
               <div class="text-muted small">Email</div>
               <div>{{ user.email }}</div>
             </div>
+
           </div>
 
           <div class="quick-info-row">
+
             <i data-feather="phone" class="quick-info-icon"></i>
+
             <div>
               <div class="text-muted small">Phone</div>
               <div>{{ user.phone || '—' }}</div>
             </div>
+
           </div>
 
           <div class="quick-info-row mb-0">
+
             <i data-feather="user-check" class="quick-info-icon"></i>
+
             <div>
               <div class="text-muted small">Supervisor</div>
               <div>{{ user.adminName || '—' }}</div>
             </div>
+
           </div>
 
         </div>
       </div>
 
     </div>
+
 
     <!-- ==========================
           DETAILS CARD
@@ -117,25 +130,56 @@
       <div class="card">
 
         <!-- TABS -->
+
         <div class="card-header">
+
           <ul class="nav nav-tabs card-header-tabs">
 
+            <!-- INFORMATION -->
+
             <li class="nav-item">
+
               <button class="nav-link" [class.active]="selectedTab() === 'info'" (click)="selectTab('info')">
+
                 <i data-feather="info" class="me-1"></i>
                 Information
+
               </button>
+
             </li>
 
+
+            <!-- DRIVER DOCUMENTS -->
+
             <li class="nav-item" *ngIf="isDriver()">
+
               <button class="nav-link" [class.active]="selectedTab() === 'documents'" (click)="selectTab('documents')">
+
                 <i data-feather="file-text" class="me-1"></i>
                 Documents
+
               </button>
+
+            </li>
+
+
+            <!-- DRIVER MISSIONS -->
+
+            <li class="nav-item" *ngIf="isDriver()">
+
+              <button class="nav-link" [class.active]="selectedTab() === 'missions'" (click)="selectTab('missions')">
+
+                <i data-feather="map" class="me-1"></i>
+                Missions
+
+              </button>
+
             </li>
 
           </ul>
+
         </div>
+
 
         <div class="card-body">
 
@@ -146,11 +190,14 @@
           <div *ngIf="selectedTab() === 'info'">
 
             <table class="table table-borderless align-middle mb-0">
+
               <tbody>
 
                 <tr>
                   <th width="35%">Full Name</th>
-                  <td>{{ user.firstName }} {{ user.lastName }}</td>
+                  <td>
+                    {{ user.firstName }} {{ user.lastName }}
+                  </td>
                 </tr>
 
                 <tr>
@@ -165,18 +212,26 @@
 
                 <tr>
                   <th>Role</th>
+
                   <td>
-                    <span class="badge bg-primary">{{ user.role }}</span>
+                    <span class="badge bg-primary">
+                      {{ user.role }}
+                    </span>
                   </td>
+
                 </tr>
 
                 <tr>
                   <th>Account Status</th>
+
                   <td>
                     <span class="badge" [ngClass]="user.isValidate ? 'bg-success' : 'bg-danger'">
+
                       {{ user.isValidate ? 'Active' : 'Inactive' }}
+
                     </span>
                   </td>
+
                 </tr>
 
                 <tr>
@@ -186,18 +241,32 @@
 
                 <tr>
                   <th>Created At</th>
-                  <td>{{ user.createdAt ? (user.createdAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+
+                  <td>
+                    {{ user.createdAt
+                    ? (user.createdAt | date:'dd/MM/yyyy HH:mm')
+                    : '—' }}
+                  </td>
+
                 </tr>
 
                 <tr>
                   <th>Last Update</th>
-                  <td>{{ user.updatedAt ? (user.updatedAt | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+
+                  <td>
+                    {{ user.updatedAt
+                    ? (user.updatedAt | date:'dd/MM/yyyy HH:mm')
+                    : '—' }}
+                  </td>
+
                 </tr>
 
               </tbody>
+
             </table>
 
           </div>
+
 
           <!-- ==========================
                 DRIVER DOCUMENTS TAB
@@ -208,81 +277,258 @@
             <div class="row g-3">
 
               <!-- LICENSE -->
+
               <div class="col-md-6">
+
                 <div class="card border">
+
                   <div class="card-body text-center">
-                    <i data-feather="credit-card" class="text-primary mb-3" style="width:40px;height:40px;"></i>
+
+                    <i data-feather="credit-card" class="text-primary mb-3" style="width:40px;height:40px;">
+                    </i>
+
                     <h5>Driver License</h5>
+
                     <span class="badge" [ngClass]="hasLicense() ? 'bg-success' : 'bg-danger'">
-                      {{ hasLicense() ? 'Uploaded' : 'Missing' }}
+
+                      {{ hasLicense()
+                      ? 'Uploaded'
+                      : 'Missing' }}
+
                     </span>
+
                   </div>
+
                 </div>
+
               </div>
 
+
               <!-- ID CARD -->
+
               <div class="col-md-6">
+
                 <div class="card border">
+
                   <div class="card-body text-center">
-                    <i data-feather="file-text" class="text-primary mb-3" style="width:40px;height:40px;"></i>
+
+                    <i data-feather="file-text" class="text-primary mb-3" style="width:40px;height:40px;">
+                    </i>
+
                     <h5>Identity Card</h5>
+
                     <span class="badge" [ngClass]="hasIdCard() ? 'bg-success' : 'bg-danger'">
-                      {{ hasIdCard() ? 'Uploaded' : 'Missing' }}
+
+                      {{ hasIdCard()
+                      ? 'Uploaded'
+                      : 'Missing' }}
+
                     </span>
+
                   </div>
+
                 </div>
+
               </div>
 
             </div>
+
 
             <!-- GLOBAL DOCUMENT STATUS -->
 
-            <div class="alert mt-4" [ngClass]="hasCompleteDocuments() ? 'alert-success' : 'alert-warning'">
+            <div class="alert mt-4" [ngClass]="hasCompleteDocuments()
+              ? 'alert-success'
+              : 'alert-warning'">
+
               <i data-feather="info" class="me-1"></i>
-              <span *ngIf="hasCompleteDocuments()">All required driver documents are uploaded.</span>
-              <span *ngIf="!hasCompleteDocuments()">Driver documents are incomplete.</span>
+
+              <span *ngIf="hasCompleteDocuments()">
+                All required driver documents are uploaded.
+              </span>
+
+              <span *ngIf="!hasCompleteDocuments()">
+                Driver documents are incomplete.
+              </span>
+
             </div>
+
 
             <!-- DOCUMENT LIST -->
 
             <div class="mt-4">
 
               <table class="table table-hover" *ngIf="driverDocs().length > 0">
+
                 <thead>
+
                   <tr>
                     <th>Title</th>
                     <th>Type</th>
                     <th>Status</th>
                     <th class="text-end">Actions</th>
                   </tr>
+
                 </thead>
+
                 <tbody>
+
                   <tr *ngFor="let doc of driverDocs()">
+
                     <td>{{ doc.title }}</td>
-                    <td>{{ doc.type === 'DRIVER_LICENSE' ? 'Driver License' : 'ID Card' }}</td>
+
                     <td>
-                      <span class="badge" [ngClass]="{
-                        'bg-warning': doc.status === 'PENDING',
-                        'bg-success': doc.status === 'APPROVED',
-                        'bg-danger': doc.status === 'REJECTED'
-                      }">
-                        {{ doc.status }}
-                      </span>
+                      {{ doc.type === 'DRIVER_LICENSE'
+                      ? 'Driver License'
+                      : 'ID Card' }}
                     </td>
+
+                    <td>
+
+                      <span class="badge" [ngClass]="{
+                          'bg-warning': doc.status === 'PENDING',
+                          'bg-success': doc.status === 'APPROVED',
+                          'bg-danger': doc.status === 'REJECTED'
+                        }">
+
+                        {{ doc.status }}
+
+                      </span>
+
+                    </td>
+
                     <td class="text-end">
+
                       <button class="btn btn-sm btn-outline-secondary me-1" (click)="previewDriverDocument(doc.id)"
                         title="Preview" aria-label="Preview">
+
                         <i data-feather="eye"></i>
+
                       </button>
+
                     </td>
+
                   </tr>
+
                 </tbody>
+
               </table>
 
+
               <div *ngIf="driverDocs().length === 0" class="text-center text-muted py-4">
-                <i data-feather="file" style="width:40px;height:40px;"></i>
-                <p class="mt-2">No documents uploaded yet.</p>
+
+                <i data-feather="file" style="width:40px;height:40px;">
+                </i>
+
+                <p class="mt-2">
+                  No documents uploaded yet.
+                </p>
+
               </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ==========================
+                DRIVER MISSIONS TAB
+          =========================== -->
+
+          <div *ngIf="selectedTab() === 'missions' && isDriver()">
+
+            <div class="mb-4">
+
+              <h5 class="card-title mb-1">
+                <i data-feather="map" class="me-1"></i>
+                Driver Missions
+              </h5>
+
+              <p class="text-muted mb-0">
+                View missions assigned to this driver.
+              </p>
+
+            </div>
+
+
+            <!-- LOADING -->
+
+            <div *ngIf="loadingMissions()" class="text-center py-5 text-muted">
+
+              <div class="spinner-border spinner-border-sm me-2"></div>
+              Loading missions...
+
+            </div>
+
+
+            <!-- MISSION TABLE -->
+
+            <div *ngIf="!loadingMissions() && driverMissions().length > 0" class="table-responsive">
+
+              <table class="table table-hover align-middle mb-0">
+
+                <thead>
+
+                  <tr>
+                    <th>Title</th>
+                    <th>Vehicle</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  <tr *ngFor="let mission of driverMissions()">
+
+                    <td>
+                      <strong>{{ mission.title }}</strong>
+                    </td>
+
+                    <td>
+                      {{ mission.vehiclePlateNumber || '—' }}
+                    </td>
+
+                    <td>
+                      {{ mission.startDate
+                      | date:'dd/MM/yyyy HH:mm' }}
+                    </td>
+
+                    <td>
+                      {{ mission.endDate
+                      | date:'dd/MM/yyyy HH:mm' }}
+                    </td>
+
+                    <td>
+
+                      <span class="badge" [ngClass]="getMissionStatusClass(mission.status)">
+
+                        {{ mission.status }}
+
+                      </span>
+
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+
+            <!-- EMPTY -->
+
+            <div *ngIf="!loadingMissions() && driverMissions().length === 0" class="text-center text-muted py-5">
+
+              <i data-feather="map" style="width:40px;height:40px;">
+              </i>
+
+              <p class="mt-2 mb-0">
+                No missions assigned to this driver.
+              </p>
 
             </div>
 
