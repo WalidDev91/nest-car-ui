@@ -16,10 +16,15 @@
 			<!-- ========================= -->
 
 			<li class="nav-item">
+
 				<a class="nav-icon" href="#" (click)="toggleTheme(); $event.preventDefault()" title="Toggle dark mode">
+
 					<span [innerHTML]="themeIconSvg"></span>
+
 				</a>
+
 			</li>
+
 
 			<!-- ========================= -->
 			<!-- NOTIFICATIONS -->
@@ -27,63 +32,102 @@
 
 			<li class="nav-item dropdown">
 
-				<a class="nav-icon dropdown-toggle" href="#" id="notificationsDropdown" data-bs-toggle="dropdown">
+				<a class="nav-icon dropdown-toggle" href="#" id="notificationsDropdown" data-bs-toggle="dropdown"
+					(click)="loadNotifications(); $event.preventDefault()">
 
 					<div class="position-relative">
 
-						<i class="align-middle" data-feather="bell"></i>
+						<i class="align-middle" data-feather="bell">
+						</i>
 
-						<span class="indicator" *ngIf="unreadCount > 0">
-							{{ unreadCount > 9 ? '9+' : unreadCount }}
+						<span class="indicator" *ngIf="unreadCount() > 0">
+
+							{{ unreadCount() > 9 ? '9+' : unreadCount() }}
+
 						</span>
 
 					</div>
 
 				</a>
 
-				<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0">
 
-					<div class="dropdown-menu-header d-flex justify-content-between align-items-center">
+				<!-- ========================= -->
+				<!-- NOTIFICATION DROPDOWN -->
+				<!-- ========================= -->
 
-						<span>Notifications</span>
+				<div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0 notification-dropdown"
+					[class.notification-dark]="isDarkMode()" [class.notification-light]="!isDarkMode()">
 
-						<button *ngIf="unreadCount > 0" class="btn btn-link btn-sm p-0" (click)="markAllAsRead($event)">
+
+					<!-- HEADER -->
+
+					<div
+						class="dropdown-menu-header d-flex justify-content-between align-items-center notification-header">
+
+						<span>
+							Notifications
+						</span>
+
+						<button *ngIf="unreadCount() > 0" class="btn btn-link btn-sm p-0"
+							(click)="markAllAsRead($event)">
+
 							Mark all as read
+
 						</button>
 
 					</div>
 
-					<div class="list-group list-group-flush" style="max-height: 320px; overflow-y: auto;">
 
-						<a *ngFor="let notification of notifications" class="list-group-item list-group-item-action"
-							[class.bg-body-secondary]="!notification.isRead" style="cursor: pointer;"
+					<!-- NOTIFICATION LIST -->
+
+					<div class="list-group list-group-flush notification-list"
+						style="max-height: 320px; overflow-y: auto;">
+
+
+						<!-- NOTIFICATIONS -->
+
+						<div *ngFor="let notification of notifications()"
+							class="list-group-item list-group-item-action notification-item"
+							[class.notification-unread]="!notification.isRead"
 							(click)="onNotificationClick(notification)">
 
-							<div class="row g-0 align-items-center">
+							<div class="d-flex align-items-start">
 
-								<div class="col-2">
-									<i [ngClass]="getNotificationColorClass(notification.type)"
-										[attr.data-feather]="getNotificationIcon(notification.type)"></i>
+								<div class="me-3">
+
+									<i class="align-middle" [ngClass]="getNotificationColorClass(notification.type)"
+										[attr.data-feather]="getNotificationIcon(notification.type)">
+									</i>
+
 								</div>
 
-								<div class="col-10">
+
+								<div class="flex-grow-1">
 
 									<div>
 										{{ notification.title }}
 									</div>
 
-									<div class="text-muted small">
+									<div class="small notification-message">
+
 										{{ notification.message }}
+
 									</div>
 
 								</div>
 
 							</div>
 
-						</a>
+						</div>
 
-						<div *ngIf="notifications.length === 0" class="list-group-item text-center text-muted py-4">
+
+						<!-- EMPTY -->
+
+						<div *ngIf="notifications().length === 0"
+							class="list-group-item text-center py-4 notification-empty">
+
 							No notifications yet.
+
 						</div>
 
 					</div>
@@ -92,18 +136,26 @@
 
 			</li>
 
+
 			<!-- ========================= -->
-			<!-- MESSAGES (preview — comment out below if not wanted) -->
+			<!-- MESSAGES (DISABLED) -->
 			<!-- ========================= -->
 
 			<!--
 			<li class="nav-item dropdown">
 
-				<a class="nav-icon dropdown-toggle" href="#" id="messagesDropdown" data-bs-toggle="dropdown">
+				<a
+					class="nav-icon dropdown-toggle"
+					href="#"
+					id="messagesDropdown"
+					data-bs-toggle="dropdown">
 
 					<div class="position-relative">
 
-						<i class="align-middle" data-feather="message-square"></i>
+						<i
+							class="align-middle"
+							data-feather="message-square">
+						</i>
 
 						<span class="indicator">
 							4
@@ -125,11 +177,6 @@
 
 					<div class="list-group">
 
-							-->
-
-			<!-- temporary static messages -->
-
-			<!--
 						<a class="list-group-item">
 
 							<div class="row g-0 align-items-center">
@@ -138,7 +185,9 @@
 
 									<div
 										class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center">
+
 										LD
+
 									</div>
 
 								</div>
@@ -163,6 +212,7 @@
 
 						</a>
 
+
 						<a class="list-group-item">
 
 							<div class="row g-0 align-items-center">
@@ -171,7 +221,9 @@
 
 									<div
 										class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center">
+
 										CD
+
 									</div>
 
 								</div>
@@ -209,8 +261,8 @@
 				</div>
 
 			</li>
-
 			-->
+
 
 			<!-- ========================= -->
 			<!-- USER -->
@@ -220,16 +272,25 @@
 
 				<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
 
+
 					<ng-container *ngIf="hasAvatar; else initialsAvatar">
+
 						<img [src]="avatarUrl" class="avatar rounded me-1" alt="User photo">
+
 					</ng-container>
 
+
 					<ng-template #initialsAvatar>
+
 						<div
 							class="avatar rounded bg-primary text-white d-inline-flex justify-content-center align-items-center me-1">
+
 							{{ initials }}
+
 						</div>
+
 					</ng-template>
+
 
 					<span class="text-dark">
 
@@ -239,21 +300,26 @@
 
 				</a>
 
+
 				<div class="dropdown-menu dropdown-menu-end">
 
 					<a class="dropdown-item" routerLink="/profile">
 
-						<i class="align-middle me-2" data-feather="user"></i>
+						<i class="align-middle me-2" data-feather="user">
+						</i>
 
 						Profile
 
 					</a>
 
+
 					<div class="dropdown-divider"></div>
+
 
 					<a class="dropdown-item text-danger" (click)="logout()">
 
-						<i class="align-middle me-2" data-feather="log-out"></i>
+						<i class="align-middle me-2" data-feather="log-out">
+						</i>
 
 						Logout
 

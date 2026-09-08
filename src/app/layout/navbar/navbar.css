@@ -1,0 +1,137 @@
+ /* ==========================================================
+    NOTIFICATION DROPDOWN
+    ========================================================== */
+
+ .notification-dropdown {
+   min-width: 350px !important;
+ }
+
+
+ /* ==========================================================
+   DARK MODE
+   ========================================================== */
+
+ .notification-dropdown.notification-dark {
+   background-color: #1e1e2d !important;
+   color: #ffffff !important;
+   border: 1px solid #34344a !important;
+ }
+
+ .notification-dark .notification-header {
+   background-color: #1e1e2d !important;
+   color: #ffffff !important;
+   border-color: #34344a !important;
+ }
+
+ .notification-dark .notification-list {
+   background-color: #1e1e2d !important;
+ }
+
+ .notification-dark .notification-item {
+   background-color: #1e1e2d !important;
+   color: #ffffff !important;
+   border-color: #34344a !important;
+ }
+
+ .notification-dark .notification-item.notification-unread {
+   background-color: #2a2a3d !important;
+   color: #ffffff !important;
+ }
+
+ .notification-dark .notification-message {
+   color: #a9a9b8 !important;
+ }
+
+ .notification-dark .notification-empty {
+   background-color: #1e1e2d !important;
+   color: #a9a9b8 !important;
+   border-color: #34344a !important;
+ }
+
+
+ /* ==========================================================
+   DARK MODE HOVER
+   ========================================================== */
+
+ .notification-dark .notification-item:hover,
+ .notification-dark .notification-item:focus {
+   background-color: #303047 !important;
+   color: #ffffff !important;
+ }
+
+ .notification-dark .notification-item.notification-unread:hover,
+ .notification-dark .notification-item.notification-unread:focus {
+   background-color: #353550 !important;
+   color: #ffffff !important;
+ }
+
+
+ /* ==========================================================
+   LIGHT MODE
+   ========================================================== */
+
+ .notification-dropdown.notification-light {
+   background-color: #ffffff !important;
+   color: #212529 !important;
+   border: 1px solid #dee2e6 !important;
+ }
+
+ .notification-light .notification-header {
+   background-color: #ffffff !important;
+   color: #212529 !important;
+   border-color: #dee2e6 !important;
+ }
+
+ .notification-light .notification-list {
+   background-color: #ffffff !important;
+ }
+
+ .notification-light .notification-item {
+   background-color: #ffffff !important;
+   color: #212529 !important;
+   border-color: #dee2e6 !important;
+ }
+
+ .notification-light .notification-item.notification-unread {
+   background-color: #f2f2f2 !important;
+   color: #212529 !important;
+ }
+
+ .notification-light .notification-message {
+   color: #6c757d !important;
+ }
+
+ .notification-light .notification-empty {
+   background-color: #ffffff !important;
+   color: #6c757d !important;
+   border-color: #dee2e6 !important;
+ }
+
+
+ /* ==========================================================
+   LIGHT MODE HOVER
+   ========================================================== */
+
+ .notification-light .notification-item:hover,
+ .notification-light .notification-item:focus {
+   background-color: #f5f5f5 !important;
+   color: #212529 !important;
+ }
+
+
+ /* ==========================================================
+   MARK ALL AS READ BUTTON
+   ========================================================== */
+
+ .notification-dropdown .btn-link {
+   color: var(--bs-primary) !important;
+ }
+
+
+ /* ==========================================================
+   FEATHER ICONS
+   ========================================================== */
+
+ .notification-dropdown svg {
+   vertical-align: middle;
+ }

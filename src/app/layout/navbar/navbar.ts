@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
@@ -34,9 +34,9 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
   // NOTIFICATIONS
   // ==========================
 
-  notifications: Notification[] = [];
+  notifications = signal<Notification[]>([]);
 
-  unreadCount = 0;
+  unreadCount = signal(0);
 
   private pollingSubscription?: Subscription;
 
@@ -59,7 +59,9 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
     ).subscribe({
 
       next: count => {
-        this.unreadCount = count;
+
+        this.unreadCount.set(count);
+
       },
 
       error: err => console.error('Failed to load unread count', err)
@@ -70,16 +72,7 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
 
-    // Hook into Bootstrap's own "about to open" event instead of a plain
-    // (click) handler — this guarantees the notification list is fetched
-    // and populated before the dropdown actually becomes visible, instead
-    // of racing with Bootstrap's own click-driven show/hide toggle (which
-    // was causing the "click twice" bug).
-    const dropdownToggle = this.elementRef.nativeElement.querySelector('#notificationsDropdown');
-
-    dropdownToggle?.addEventListener('show.bs.dropdown', () => {
-      this.loadNotifications();
-    });
+    setTimeout(() => feather.replace(), 0);
 
   }
 
@@ -93,7 +86,7 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
 
       next: notifications => {
 
-        this.notifications = notifications.slice(0, 15);
+        this.notifications.set(notifications.slice(0, 15));
 
         setTimeout(() => feather.replace(), 0);
 
@@ -113,9 +106,17 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
 
         next: () => {
 
-          notification.isRead = true;
+          this.notifications.update(items =>
+            items.map(n =>
+              n.id === notification.id
+                ? { ...n, isRead: true }
+                : n
+            )
+          );
 
-          this.unreadCount = Math.max(0, this.unreadCount - 1);
+          this.unreadCount.update(count => Math.max(0, count - 1));
+
+          setTimeout(() => feather.replace(), 0);
 
         },
 
@@ -139,9 +140,13 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
 
       next: () => {
 
-        this.notifications.forEach(n => n.isRead = true);
+        this.notifications.update(items =>
+          items.map(n => ({ ...n, isRead: true }))
+        );
 
-        this.unreadCount = 0;
+        this.unreadCount.set(0);
+
+        setTimeout(() => feather.replace(), 0);
 
       },
 
