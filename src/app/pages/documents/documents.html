@@ -183,6 +183,7 @@
               <th>Driver</th>
               <th>Status</th>
               <th>Expiry Date</th>
+              <th>Expiry Status</th>
               <th>Upload Date</th>
               <th class="text-end">Actions</th>
             </tr>
@@ -210,6 +211,12 @@
 
               <td>
                 {{ doc.expiryDate | date:'dd/MM/yyyy' }}
+              </td>
+
+              <td>
+                <span class="badge" [ngClass]="getExpiryBadgeClass(getExpiryStatus(doc.expiryDate))">
+                  {{ getExpiryLabel(getExpiryStatus(doc.expiryDate)) }}
+                </span>
               </td>
 
               <td>{{ doc.uploadedAt | date:'dd/MM/yyyy HH:mm' }}</td>
@@ -263,14 +270,14 @@
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
-              <td colspan="7" class="text-center py-5 text-muted">
+              <td colspan="8" class="text-center py-5 text-muted">
                 <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No driver documents yet.</div>
               </td>
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
-              <td colspan="7" class="text-center py-5 text-muted">
+              <td colspan="8" class="text-center py-5 text-muted">
                 <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No documents match your filters.</div>
                 <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
@@ -297,6 +304,7 @@
               <th>Type</th>
               <th>Vehicle</th>
               <th>Expiry Date</th>
+              <th>Expiry Status</th>
               <th>Uploaded By</th>
               <th>Upload Date</th>
               <th class="text-end">Actions</th>
@@ -315,6 +323,12 @@
 
               <td>
                 {{ doc.expiryDate | date:'dd/MM/yyyy' }}
+              </td>
+
+              <td>
+                <span class="badge" [ngClass]="getExpiryBadgeClass(getExpiryStatus(doc.expiryDate))">
+                  {{ getExpiryLabel(getExpiryStatus(doc.expiryDate)) }}
+                </span>
               </td>
 
               <td>{{ doc.uploadedByName || '—' }}</td>
@@ -350,14 +364,14 @@
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && !hasActiveFilters()">
-              <td colspan="7" class="text-center py-5 text-muted">
+              <td colspan="8" class="text-center py-5 text-muted">
                 <i data-feather="file-text" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No vehicle documents yet.</div>
               </td>
             </tr>
 
             <tr *ngIf="!loading() && paginatedDocuments().length===0 && hasActiveFilters()">
-              <td colspan="7" class="text-center py-5 text-muted">
+              <td colspan="8" class="text-center py-5 text-muted">
                 <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
                 <div>No documents match your filters.</div>
                 <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>

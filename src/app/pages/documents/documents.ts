@@ -1191,4 +1191,44 @@ export class Documents implements OnInit {
 
   }
 
+  getExpiryStatus(expiryDate: string | null | undefined): 'EXPIRED' | 'EXPIRING_SOON' | 'VALID' | 'NONE' {
+
+    if (!expiryDate) return 'NONE';
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const expiry = new Date(expiryDate);
+    expiry.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'EXPIRED';
+    if (diffDays <= 30) return 'EXPIRING_SOON';
+
+    return 'VALID';
+
+  }
+
+  getExpiryBadgeClass(status: string): string {
+
+    switch (status) {
+      case 'EXPIRED': return 'bg-danger';
+      case 'EXPIRING_SOON': return 'bg-warning text-dark';
+      case 'VALID': return 'bg-success';
+      default: return 'bg-secondary';
+    }
+
+  }
+
+  getExpiryLabel(status: string): string {
+
+    switch (status) {
+      case 'EXPIRED': return 'Expired';
+      case 'EXPIRING_SOON': return 'Expiring Soon';
+      case 'VALID': return 'Valid';
+      default: return '—';
+    }
+
+  }
 }
