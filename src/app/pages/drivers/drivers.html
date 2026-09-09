@@ -136,6 +136,8 @@
 
                         <th>Email</th>
                         <th>Phone</th>
+                        <th>Supervisor</th>
+
 
                         <th class="sortable" (click)="sort('availability')">
                             Availability
@@ -161,7 +163,7 @@
                 <tbody>
 
                     <tr *ngIf="loading()">
-                        <td colspan="8" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <div class="spinner-border spinner-border-sm me-2"></div>
                             Loading drivers...
                         </td>
@@ -174,6 +176,9 @@
                         <td>{{ driver.email }}</td>
 
                         <td>{{ driver.phone || '—' }}</td>
+
+                        <td>{{ driver.adminName || '—' }}</td>
+
 
                         <td>
                             <span class="badge" [ngClass]="getAvailabilityClass(driver)">
@@ -218,7 +223,7 @@
 
                     <!-- EMPTY: no drivers at all -->
                     <tr *ngIf="!loading() && paginatedDrivers().length===0 && !hasActiveFilters()">
-                        <td colspan="8" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i data-feather="users" class="mb-2" style="width:32px;height:32px;"></i>
                             <div>No drivers yet.</div>
                         </td>
@@ -226,7 +231,7 @@
 
                     <!-- EMPTY: filters/search excluded everyone -->
                     <tr *ngIf="!loading() && paginatedDrivers().length===0 && hasActiveFilters()">
-                        <td colspan="8" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i data-feather="search" class="mb-2" style="width:32px;height:32px;"></i>
                             <div>No drivers match your filters.</div>
                             <button class="btn btn-link btn-sm" (click)="clearFilters()">Clear filters</button>
