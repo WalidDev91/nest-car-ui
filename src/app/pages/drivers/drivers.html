@@ -204,10 +204,13 @@
                         </td>
 
                         <td>
-                            <span class="badge" [ngClass]="isEligible(driver) ? 'bg-success' : 'bg-danger'"
-                                [title]="eligibilityReason(driver)">
-                                {{ isEligible(driver) ? 'Eligible' : 'Ineligible' }}
+                            <span class="badge" [ngClass]="getEligibilityClass(driver)">
+                                {{ getEligibilityLabel(driver) }}
                             </span>
+
+                            <div *ngIf="!getEligibility(driver).eligible" class="small text-danger mt-1">
+                                {{ getEligibility(driver).reasons.join(', ') }}
+                            </div>
                         </td>
 
                         <td class="text-end">

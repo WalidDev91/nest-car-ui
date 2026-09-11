@@ -163,6 +163,7 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
       case 'DOCUMENT_APPROVED': return 'check-circle';
       case 'DOCUMENT_REJECTED': return 'x-circle';
       case 'DOCUMENT_EXPIRING_SOON': return 'alert-triangle';
+      case 'DOCUMENT_EXPIRED': return 'alert-circle';
       case 'MISSION_ASSIGNED': return 'map';
       case 'VEHICLE_ASSIGNED': return 'truck';
       case 'REQUEST_SUBMITTED': return 'message-square';
@@ -178,6 +179,7 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
       case 'DOCUMENT_APPROVED': return 'text-success';
       case 'DOCUMENT_REJECTED': return 'text-danger';
       case 'DOCUMENT_EXPIRING_SOON': return 'text-warning';
+      case 'DOCUMENT_EXPIRED': return 'text-danger';
       case 'MISSION_ASSIGNED': return 'text-success';
       case 'VEHICLE_ASSIGNED': return 'text-primary';
       default: return 'text-primary';

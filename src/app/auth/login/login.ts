@@ -194,23 +194,19 @@ export class Login {
       next: () => {
 
         this.resendLoading.set(false);
-
         this.otpCode = '';
 
       },
 
       error: (err) => {
 
-        console.error(
-          'Resend OTP failed:',
-          err
-        );
+        console.error('Resend OTP failed:', err);
 
-        this.otpError.set(
-          'Could not resend the code. Please try again.'
-        );
-
+        // SMS may still have been sent successfully even if
+        // Angular cannot parse the backend response.
         this.resendLoading.set(false);
+        this.otpCode = '';
+        this.otpError.set('');
 
       }
 

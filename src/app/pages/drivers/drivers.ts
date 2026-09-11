@@ -313,47 +313,64 @@ export class Drivers implements OnInit {
   // ELIGIBILITY
   // ==========================
 
-  private isValidDoc(doc: DriverDocument | undefined): boolean {
-    return !!doc && doc.status === 'APPROVED' && new Date(doc.expiryDate) >= new Date();
+  getEligibility(driver: User): {
+    eligible: boolean;
+    reasons: string[];
+  } {
+
+    const docs = this.driverDocuments()
+      .filter(d => d.driverId === driver.id);
+
+    const license = docs.find(d => d.type === 'DRIVER_LICENSE');
+    const idCard = docs.find(d => d.type === 'ID_CARD');
+
+    const reasons: string[] = [];
+    const now = new Date();
+
+    // DRIVER LICENSE
+    if (!license) {
+      reasons.push('Missing driver license');
+    } else if (license.status === 'PENDING') {
+      reasons.push('Driver license pending approval');
+    } else if (license.status === 'REJECTED') {
+      reasons.push('Driver license rejected');
+    } else if (!license.expiryDate) {
+      reasons.push('Driver license expiry date missing');
+    } else if (new Date(license.expiryDate) < now) {
+      reasons.push('Driver license expired');
+    }
+
+    // ID CARD
+    if (!idCard) {
+      reasons.push('Missing ID card');
+    } else if (idCard.status === 'PENDING') {
+      reasons.push('ID card pending approval');
+    } else if (idCard.status === 'REJECTED') {
+      reasons.push('ID card rejected');
+    } else if (!idCard.expiryDate) {
+      reasons.push('ID card expiry date missing');
+    } else if (new Date(idCard.expiryDate) < now) {
+      reasons.push('ID card expired');
+    }
+
+    return {
+      eligible: reasons.length === 0,
+      reasons
+    };
   }
 
   isEligible(driver: User): boolean {
-
-    const docs = this.driverDocuments().filter(d => d.driverId === driver.id);
-
-    const license = docs.find(d => d.type === 'DRIVER_LICENSE');
-    const idCard = docs.find(d => d.type === 'ID_CARD');
-
-    return this.isValidDoc(license) && this.isValidDoc(idCard);
-
+    return this.getEligibility(driver).eligible;
   }
 
   eligibilityReason(driver: User): string {
+    const result = this.getEligibility(driver);
 
-    if (this.isEligible(driver)) {
-      return 'All documents approved and valid';
-    }
-
-    const now = new Date();
-
-    const docs = this.driverDocuments().filter(d => d.driverId === driver.id);
-
-    const license = docs.find(d => d.type === 'DRIVER_LICENSE');
-    const idCard = docs.find(d => d.type === 'ID_CARD');
-
-    const issues: string[] = [];
-
-    if (!license) issues.push('missing driver license');
-    else if (license.status !== 'APPROVED') issues.push('driver license not approved');
-    else if (new Date(license.expiryDate) < now) issues.push('driver license expired');
-
-    if (!idCard) issues.push('missing ID card');
-    else if (idCard.status !== 'APPROVED') issues.push('ID card not approved');
-    else if (new Date(idCard.expiryDate) < now) issues.push('ID card expired');
-
-    return issues.join(', ');
-
+    return result.eligible
+      ? 'All required documents are approved and valid'
+      : result.reasons.join(', ');
   }
+
 
   // ==========================
   // HELPERS
@@ -365,6 +382,14 @@ export class Drivers implements OnInit {
 
   viewDetails(id: string) {
     this.router.navigate(['/users', id]);
+  }
+
+  getEligibilityClass(driver: User): string {
+    return this.getEligibility(driver).eligible ? 'bg-success' : 'bg-danger';
+  }
+
+  getEligibilityLabel(driver: User): string {
+    return this.getEligibility(driver).eligible ? 'Eligible' : 'Ineligible';
   }
 
 }
