@@ -337,109 +337,443 @@
                     <!-- INSPECTION -->
                     <div *ngIf="selectedTab() === 'inspection'">
 
-                        <div class="d-flex justify-content-end mb-3">
-                            <button *ngIf="!mission.vehicleInspection" class="btn btn-primary btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#inspectionModal">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <p class="text-muted mb-0">
+                                Vehicle inspections performed before and after the mission.
+                            </p>
+
+                            <!-- 
+                            <button class="btn btn-primary btn-sm" (click)="openInspectionModal('BEFORE')">
                                 <i data-feather="plus" class="me-1"></i>
                                 Create Inspection
                             </button>
+                            -->
                         </div>
 
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Mileage</th>
-                                    <th>Fuel Level</th>
-                                    <th>Inspection Date</th>
-                                    <th>Notes</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <!-- BEFORE INSPECTION -->
+                        <div class="card mb-3">
 
-                                <tr *ngIf="mission.vehicleInspection">
-                                    <td>{{ mission.vehicleInspection.mileage }} km</td>
-                                    <td>{{ mission.vehicleInspection.fuelLevel }}%</td>
-                                    <td>{{ mission.vehicleInspection.inspectionDate | date:'dd/MM/yyyy HH:mm' }}</td>
-                                    <td>{{ mission.vehicleInspection.notes || '—' }}</td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="modal"
-                                            data-bs-target="#inspectionModal" title="Edit">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">Before Mission Inspection</h5>
+                                    <small class="text-muted">
+                                        Vehicle condition before departure.
+                                    </small>
+                                </div>
+
+                                <span class="badge bg-primary">BEFORE</span>
+                            </div>
+
+                            <div class="card-body">
+
+                                <ng-container *ngIf="getInspection('BEFORE') as inspection; else noBeforeInspection">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-4">
+                                            <div class="text-muted small">Inspection Date</div>
+                                            <div>{{ inspection.inspectionDate | date:'dd/MM/yyyy HH:mm' }}</div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="text-muted small">Mileage</div>
+                                            <div>{{ inspection.mileage }} km</div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="text-muted small">Fuel Level</div>
+                                            <div>{{ inspection.fuelLevel }}%</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Tire Pressure</div>
+                                            <div>{{ inspection.tirePressure || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Oil Change</div>
+                                            <div>{{ inspection.oilChange || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Water Check</div>
+                                            <div>{{ inspection.waterCheck || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Parts Condition</div>
+                                            <div>{{ inspection.partsCondition || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Repair Status</div>
+                                            <div>{{ inspection.repairStatus || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Accident Occurred</div>
+                                            <span class="badge"
+                                                [ngClass]="inspection.accidentOccurred ? 'bg-danger' : 'bg-success'">
+                                                {{ inspection.accidentOccurred ? 'Yes' : 'No' }}
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="text-muted small">Notes</div>
+                                            <div>{{ inspection.notes || '—' }}</div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
+
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            (click)="openInspectionModal('BEFORE')" title="Edit">
                                             <i data-feather="edit"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteInspectionModal" title="Delete">
+
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            (click)="deleteInspection(inspection.id)" title="Delete">
                                             <i data-feather="trash-2"></i>
                                         </button>
-                                    </td>
-                                </tr>
 
-                                <tr *ngIf="!mission.vehicleInspection">
-                                    <td colspan="5" class="text-center text-muted py-4">No inspection added yet.</td>
-                                </tr>
+                                    </div>
 
-                            </tbody>
-                        </table>
+                                </ng-container>
+
+                                <ng-template #noBeforeInspection>
+
+                                    <div class="text-center text-muted py-4">
+                                        <i data-feather="clipboard" style="width:36px;height:36px;"></i>
+
+                                        <p class="mt-2 mb-3">
+                                            No before-mission inspection yet.
+                                        </p>
+
+                                        <button class="btn btn-outline-primary btn-sm"
+                                            (click)="openInspectionModal('BEFORE')">
+                                            <i data-feather="plus" class="me-1"></i>
+                                            Create Before Inspection
+                                        </button>
+                                    </div>
+
+                                </ng-template>
+
+                            </div>
+
+                        </div>
+
+                        <!-- AFTER INSPECTION -->
+                        <div class="card">
+
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">After Mission Inspection</h5>
+                                    <small class="text-muted">
+                                        Vehicle condition after mission completion.
+                                    </small>
+                                </div>
+
+                                <span class="badge bg-primary">AFTER</span>
+                            </div>
+
+                            <div class="card-body">
+
+                                <ng-container *ngIf="getInspection('AFTER') as inspection; else noAfterInspection">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-4">
+                                            <div class="text-muted small">Inspection Date</div>
+                                            <div>{{ inspection.inspectionDate | date:'dd/MM/yyyy HH:mm' }}</div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="text-muted small">Mileage</div>
+                                            <div>{{ inspection.mileage }} km</div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="text-muted small">Fuel Level</div>
+                                            <div>{{ inspection.fuelLevel }}%</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Tire Pressure</div>
+                                            <div>{{ inspection.tirePressure || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Oil Change</div>
+                                            <div>{{ inspection.oilChange || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Water Check</div>
+                                            <div>{{ inspection.waterCheck || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Parts Condition</div>
+                                            <div>{{ inspection.partsCondition || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Repair Status</div>
+                                            <div>{{ inspection.repairStatus || '—' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small">Accident Occurred</div>
+                                            <span class="badge"
+                                                [ngClass]="inspection.accidentOccurred ? 'bg-danger' : 'bg-success'">
+                                                {{ inspection.accidentOccurred ? 'Yes' : 'No' }}
+                                            </span>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="text-muted small">Notes</div>
+                                            <div>{{ inspection.notes || '—' }}</div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2 mt-3">
+
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            (click)="openInspectionModal('AFTER')" title="Edit">
+                                            <i data-feather="edit"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger"
+                                            (click)="deleteInspection(inspection.id)" title="Delete">
+                                            <i data-feather="trash-2"></i>
+                                        </button>
+
+                                    </div>
+
+                                </ng-container>
+
+                                <ng-template #noAfterInspection>
+
+                                    <div class="text-center text-muted py-4">
+                                        <i data-feather="clipboard" style="width:36px;height:36px;"></i>
+
+                                        <p class="mt-2 mb-3">
+                                            No after-mission inspection yet.
+                                        </p>
+
+                                        <button class="btn btn-outline-primary btn-sm"
+                                            (click)="openInspectionModal('AFTER')">
+                                            <i data-feather="plus" class="me-1"></i>
+                                            Create After Inspection
+                                        </button>
+                                    </div>
+
+                                </ng-template>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
                     <!-- PHOTOS -->
                     <div *ngIf="selectedTab() === 'photos'">
 
-                        <div *ngIf="!mission.vehicleInspection" class="alert alert-warning mb-3">
-                            <i data-feather="alert-circle" class="me-1"></i>
-                            Create a vehicle inspection before uploading photos.
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <p class="text-muted mb-0">
+                                Photos captured during vehicle inspections.
+                            </p>
+
+                            <!-- 
+                            <div class="d-flex align-items-center gap-2">
+
+                                <label class="form-label mb-0 small text-muted">
+                                    Inspection
+                                </label>
+
+                                <select class="form-select form-select-sm" style="width: 180px;"
+                                    [(ngModel)]="selectedInspectionType">
+
+                                    <option value="BEFORE">Before Mission</option>
+                                    <option value="AFTER">After Mission</option>
+
+                                </select>
+
+                            </div>
+                            -->
+
                         </div>
 
-                        <div class="row align-items-end mb-4">
+                        <!-- PHOTO UPLOAD -->
+                        <div *ngIf="getInspection(selectedInspectionType) as selectedInspection; else noSelectedInspection"
+                            class="row align-items-end mb-4">
 
                             <div class="col-md-8">
-                                <label class="form-label">Select Image</label>
+
+                                <label class="form-label">
+                                    Select Image
+                                </label>
+
                                 <input id="missionPhotoInput" type="file" class="form-control" accept="image/*"
-                                    [disabled]="!mission.vehicleInspection" (change)="onPhotoSelected($event)">
+                                    (change)="onPhotoSelected($event)">
+
                             </div>
 
                             <div class="col-md-4 mt-3 mt-md-0">
-                                <button class="btn btn-primary w-100"
-                                    [disabled]="!selectedPhoto || !mission.vehicleInspection"
+
+                                <button class="btn btn-primary w-100" [disabled]="!selectedPhoto"
                                     (click)="uploadInspectionPhoto()">
+
                                     <i data-feather="upload" class="me-1"></i>
                                     Upload Photo
+
                                 </button>
+
                             </div>
 
                         </div>
 
+                        <ng-template #noSelectedInspection>
+
+                            <div class="alert alert-warning mb-3">
+                                <i data-feather="alert-circle" class="me-1"></i>
+
+                                Create the selected inspection before uploading photos.
+                            </div>
+
+                        </ng-template>
+
                         <div *ngIf="photoPreview" class="mb-4 text-center">
+
                             <img [src]="photoPreview" class="rounded border shadow-sm" style="max-height:140px;">
+
                         </div>
 
-                        <div *ngIf="!mission.vehicleInspection?.photos?.length" class="text-center text-muted py-4">
-                            <i data-feather="image" style="width:40px;height:40px;"></i>
-                            <p class="mt-2 mb-0">No inspection photos uploaded yet.</p>
-                        </div>
+                        <!-- BEFORE PHOTOS -->
+                        <div class="card mb-4">
 
-                        <div class="row g-3" *ngIf="mission.vehicleInspection?.photos?.length">
-
-                            <div class="col-6 col-md-4 col-xl-3"
-                                *ngFor="let photo of mission.vehicleInspection!.photos">
-
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <div>
+                                    <h5 class="mb-0">Before Mission Photos</h5>
+                                    <small class="text-muted">Photos linked to the BEFORE inspection.</small>
+                                </div>
 
-                                    <div class="position-relative">
-                                        <img [src]="photoUrl(photo.photoUrl)" alt="Inspection photo"
-                                            class="rounded shadow-sm w-100" style="height:180px; object-fit:cover;">
+                                <span class="badge bg-primary">
+                                    {{ getInspection('BEFORE')?.photos?.length ?? 0 }}
+                                </span>
+                            </div>
 
-                                        <button type="button"
-                                            class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
-                                            (click)="deletePhoto(photo.id)" title="Delete photo">
-                                            <i data-feather="trash-2"></i>
-                                        </button>
+                            <div class="card-body">
+
+                                <div *ngIf="!getInspection('BEFORE')?.photos?.length"
+                                    class="text-center text-muted py-4">
+
+                                    <i data-feather="image" style="width:40px;height:40px;"></i>
+
+                                    <p class="mt-2 mb-0">
+                                        No before-mission photos.
+                                    </p>
+
+                                </div>
+
+                                <div class="row g-3" *ngIf="getInspection('BEFORE')?.photos?.length">
+
+                                    <div class="col-6 col-md-4 col-xl-3"
+                                        *ngFor="let photo of getInspection('BEFORE')!.photos">
+
+                                        <div>
+
+                                            <div class="position-relative">
+
+                                                <img [src]="photoUrl(photo.photoUrl)" alt="Before inspection photo"
+                                                    class="rounded shadow-sm w-100"
+                                                    style="height:180px;object-fit:cover;">
+
+                                                <button type="button"
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+                                                    (click)="deletePhoto(photo.id)" title="Delete photo">
+
+                                                    <i data-feather="trash-2"></i>
+
+                                                </button>
+
+                                            </div>
+
+                                            <small class="text-muted d-block mt-2">
+                                                Uploaded:
+                                                {{ photo.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                                            </small>
+
+                                        </div>
+
                                     </div>
 
-                                    <small class="text-muted d-block mt-2">
-                                        Uploaded: {{ photo.createdAt | date:'dd/MM/yyyy HH:mm' }}
-                                    </small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- AFTER PHOTOS -->
+                        <div class="card">
+
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">After Mission Photos</h5>
+                                    <small class="text-muted">Photos linked to the AFTER inspection.</small>
+                                </div>
+
+                                <span class="badge bg-primary">
+                                    {{ getInspection('AFTER')?.photos?.length ?? 0 }}
+                                </span>
+                            </div>
+
+                            <div class="card-body">
+
+                                <div *ngIf="!getInspection('AFTER')?.photos?.length"
+                                    class="text-center text-muted py-4">
+
+                                    <i data-feather="image" style="width:40px;height:40px;"></i>
+
+                                    <p class="mt-2 mb-0">
+                                        No after-mission photos.
+                                    </p>
+
+                                </div>
+
+                                <div class="row g-3" *ngIf="getInspection('AFTER')?.photos?.length">
+
+                                    <div class="col-6 col-md-4 col-xl-3"
+                                        *ngFor="let photo of getInspection('AFTER')!.photos">
+
+                                        <div>
+
+                                            <div class="position-relative">
+
+                                                <img [src]="photoUrl(photo.photoUrl)" alt="After inspection photo"
+                                                    class="rounded shadow-sm w-100"
+                                                    style="height:180px;object-fit:cover;">
+
+                                                <button type="button"
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+                                                    (click)="deletePhoto(photo.id)" title="Delete photo">
+
+                                                    <i data-feather="trash-2"></i>
+
+                                                </button>
+
+                                            </div>
+
+                                            <small class="text-muted d-block mt-2">
+                                                Uploaded:
+                                                {{ photo.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                                            </small>
+
+                                        </div>
+
+                                    </div>
 
                                 </div>
 
@@ -517,31 +851,155 @@
 <div class="modal fade" id="inspectionModal" tabindex="-1">
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
+
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">{{ mission()?.vehicleInspection ? 'Edit Inspection' : 'Create Inspection' }}
+
+                <h5 class="modal-title">
+                    {{ getInspection(selectedInspectionType)
+                    ? 'Edit'
+                    : 'Create' }}
+                    {{ selectedInspectionType === 'BEFORE'
+                    ? ' Before Mission Inspection'
+                    : ' After Mission Inspection' }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+
             </div>
 
             <div class="modal-body">
 
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Inspection Type
+                    </label>
+
+                    <select class="form-select" [(ngModel)]="selectedInspectionType">
+
+                        <option value="BEFORE">
+                            Before Mission
+                        </option>
+
+                        <option value="AFTER">
+                            After Mission
+                        </option>
+
+                    </select>
+
+                </div>
+
                 <div class="row g-3">
 
                     <div class="col-md-6">
-                        <label class="form-label">Mileage (km)</label>
-                        <input type="number" class="form-control" [(ngModel)]="inspectionMileage">
+
+                        <label class="form-label">
+                            Mileage (km)
+                        </label>
+
+                        <input type="number" class="form-control" min="0" [(ngModel)]="inspectionMileage">
+
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Fuel Level (%)</label>
+
+                        <label class="form-label">
+                            Fuel Level (%)
+                        </label>
+
                         <input type="number" class="form-control" min="0" max="100" [(ngModel)]="inspectionFuelLevel">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Tire Pressure
+                        </label>
+
+                        <input type="text" class="form-control" placeholder="e.g. Good, Low, 2.3 bar..."
+                            [(ngModel)]="inspectionTirePressure">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Oil Change
+                        </label>
+
+                        <input type="text" class="form-control" placeholder="e.g. Not needed, Needed..."
+                            [(ngModel)]="inspectionOilChange">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Water Check
+                        </label>
+
+                        <input type="text" class="form-control" placeholder="e.g. Good, Low, Refill needed..."
+                            [(ngModel)]="inspectionWaterCheck">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Parts Condition
+                        </label>
+
+                        <input type="text" class="form-control" placeholder="e.g. Good, Brake pads need replacement..."
+                            [(ngModel)]="inspectionPartsCondition">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Repair Status
+                        </label>
+
+                        <input type="text" class="form-control" placeholder="e.g. No repair, Workshop required..."
+                            [(ngModel)]="inspectionRepairStatus">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Accident Occurred
+                        </label>
+
+                        <div class="form-check mt-2">
+
+                            <input class="form-check-input" type="checkbox" id="accidentOccurred"
+                                [(ngModel)]="inspectionAccidentOccurred">
+
+                            <label class="form-check-label" for="accidentOccurred">
+
+                                Vehicle was involved in an accident
+
+                            </label>
+
+                        </div>
+
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label">Notes</label>
-                        <textarea rows="4" class="form-control" [(ngModel)]="inspectionNotes"></textarea>
+
+                        <label class="form-label">
+                            Notes
+                        </label>
+
+                        <textarea rows="4" class="form-control" placeholder="Additional observations..."
+                            [(ngModel)]="inspectionNotes">
+                        </textarea>
+
                     </div>
 
                 </div>
@@ -549,14 +1007,22 @@
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
                 <button class="btn btn-primary" (click)="saveVehicleInspection()">
+
                     <i data-feather="save" class="me-1"></i>
                     Save Inspection
+
                 </button>
+
             </div>
 
         </div>
+
     </div>
 
 </div>
@@ -588,7 +1054,7 @@
 
             <div class="modal-footer justify-content-center">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-danger" (click)="deleteInspection()">
+                <button class="btn btn-danger" (click)="confirmDeleteInspection()">
                     <i data-feather="trash-2" class="me-1"></i>
                     Delete Inspection
                 </button>

@@ -9,6 +9,7 @@ import { MissionService } from '../../services/mission.service';
 import { Mission } from '../../models/mission';
 import { Vehicle } from '../../models/vehicle';
 import { User } from '../../models/user';
+import { MissionVehicleInspection } from '../../models/mission-vehicle-inspection';
 import { UserService } from '../../services/user.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { MissionDocumentService } from '../../services/mission-document.service';
@@ -62,8 +63,16 @@ export class MissionDetails implements OnInit {
   // INSPECTION FORM
   // ==========================================================
 
+  selectedInspectionType: 'BEFORE' | 'AFTER' = 'BEFORE';
+
   inspectionMileage: number | null = null;
   inspectionFuelLevel: number | null = null;
+  inspectionTirePressure = '';
+  inspectionOilChange = '';
+  inspectionWaterCheck = '';
+  inspectionPartsCondition = '';
+  inspectionRepairStatus = '';
+  inspectionAccidentOccurred = false;
   inspectionNotes = '';
 
   // ==========================================================
@@ -79,13 +88,18 @@ export class MissionDetails implements OnInit {
   // QUICK INFO
   // ==========================================================
 
-  hasInspection = computed(() => !!this.mission()?.vehicleInspection);
-
-  totalPhotos = computed(() =>
-    this.mission()?.vehicleInspection?.photos.length ?? 0
+  hasInspection = computed(() =>
+    (this.mission()?.vehicleInspections?.length ?? 0) > 0
   );
 
-  totalDocuments = computed(() => this.mission()?.documents?.length ?? 0);
+  totalPhotos = computed(() =>
+    this.mission()?.vehicleInspections
+      ?.reduce((total, inspection) => total + (inspection.photos?.length ?? 0), 0) ?? 0
+  );
+
+  totalDocuments = computed(() =>
+    this.mission()?.documents?.length ?? 0
+  );
 
   constructor(
     private route: ActivatedRoute,
@@ -132,19 +146,7 @@ export class MissionDetails implements OnInit {
         this.documentsVerified.set(data.documentsVerified ?? false);
         this.verificationDate.set(data.documentsVerificationDate ?? null);
 
-        if (data.vehicleInspection) {
-
-          this.inspectionMileage = data.vehicleInspection.mileage ?? null;
-          this.inspectionFuelLevel = data.vehicleInspection.fuelLevel ?? null;
-          this.inspectionNotes = data.vehicleInspection.notes ?? '';
-
-        } else {
-
-          this.inspectionMileage = null;
-          this.inspectionFuelLevel = null;
-          this.inspectionNotes = '';
-
-        }
+        this.resetInspectionForm();
 
         this.loading.set(false);
 
@@ -157,7 +159,6 @@ export class MissionDetails implements OnInit {
         console.error(err);
 
         this.loading.set(false);
-
 
       }
 
@@ -419,6 +420,10 @@ export class MissionDetails implements OnInit {
   // INSPECTION
   // ==========================================================
 
+  // ==========================================================
+  // SAVE INSPECTION
+  // ==========================================================
+
   saveVehicleInspection(): void {
 
     const current = this.mission();
@@ -426,30 +431,81 @@ export class MissionDetails implements OnInit {
     if (!current) return;
 
     const request = {
+      inspectionType: this.selectedInspectionType,
       mileage: this.inspectionMileage,
       fuelLevel: this.inspectionFuelLevel,
+      tirePressure: this.inspectionTirePressure,
+      oilChange: this.inspectionOilChange,
+      waterCheck: this.inspectionWaterCheck,
+      partsCondition: this.inspectionPartsCondition,
+      repairStatus: this.inspectionRepairStatus,
+      accidentOccurred: this.inspectionAccidentOccurred,
       notes: this.inspectionNotes
     };
 
-    this.missionService.saveVehicleInspection(current.id, request).subscribe({
+    this.missionService.saveVehicleInspection(
+      current.id,
+      request
+    ).subscribe({
+
+      next: () => {
+
+        bootstrap.Modal
+          .getInstance(document.getElementById('inspectionModal'))
+          ?.hide();
+
+        this.loadMission(current.id);
+
+        setTimeout(() => feather.replace(), 0);
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+      }
+
+    });
+  }
+
+  // ==========================================================
+  // DELETE INSPECTION
+  // ==========================================================
+
+  inspectionToDeleteId: string | null = null;
+
+  deleteInspection(inspectionId: string): void {
+
+    this.inspectionToDeleteId = inspectionId;
+
+    const modal = new bootstrap.Modal(
+      document.getElementById('deleteInspectionModal')
+    );
+
+    modal.show();
+  }
+
+  confirmDeleteInspection(): void {
+
+    const mission = this.mission();
+    const inspectionId = this.inspectionToDeleteId;
+
+    if (!mission || !inspectionId) return;
+
+    this.missionService.deleteInspection(
+      inspectionId
+    ).subscribe({
 
       next: (updatedMission: Mission) => {
 
         this.mission.set(updatedMission);
 
-        if (updatedMission.vehicleInspection) {
+        this.inspectionToDeleteId = null;
 
-          this.inspectionMileage = updatedMission.vehicleInspection.mileage;
-          this.inspectionFuelLevel = updatedMission.vehicleInspection.fuelLevel;
-          this.inspectionNotes = updatedMission.vehicleInspection.notes ?? '';
-
-        }
-
-        bootstrap.Modal.getInstance(document.getElementById('inspectionModal'))?.hide();
-
-        this.loadMission(current.id);
-
-
+        bootstrap.Modal
+          .getInstance(document.getElementById('deleteInspectionModal'))
+          ?.hide();
 
         setTimeout(() => feather.replace(), 0);
 
@@ -459,44 +515,15 @@ export class MissionDetails implements OnInit {
 
         console.error(err);
 
+        this.inspectionToDeleteId = null;
 
-
-      }
-
-    });
-
-  }
-
-  deleteInspection(): void {
-
-    const mission = this.mission();
-
-    if (!mission?.vehicleInspection) return;
-
-    this.missionService.deleteInspection(mission.id).subscribe({
-
-      next: () => {
-
-        bootstrap.Modal.getInstance(document.getElementById('deleteInspectionModal'))?.hide();
-
-        this.loadMission(mission.id);
-
-
-
-        setTimeout(() => feather.replace(), 0);
-
-      },
-
-      error: err => {
-
-        console.error(err);
-
-
+        bootstrap.Modal
+          .getInstance(document.getElementById('deleteInspectionModal'))
+          ?.hide();
 
       }
 
     });
-
   }
 
   // ==========================================================
@@ -523,26 +550,34 @@ export class MissionDetails implements OnInit {
 
   uploadInspectionPhoto(): void {
 
-    const current = this.mission();
+    if (!this.selectedPhoto) return;
 
-    if (!current || !this.selectedPhoto) return;
+    const inspection = this.getInspection(this.selectedInspectionType);
 
-    this.missionService.uploadInspectionPhoto(current.id, this.selectedPhoto).subscribe({
+    if (!inspection) return;
+
+    this.missionService.uploadInspectionPhoto(
+      inspection.id,
+      this.selectedPhoto
+    ).subscribe({
 
       next: () => {
 
         this.selectedPhoto = null;
         this.photoPreview = null;
 
-        const input = document.getElementById('missionPhotoInput') as HTMLInputElement;
+        const input =
+          document.getElementById('missionPhotoInput') as HTMLInputElement;
 
         if (input) {
           input.value = '';
         }
 
-        this.loadMission(current.id);
+        const current = this.mission();
 
-
+        if (current) {
+          this.loadMission(current.id);
+        }
 
         setTimeout(() => feather.replace(), 0);
 
@@ -550,19 +585,19 @@ export class MissionDetails implements OnInit {
 
       error: err => {
 
-        // TODO: Backend should return HTTP 413 for MaxUploadSizeExceededException.
-        // Current scenario: any 403 during upload is treated as "photo too large".
         if (err.status === 403) {
 
-          bootstrap.Modal.getOrCreateInstance(document.getElementById('photoSizeModal')).show();
+          bootstrap.Modal
+            .getOrCreateInstance(
+              document.getElementById('photoSizeModal')
+            )
+            .show();
 
           return;
 
         }
 
         console.error(err);
-
-
 
       }
 
@@ -672,5 +707,68 @@ export class MissionDetails implements OnInit {
   goBack(): void {
     this.router.navigate(['/missions']);
   }
+
+
+  // ==========================================================
+  // INSPECTION HELPERS
+  // ==========================================================
+
+  getInspection(type: 'BEFORE' | 'AFTER'): MissionVehicleInspection | undefined {
+
+    return this.mission()?.vehicleInspections?.find(
+      inspection => inspection.inspectionType === type
+    );
+
+  }
+
+  openInspectionModal(type: 'BEFORE' | 'AFTER'): void {
+
+    const inspection = this.getInspection(type);
+
+    this.selectedInspectionType = type;
+
+    if (inspection) {
+
+      this.inspectionMileage = inspection.mileage ?? null;
+      this.inspectionFuelLevel = inspection.fuelLevel ?? null;
+      this.inspectionTirePressure = inspection.tirePressure ?? '';
+      this.inspectionOilChange = inspection.oilChange ?? '';
+      this.inspectionWaterCheck = inspection.waterCheck ?? '';
+      this.inspectionPartsCondition = inspection.partsCondition ?? '';
+      this.inspectionRepairStatus = inspection.repairStatus ?? '';
+      this.inspectionAccidentOccurred = inspection.accidentOccurred ?? false;
+      this.inspectionNotes = inspection.notes ?? '';
+
+    } else {
+
+      this.resetInspectionForm();
+
+      this.selectedInspectionType = type;
+
+    }
+
+    const modalElement = document.getElementById('inspectionModal');
+
+    if (!modalElement) return;
+
+    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+
+  }
+
+  resetInspectionForm(): void {
+
+    this.inspectionMileage = null;
+    this.inspectionFuelLevel = null;
+    this.inspectionTirePressure = '';
+    this.inspectionOilChange = '';
+    this.inspectionWaterCheck = '';
+    this.inspectionPartsCondition = '';
+    this.inspectionRepairStatus = '';
+    this.inspectionAccidentOccurred = false;
+    this.inspectionNotes = '';
+
+  }
+
+
 
 }

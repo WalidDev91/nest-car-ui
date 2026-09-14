@@ -70,7 +70,7 @@ export interface Mission {
   // INSPECTION
   // ==========================
 
-  vehicleInspection?: MissionVehicleInspection | null;
+  vehicleInspections?: MissionVehicleInspection[];
 
 
 

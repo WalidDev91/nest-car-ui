@@ -89,4 +89,12 @@ export class VehicleService {
 
   }
 
+  getAssignableVehicles() {
+
+    return this.http.get<Vehicle[]>(
+      `${this.baseUrl}/assignable`
+    );
+
+  }
+
 }

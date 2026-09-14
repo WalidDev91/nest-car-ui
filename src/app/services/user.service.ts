@@ -180,4 +180,12 @@ export class UserService {
     );
 
   }
+
+  getAssignableDrivers() {
+
+    return this.http.get<User[]>(
+      `${this.baseUrl}/assignable-drivers`
+    );
+
+  }
 }

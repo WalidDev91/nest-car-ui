@@ -225,7 +225,7 @@ export class Documents implements OnInit {
       driverDocs: this.driverDocumentService.getAll(),
       vehicleDocs: this.vehicleDocumentService.getAll(),
       missionDocs: this.missionDocumentService.getAll(),
-      vehicles: this.vehicleService.getAll(),
+      vehicles: this.vehicleService.getAssignableVehicles(),
       missions: this.missionService.getAll()
     }).subscribe({
 

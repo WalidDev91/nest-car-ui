@@ -425,7 +425,7 @@
 </div>
 
 <!-- ========================================================= -->
-<!-- AVAILABILITY ERROR MODAL -->
+<!-- AVAILABILITY / ELIGIBILITY ERROR MODAL -->
 <!-- ========================================================= -->
 
 <div class="modal fade" id="availabilityModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
@@ -442,24 +442,53 @@
 
             <div class="modal-body text-center">
 
-                <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;"></i>
+                <i data-feather="alert-triangle" class="text-danger mb-3" style="width:48px;height:48px;">
+                </i>
 
-                <h5 class="mb-3">Resource unavailable</h5>
+                <!-- DRIVER UNAVAILABLE -->
+                <div *ngIf="availabilityError() === 'DRIVER'">
+                    <h5 class="mb-3">Driver unavailable</h5>
 
-                <p class="text-muted mb-0" *ngIf="availabilityError() === 'DRIVER'">
-                    The selected driver is already assigned to another mission
-                    during this period.
-                </p>
+                    <p class="text-muted mb-0">
+                        The selected driver is already assigned to another
+                        mission during this period.
+                    </p>
+                </div>
 
-                <p class="text-muted mb-0" *ngIf="availabilityError() === 'VEHICLE'">
-                    The selected vehicle is already assigned to another mission
-                    during this period.
-                </p>
+                <!-- VEHICLE UNAVAILABLE -->
+                <div *ngIf="availabilityError() === 'VEHICLE'">
+                    <h5 class="mb-3">Vehicle unavailable</h5>
 
-                <p class="text-muted mb-0" *ngIf="availabilityError() === 'BOTH'">
-                    Both the selected driver and vehicle are already assigned to
-                    another mission during this period.
-                </p>
+                    <p class="text-muted mb-0">
+                        The selected vehicle is already assigned to another
+                        mission during this period.
+                    </p>
+                </div>
+
+                <!-- BOTH UNAVAILABLE -->
+                <div *ngIf="availabilityError() === 'BOTH'">
+                    <h5 class="mb-3">Resources unavailable</h5>
+
+                    <p class="text-muted mb-0">
+                        Both the selected driver and vehicle are already
+                        assigned to another mission during this period.
+                    </p>
+                </div>
+
+                <!-- DRIVER INELIGIBLE -->
+                <div *ngIf="availabilityError() === 'DRIVER_INELIGIBLE'">
+                    <h5 class="mb-3">Driver not eligible</h5>
+
+                    <p class="text-muted mb-2">
+                        The selected driver cannot be assigned because their
+                        required documents are not valid.
+                    </p>
+
+                    <p class="text-muted mb-0">
+                        Please check the <strong>Drivers</strong> page to see
+                        the eligibility status and the reason.
+                    </p>
+                </div>
 
             </div>
 

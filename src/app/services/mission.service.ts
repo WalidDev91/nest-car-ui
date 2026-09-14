@@ -134,31 +134,21 @@ export class MissionService {
 
 
   // ==========================================================
-  // VEHICLE INSPECTION
+  // VEHICLE INSPECTIONS
   // ==========================================================
 
-
   saveVehicleInspection(
-    id: string,
+    missionId: string,
     request: any
   ) {
     return this.http.post<Mission>(
-      `${this.baseUrl}/${id}/inspection`,
+      `${this.baseUrl}/${missionId}/inspection`,
       request
     );
   }
 
-
-
-
-
-  // ==========================================================
-  // MISSION PHOTOS
-  // ==========================================================
-
-
   uploadInspectionPhoto(
-    missionId: string,
+    inspectionId: string,
     file: File,
     description?: string
   ) {
@@ -172,22 +162,17 @@ export class MissionService {
     }
 
     return this.http.post<Mission>(
-      `${this.baseUrl}/${missionId}/inspection/photos`,
+      `${this.baseUrl}/inspections/${inspectionId}/photos`,
       formData
     );
   }
 
-  deleteInspection(missionId: string) {
+  deleteInspection(inspectionId: string) {
 
     return this.http.delete<Mission>(
-      `${this.baseUrl}/${missionId}/inspection`
+      `${this.baseUrl}/inspections/${inspectionId}`
     );
-
   }
-
-
-
-
 
   deleteInspectionPhoto(
     missionId: string,
@@ -197,8 +182,10 @@ export class MissionService {
     return this.http.delete<Mission>(
       `${this.baseUrl}/${missionId}/inspection/photos/${photoId}`
     );
-
   }
+
+
+
 
 
 

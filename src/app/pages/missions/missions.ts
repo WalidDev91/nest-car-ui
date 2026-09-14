@@ -241,7 +241,7 @@ export class Missions implements OnInit {
 
   status: 'PLANNED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED' = 'PLANNED';
 
-  availabilityError = signal<'DRIVER' | 'VEHICLE' | 'BOTH' | null>(null);
+  availabilityError = signal<'DRIVER' | 'VEHICLE' | 'BOTH' | 'DRIVER_INELIGIBLE' | null>(null);
 
   driverId: string | null = null;
   vehicleId: string | null = null;
@@ -310,8 +310,8 @@ export class Missions implements OnInit {
 
     forkJoin({
       missions: this.missionService.getAll(),
-      users: this.userService.getAll(),
-      vehicles: this.vehicleService.getAll()
+      users: this.userService.getAssignableDrivers(),
+      vehicles: this.vehicleService.getAssignableVehicles()
     }).subscribe({
 
       next: ({ missions, users, vehicles }) => {
@@ -395,7 +395,10 @@ export class Missions implements OnInit {
   // ==========================================================
 
   driversList() {
-    return this.users().filter(u => u.role === 'DRIVER');
+    // this.users() now already comes from the hierarchy-filtered
+    // /assignable-drivers endpoint (drivers only, within the caller's
+    // own branch), so no further role filtering is needed here.
+    return this.users();
   }
 
   vehiclesList() {
@@ -570,6 +573,17 @@ export class Missions implements OnInit {
     if (message === 'Vehicle is not available during this period') {
 
       this.availabilityError.set('VEHICLE');
+
+      new bootstrap.Modal(
+        document.getElementById('availabilityModal')
+      ).show();
+
+      return true;
+    }
+
+    if (message === 'Driver is not eligible to work') {
+
+      this.availabilityError.set('DRIVER_INELIGIBLE');
 
       new bootstrap.Modal(
         document.getElementById('availabilityModal')
