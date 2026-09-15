@@ -32,6 +32,11 @@ export class Vehicles implements OnInit {
   vehicleDocuments = signal<any[]>([]);
   loading = signal(false);
 
+  // Document types required for a vehicle to be considered eligible
+  // for dispatch. 'OTHER' (e.g. accident reports) is intentionally
+  // excluded — it's not a mandatory operating document.
+  private readonly requiredVehicleDocTypes: string[] = ['LICENSE', 'TECHNICAL_CHECK', 'INSURANCE', 'VEHICLE_TAX'];
+
   // ==========================================================
   // SEARCH / FILTER
   // ==========================================================
@@ -40,9 +45,12 @@ export class Vehicles implements OnInit {
 
   availabilityFilter = signal<'ALL' | 'AVAILABLE' | 'IN_MISSION'>('ALL');
 
+  eligibilityFilter = signal<'ALL' | 'ELIGIBLE' | 'INELIGIBLE'>('ALL');
+
   hasActiveFilters = computed(() =>
     this.search().trim().length > 0 ||
-    this.availabilityFilter() !== 'ALL'
+    this.availabilityFilter() !== 'ALL' ||
+    this.eligibilityFilter() !== 'ALL'
   );
 
   // ==========================================================
@@ -203,6 +211,98 @@ export class Vehicles implements OnInit {
 
   });
 
+  ineligibleVehiclesCount = computed(() =>
+    this.vehicles().filter(v => !this.isVehicleEligible(v)).length
+  );
+
+  // ==========================================================
+  // ELIGIBILITY
+  // ==========================================================
+
+  private getVehicleDocuments(vehicleId: string) {
+    return this.vehicleDocuments().filter((d: any) => d.vehicleId === vehicleId);
+  }
+
+  private isDocValid(doc: any): boolean {
+    if (!doc || !doc.expiryDate) return false;
+    return new Date(doc.expiryDate) >= new Date();
+  }
+
+  private findLatestDocOfType(docs: any[], type: string): any {
+
+    return docs
+      .filter(d => d.type === type)
+      .sort((a, b) => new Date(b.expiryDate).getTime() - new Date(a.expiryDate).getTime())[0];
+
+  }
+
+  isVehicleEligible(vehicle: Vehicle): boolean {
+
+    const docs = this.getVehicleDocuments(vehicle.id);
+
+    return this.requiredVehicleDocTypes.every(type => {
+      const doc = this.findLatestDocOfType(docs, type);
+      return this.isDocValid(doc);
+    });
+
+  }
+
+  vehicleEligibilityReason(vehicle: Vehicle): string {
+
+    if (this.isVehicleEligible(vehicle)) {
+      return 'All required documents are valid';
+    }
+
+    const docs = this.getVehicleDocuments(vehicle.id);
+
+    const issues: string[] = [];
+
+    this.requiredVehicleDocTypes.forEach(type => {
+
+      const doc = this.findLatestDocOfType(docs, type);
+      const label = type.replace('_', ' ').toLowerCase();
+
+      if (!doc) {
+        issues.push(`missing ${label}`);
+      } else if (!this.isDocValid(doc)) {
+        issues.push(`${label} expired`);
+      }
+
+    });
+
+    return issues.join(', ');
+
+  }
+
+  getVehicleEligibility(vehicle: Vehicle): {
+    eligible: boolean;
+    reasons: string[];
+  } {
+
+    const docs = this.getVehicleDocuments(vehicle.id);
+
+    const reasons: string[] = [];
+
+    this.requiredVehicleDocTypes.forEach(type => {
+
+      const doc = this.findLatestDocOfType(docs, type);
+      const label = type.replace('_', ' ').toLowerCase();
+
+      if (!doc) {
+        reasons.push(`Missing ${label}`);
+      } else if (!this.isDocValid(doc)) {
+        reasons.push(`${label.charAt(0).toUpperCase() + label.slice(1)} expired`);
+      }
+
+    });
+
+    return {
+      eligible: reasons.length === 0,
+      reasons
+    };
+
+  }
+
   // ==========================================================
   // FILTERED / SORTED
   // ==========================================================
@@ -230,6 +330,16 @@ export class Vehicles implements OnInit {
 
       data = data.filter(v =>
         this.vehicleStatusMap().get(v.id) === availability
+      );
+
+    }
+
+    const eligibility = this.eligibilityFilter();
+
+    if (eligibility !== 'ALL') {
+
+      data = data.filter(v =>
+        eligibility === 'ELIGIBLE' ? this.isVehicleEligible(v) : !this.isVehicleEligible(v)
       );
 
     }
@@ -392,11 +502,23 @@ export class Vehicles implements OnInit {
 
   }
 
+  filterEligibility(value: 'ALL' | 'ELIGIBLE' | 'INELIGIBLE') {
+
+    this.eligibilityFilter.set(value);
+
+    this.currentPage.set(1);
+
+    setTimeout(() => feather.replace(), 0);
+
+  }
+
   clearFilters() {
 
     this.search.set('');
 
     this.availabilityFilter.set('ALL');
+
+    this.eligibilityFilter.set('ALL');
 
     this.currentPage.set(1);
 

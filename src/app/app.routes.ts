@@ -1,70 +1,284 @@
 import { Routes } from '@angular/router';
+
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Users } from './pages/users/users';
 import { UserDetails } from './pages/users/user-details';
+
 import { Vehicles } from './pages/vehicles/vehicles';
-import { Drivers} from './pages/drivers/drivers';
-import { Profile } from './pages/profile/profile';
 import { VehicleDetails } from './pages/vehicles/vehicle-details';
+
+import { Drivers } from './pages/drivers/drivers';
+
 import { Missions } from './pages/missions/missions';
+import { MissionDetails } from './pages/missions/mission-details';
+
 import { Documents } from './pages/documents/documents';
-//import { DriverDocumentDetails } from './pages/documents/driver-document-details';
-//import { VehicleDocumentDetails } from './pages/documents/vehicle-document-details';
-//import { MissionDocumentDetails } from './pages/documents/mission-document-details';
+
+import { Profile } from './pages/profile/profile';
+
 import { Administration } from './pages/administration/administration';
+
 import { Login } from './auth/login/login';
 import { ForgotPassword } from './auth/forgot-password/forgot-password';
 import { ResetPassword } from './auth/reset-password/reset-password';
-import { authGuard } from './guards/auth-guard'
-import { AuthLayout } from './layout/auth-layout/auth-layout';
+
+import { authGuard } from './guards/auth-guard';
 import { guestGuard } from './guards/guest-guard';
+import { roleGuard } from './guards/role-guard';
+
+import { AuthLayout } from './layout/auth-layout/auth-layout';
 import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
-import { MissionDetails } from './pages/missions/mission-details';
 
 export const routes: Routes = [
+
+  // =========================================================
+  // DASHBOARD APPLICATION
+  // =========================================================
 
   {
     path: '',
     component: DashboardLayout,
     canActivate: [authGuard],
+
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
-      { path: 'dashboard', component: Dashboard },
+      // -------------------------------------------------------
+      // DEFAULT
+      // -------------------------------------------------------
 
-      { path: 'users', component: Users },
-      { path: 'users/:id', component: UserDetails },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
 
-      { path: 'vehicles', component: Vehicles },
-      { path: 'vehicles/:id', component: VehicleDetails },
+      // -------------------------------------------------------
+      // DASHBOARD
+      // All authenticated roles
+      // -------------------------------------------------------
 
-      { path: 'missions', component: Missions },
-      { path: 'missions/:id', component: MissionDetails },
+      {
+        path: 'dashboard',
+        component: Dashboard
+      },
 
-      { path: 'drivers', component: Drivers },
+      // -------------------------------------------------------
+      // USERS
+      // Super Admin + Admin
+      // -------------------------------------------------------
 
-      { path: 'profile', component: Profile },
+      {
+        path: 'users',
+        component: Users,
+        canActivate: [roleGuard],
+        data: {
+          roles: ['SUPER_ADMIN', 'ADMIN']
+        }
+      },
 
-      { path: 'documents', component: Documents },
-      // { path: 'documents/driver/:id', component: DriverDocumentDetails },
-      // { path: 'documents/vehicle/:id', component: VehicleDocumentDetails },
-      // { path: 'documents/mission/:id', component: MissionDocumentDetails },
+      {
+        path: 'users/:id',
+        component: UserDetails,
+        canActivate: [roleGuard],
+        data: {
+          roles: ['SUPER_ADMIN', 'ADMIN']
+        }
+      },
 
-      { path: 'administration', component: Administration }
+      // -------------------------------------------------------
+      // VEHICLES
+      // All roles
+      // Driver view will be personalized later
+      // -------------------------------------------------------
+
+      {
+        path: 'vehicles',
+        component: Vehicles,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'SUPER_ADMIN',
+            'ADMIN',
+            'FLEET_MANAGER',
+            'DRIVER'
+          ]
+        }
+      },
+
+      {
+        path: 'vehicles/:id',
+        component: VehicleDetails,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'SUPER_ADMIN',
+            'ADMIN',
+            'FLEET_MANAGER',
+            'DRIVER'
+          ]
+        }
+      },
+
+      // -------------------------------------------------------
+      // MISSIONS
+      // All roles
+      // Driver view will be personalized later
+      // -------------------------------------------------------
+
+      {
+        path: 'missions',
+        component: Missions,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'SUPER_ADMIN',
+            'ADMIN',
+            'FLEET_MANAGER',
+            'DRIVER'
+          ]
+        }
+      },
+
+      {
+        path: 'missions/:id',
+        component: MissionDetails,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'SUPER_ADMIN',
+            'ADMIN',
+            'FLEET_MANAGER',
+            'DRIVER'
+          ]
+        }
+      },
+
+      // -------------------------------------------------------
+      // DRIVERS
+      // Super Admin + Admin + Fleet Manager
+      // -------------------------------------------------------
+
+      {
+        path: 'drivers',
+        component: Drivers,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'SUPER_ADMIN',
+            'ADMIN',
+            'FLEET_MANAGER'
+          ]
+        }
+      },
+
+      // -------------------------------------------------------
+      // PROFILE
+      // All authenticated roles
+      // -------------------------------------------------------
+
+      {
+        path: 'profile',
+        component: Profile
+      },
+
+      // -------------------------------------------------------
+      // DOCUMENTS
+      // All roles
+      // -------------------------------------------------------
+
+      {
+        path: 'documents',
+        component: Documents,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'SUPER_ADMIN',
+            'ADMIN',
+            'FLEET_MANAGER',
+            'DRIVER'
+          ]
+        }
+      },
+
+      /*
+      {
+        path: 'documents/driver/:id',
+        component: DriverDocumentDetails
+      },
+
+      {
+        path: 'documents/vehicle/:id',
+        component: VehicleDocumentDetails
+      },
+
+      {
+        path: 'documents/mission/:id',
+        component: MissionDocumentDetails
+      },
+      */
+
+      // -------------------------------------------------------
+      // ADMINISTRATION
+      // Super Admin + Admin + Fleet Manager
+      // -------------------------------------------------------
+
+      {
+        path: 'administration',
+        component: Administration,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'SUPER_ADMIN',
+            'ADMIN',
+            'FLEET_MANAGER'
+          ]
+        }
+      }
+
     ]
   },
+
+  // =========================================================
+  // AUTHENTICATION
+  // =========================================================
 
   {
     path: 'auth',
     component: AuthLayout,
     canActivate: [guestGuard],
+
     children: [
 
-      { path: 'login', component: Login },
+      // -------------------------------------------------------
+      // LOGIN
+      // -------------------------------------------------------
 
-      { path: 'forgot-password', component: ForgotPassword },
+      {
+        path: 'login',
+        component: Login
+      },
 
-      { path: 'reset-password', component: ResetPassword },
+      // -------------------------------------------------------
+      // FORGOT PASSWORD
+      // -------------------------------------------------------
+
+      {
+        path: 'forgot-password',
+        component: ForgotPassword
+      },
+
+      // -------------------------------------------------------
+      // RESET PASSWORD
+      // -------------------------------------------------------
+
+      {
+        path: 'reset-password',
+        component: ResetPassword
+      },
+
+      // -------------------------------------------------------
+      // REGISTER
+      // -------------------------------------------------------
 
       {
         path: 'register',
@@ -76,6 +290,13 @@ export const routes: Routes = [
     ]
   },
 
-  { path: '**', redirectTo: 'auth/login' }
+  // =========================================================
+  // UNKNOWN ROUTES
+  // =========================================================
+
+  {
+    path: '**',
+    redirectTo: 'auth/login'
+  }
 
 ];

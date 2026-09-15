@@ -24,7 +24,7 @@
         Main
       </li>
 
-      <li class="sidebar-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+      <li class="sidebar-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
 
         <a class="sidebar-link" routerLink="/dashboard">
 
@@ -36,15 +36,13 @@
 
       </li>
 
-
-
       <!-- OPERATIONS -->
 
-      <li class="sidebar-header">
+      <li class="sidebar-header" *ngIf="canSeeOperations">
         Operations
       </li>
 
-      <li class="sidebar-item" routerLinkActive="active">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="canSeeDocuments">
 
         <a class="sidebar-link" routerLink="/documents">
 
@@ -56,7 +54,7 @@
 
       </li>
 
-      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="canSeeMissions">
 
         <a class="sidebar-link" routerLink="/missions">
 
@@ -68,7 +66,7 @@
 
       </li>
 
-      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="canSeeVehicles">
 
         <a class="sidebar-link" routerLink="/vehicles">
 
@@ -80,7 +78,7 @@
 
       </li>
 
-      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="canSeeDrivers">
 
         <a class="sidebar-link" routerLink="/drivers">
 
@@ -92,17 +90,13 @@
 
       </li>
 
-
-
       <!-- MANAGEMENT -->
 
-      <li class="sidebar-header" *ngIf="isSuperAdmin || isAdmin">
-
+      <li class="sidebar-header" *ngIf="canSeeManagement">
         Management
-
       </li>
 
-      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="canSeeUsers">
 
         <a class="sidebar-link" routerLink="/users">
 
@@ -114,9 +108,7 @@
 
       </li>
 
-      <!-- ADMINISTRATION -->
-
-      <li class="sidebar-item" routerLinkActive="active" *ngIf="isSuperAdmin || isAdmin || isFleetManager">
+      <li class="sidebar-item" routerLinkActive="active" *ngIf="canSeeAdministration">
 
         <a class="sidebar-link" routerLink="/administration">
 

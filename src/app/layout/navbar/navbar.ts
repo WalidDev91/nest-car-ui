@@ -168,6 +168,7 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
       case 'VEHICLE_ASSIGNED': return 'truck';
       case 'REQUEST_SUBMITTED': return 'message-square';
       case 'REQUEST_REVIEWED': return 'message-circle';
+      case 'INSPECTION_COMPLETED': return 'clipboard';
       default: return 'bell';
     }
 
@@ -182,6 +183,7 @@ export class Navbar implements OnInit, OnDestroy, AfterViewInit {
       case 'DOCUMENT_EXPIRED': return 'text-danger';
       case 'MISSION_ASSIGNED': return 'text-success';
       case 'VEHICLE_ASSIGNED': return 'text-primary';
+      case 'INSPECTION_COMPLETED': return 'text-success';
       default: return 'text-primary';
     }
 

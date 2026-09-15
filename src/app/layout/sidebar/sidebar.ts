@@ -15,20 +15,40 @@ export class Sidebar {
 
   role = localStorage.getItem('role') ?? '';
 
-  get isDriver(): boolean {
-    return this.role === 'DRIVER';
+  get canSeeDocuments(): boolean {
+    return ['SUPER_ADMIN', 'ADMIN', 'FLEET_MANAGER', 'DRIVER'].includes(this.role);
   }
 
-  get isFleetManager(): boolean {
-    return this.role === 'FLEET_MANAGER';
+  get canSeeMissions(): boolean {
+    return ['SUPER_ADMIN', 'ADMIN', 'FLEET_MANAGER', 'DRIVER'].includes(this.role);
   }
 
-  get isAdmin(): boolean {
-    return this.role === 'ADMIN';
+  get canSeeVehicles(): boolean {
+    return ['SUPER_ADMIN', 'ADMIN', 'FLEET_MANAGER', 'DRIVER'].includes(this.role);
   }
 
-  get isSuperAdmin(): boolean {
-    return this.role === 'SUPER_ADMIN';
+  get canSeeDrivers(): boolean {
+    return ['SUPER_ADMIN', 'ADMIN', 'FLEET_MANAGER'].includes(this.role);
   }
 
+  get canSeeUsers(): boolean {
+    return ['SUPER_ADMIN', 'ADMIN'].includes(this.role);
+  }
+
+  get canSeeAdministration(): boolean {
+    return ['SUPER_ADMIN', 'ADMIN', 'FLEET_MANAGER'].includes(this.role);
+  }
+
+  get canSeeOperations(): boolean {
+    return (
+      this.canSeeDocuments ||
+      this.canSeeMissions ||
+      this.canSeeVehicles ||
+      this.canSeeDrivers
+    );
+  }
+
+  get canSeeManagement(): boolean {
+    return this.canSeeUsers || this.canSeeAdministration;
+  }
 }
