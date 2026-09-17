@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import feather from 'feather-icons';
 
 import { MissionService } from '../../services/mission.service';
@@ -45,6 +45,8 @@ export class Missions implements OnInit {
   // ==========================================================
 
   role = localStorage.getItem('role') ?? '';
+
+  loggedInUserId = localStorage.getItem('userId') ?? '';
 
   get isDriver() {
     return this.role === 'DRIVER';
@@ -123,6 +125,19 @@ export class Missions implements OnInit {
 
     let data = [...this.missions()];
 
+    // ========================================================
+    // DRIVER VIEW — only missions assigned to the logged-in
+    // driver.
+    // ========================================================
+
+    if (this.isDriver) {
+
+      data = data.filter(
+        mission => mission.driverId === this.loggedInUserId
+      );
+
+    }
+
     if (this.search().trim()) {
 
       const s = this.search().toLowerCase();
@@ -162,6 +177,9 @@ export class Missions implements OnInit {
     return data;
 
   });
+
+
+
 
   // ==========================================================
   // PAGINATION
@@ -221,6 +239,72 @@ export class Missions implements OnInit {
 
   cancelledMissions = computed(() =>
     this.missions().filter(x => x.status === 'CANCELLED').length
+  );
+
+
+
+  // ==========================================================
+  // DRIVER STATISTICS
+  // ==========================================================
+
+  myMissions = computed(() =>
+    this.missions().filter(
+      mission => mission.driverId === this.loggedInUserId
+    )
+  );
+
+  myUpcomingMissions = computed(() => {
+
+    const now = new Date();
+
+    return this.myMissions().filter(
+      mission =>
+        mission.status === 'PLANNED' &&
+        new Date(mission.startDate) > now
+    );
+
+  });
+
+  myOngoingMissions = computed(() =>
+    this.myMissions().filter(
+      mission => mission.status === 'ONGOING'
+    )
+  );
+
+  myCompletedMissions = computed(() =>
+    this.myMissions().filter(
+      mission => mission.status === 'COMPLETED'
+    )
+  );
+
+  myUpcomingMissionsCount = computed(() =>
+    this.myUpcomingMissions().length
+  );
+
+  myOngoingMissionsCount = computed(() =>
+    this.myOngoingMissions().length
+  );
+
+  myCompletedMissionsCount = computed(() =>
+    this.myCompletedMissions().length
+  );
+
+  myNextMission = computed(() => {
+
+    const upcoming = [...this.myUpcomingMissions()];
+
+    upcoming.sort(
+      (a, b) =>
+        new Date(a.startDate).getTime() -
+        new Date(b.startDate).getTime()
+    );
+
+    return upcoming[0] ?? null;
+
+  });
+
+  myCurrentMission = computed(() =>
+    this.myOngoingMissions()[0] ?? null
   );
 
   // ==========================================================
@@ -308,10 +392,14 @@ export class Missions implements OnInit {
 
     this.loading.set(true);
 
+    const missions$ = this.missionService.getAll();
+    const users$ = this.isDriver ? of([]) : this.userService.getAssignableDrivers();
+    const vehicles$ = this.isDriver ? of([]) : this.vehicleService.getAssignableVehicles();
+
     forkJoin({
-      missions: this.missionService.getAll(),
-      users: this.userService.getAssignableDrivers(),
-      vehicles: this.vehicleService.getAssignableVehicles()
+      missions: missions$,
+      users: users$,
+      vehicles: vehicles$
     }).subscribe({
 
       next: ({ missions, users, vehicles }) => {

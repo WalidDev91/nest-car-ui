@@ -35,7 +35,51 @@ export class Vehicles implements OnInit {
   // Document types required for a vehicle to be considered eligible
   // for dispatch. 'OTHER' (e.g. accident reports) is intentionally
   // excluded — it's not a mandatory operating document.
-  private readonly requiredVehicleDocTypes: string[] = ['LICENSE', 'TECHNICAL_CHECK', 'INSURANCE', 'VEHICLE_TAX'];
+  private readonly requiredVehicleDocTypes: string[] = [
+    'LICENSE',
+    'TECHNICAL_CHECK',
+    'INSURANCE',
+    'VEHICLE_TAX'
+  ];
+
+  // ==========================================================
+  // ROLE
+  // ==========================================================
+
+  role = localStorage.getItem('role') ?? '';
+  loggedInUserId = localStorage.getItem('userId') ?? '';
+
+  get isDriver() {
+    return this.role === 'DRIVER';
+  }
+
+  // ==========================================================
+  // VALIDATION
+  // ==========================================================
+
+  get plateNumberInvalid(): boolean {
+    return this.submitted() && !this.plateNumber.trim();
+  }
+
+  get brandInvalid(): boolean {
+    return this.submitted() && !this.brand.trim();
+  }
+
+  get modelInvalid(): boolean {
+    return this.submitted() && !this.model.trim();
+  }
+
+  get yearInvalid(): boolean {
+
+    if (!this.submitted()) return false;
+
+    const currentYear = new Date().getFullYear();
+
+    return !this.year ||
+      this.year < 1980 ||
+      this.year > currentYear + 1;
+
+  }
 
   // ==========================================================
   // SEARCH / FILTER
@@ -43,9 +87,13 @@ export class Vehicles implements OnInit {
 
   search = signal('');
 
-  availabilityFilter = signal<'ALL' | 'AVAILABLE' | 'IN_MISSION'>('ALL');
+  availabilityFilter = signal<
+    'ALL' | 'AVAILABLE' | 'IN_MISSION'
+  >('ALL');
 
-  eligibilityFilter = signal<'ALL' | 'ELIGIBLE' | 'INELIGIBLE'>('ALL');
+  eligibilityFilter = signal<
+    'ALL' | 'ELIGIBLE' | 'INELIGIBLE'
+  >('ALL');
 
   hasActiveFilters = computed(() =>
     this.search().trim().length > 0 ||
@@ -92,36 +140,7 @@ export class Vehicles implements OnInit {
   // Photos already saved on the vehicle (edit mode only).
   existingPhotos = signal<VehiclePhoto[]>([]);
 
-  role = localStorage.getItem('role') ?? '';
-
-
   uploadsUrl = environment.uploadsUrl;
-
-  get isDriver() {
-    return this.role === 'DRIVER';
-  }
-
-  // ==========================================================
-  // VALIDATION
-  // ==========================================================
-
-  get plateNumberInvalid(): boolean {
-    return this.submitted() && !this.plateNumber.trim();
-  }
-
-  get brandInvalid(): boolean {
-    return this.submitted() && !this.brand.trim();
-  }
-
-  get modelInvalid(): boolean {
-    return this.submitted() && !this.model.trim();
-  }
-
-  get yearInvalid(): boolean {
-    if (!this.submitted()) return false;
-    const currentYear = new Date().getFullYear();
-    return !this.year || this.year < 1980 || this.year > currentYear + 1;
-  }
 
   // ==========================================================
   // DELETE VEHICLE
@@ -131,32 +150,44 @@ export class Vehicles implements OnInit {
 
   vehicleToDeletePlate = computed(() => {
     const id = this.vehicleToDeleteId();
-    return this.vehicles().find(v => v.id === id)?.plateNumber ?? '';
+
+    return this.vehicles().find(
+      v => v.id === id
+    )?.plateNumber ?? '';
   });
 
   linkedDocumentsCount = computed(() => {
+
     const id = this.vehicleToDeleteId();
+
     if (!id) return 0;
-    return this.vehicleDocuments().filter((d: any) => d.vehicleId === id).length;
+
+    return this.vehicleDocuments().filter(
+      (d: any) => d.vehicleId === id
+    ).length;
+
   });
 
   linkedMissionsCount = computed(() => {
+
     const id = this.vehicleToDeleteId();
+
     if (!id) return 0;
-    return this.missions().filter((m: any) => m.vehicleId === id).length;
+
+    return this.missions().filter(
+      (m: any) => m.vehicleId === id
+    ).length;
+
   });
 
   hasLinkedRecords = computed(() =>
-    this.linkedDocumentsCount() > 0 || this.linkedMissionsCount() > 0
+    this.linkedDocumentsCount() > 0 ||
+    this.linkedMissionsCount() > 0
   );
 
   // ==========================================================
-  // STAT CARDS
+  // VEHICLE STATUS
   // ==========================================================
-
-  totalVehicles = computed(() =>
-    this.vehicles().length
-  );
 
   vehicleStatusMap = computed(() => {
 
@@ -169,7 +200,10 @@ export class Vehicles implements OnInit {
         .map(m => m.vehicleId)
     );
 
-    const map = new Map<string, 'IN_MISSION' | 'AVAILABLE'>();
+    const map = new Map<
+      string,
+      'IN_MISSION' | 'AVAILABLE'
+    >();
 
     this.vehicles().forEach(v => {
 
@@ -186,6 +220,14 @@ export class Vehicles implements OnInit {
 
   });
 
+  // ==========================================================
+  // STAT CARDS — GENERAL
+  // ==========================================================
+
+  totalVehicles = computed(() =>
+    this.vehicles().length
+  );
+
   vehiclesInMission = computed(() =>
     this.vehicles().filter(v =>
       this.vehicleStatusMap().get(v.id) === 'IN_MISSION'
@@ -193,79 +235,189 @@ export class Vehicles implements OnInit {
   );
 
   availableVehicles = computed(() =>
-    this.totalVehicles() - this.vehiclesInMission()
+    this.totalVehicles() -
+    this.vehiclesInMission()
   );
+
+  ineligibleVehiclesCount = computed(() =>
+    this.vehicles().filter(
+      v => !this.isVehicleEligible(v)
+    ).length
+  );
+
+  // ==========================================================
+  // DRIVER VEHICLES
+  // Vehicles associated with missions assigned to the
+  // logged-in driver.
+  // ==========================================================
+
+  myVehicleIds = computed(() => {
+
+    return new Set(
+      this.missions()
+        .filter(
+          (mission: any) =>
+            mission.driverId === this.loggedInUserId &&
+            mission.vehicleId
+        )
+        .map(
+          (mission: any) => mission.vehicleId
+        )
+    );
+
+  });
+
+  myVehicles = computed(() => {
+
+    const ids = this.myVehicleIds();
+
+    return this.vehicles().filter(
+      vehicle => ids.has(vehicle.id)
+    );
+
+  });
+
+  myVehiclesCount = computed(() =>
+    this.myVehicles().length
+  );
+
+  myVehiclesInMission = computed(() =>
+    this.myVehicles().filter(
+      vehicle =>
+        this.vehicleStatusMap().get(vehicle.id) === 'IN_MISSION'
+    ).length
+  );
+
+  myAvailableVehicles = computed(() =>
+    this.myVehicles().filter(
+      vehicle =>
+        this.vehicleStatusMap().get(vehicle.id) === 'AVAILABLE'
+    ).length
+  );
+
+  myIneligibleVehiclesCount = computed(() =>
+    this.myVehicles().filter(
+      vehicle => !this.isVehicleEligible(vehicle)
+    ).length
+  );
+
+  // ==========================================================
+  // VEHICLE AGE
+  // ==========================================================
 
   averageVehicleAge = computed(() => {
 
-    if (!this.vehicles().length) return '-';
+    const vehicles = this.isDriver
+      ? this.myVehicles()
+      : this.vehicles();
+
+    if (!vehicles.length) return '-';
 
     const currentYear = new Date().getFullYear();
 
-    const totalAge = this.vehicles()
-      .reduce((sum, v) => sum + (currentYear - v.year), 0);
+    const totalAge = vehicles.reduce(
+      (sum, v) =>
+        sum + (currentYear - v.year),
+      0
+    );
 
-    const avg = totalAge / this.vehicles().length;
+    const avg = totalAge / vehicles.length;
 
     return avg.toFixed(1);
 
   });
-
-  ineligibleVehiclesCount = computed(() =>
-    this.vehicles().filter(v => !this.isVehicleEligible(v)).length
-  );
 
   // ==========================================================
   // ELIGIBILITY
   // ==========================================================
 
   private getVehicleDocuments(vehicleId: string) {
-    return this.vehicleDocuments().filter((d: any) => d.vehicleId === vehicleId);
+
+    return this.vehicleDocuments().filter(
+      (d: any) => d.vehicleId === vehicleId
+    );
+
   }
 
   private isDocValid(doc: any): boolean {
+
     if (!doc || !doc.expiryDate) return false;
+
     return new Date(doc.expiryDate) >= new Date();
+
   }
 
-  private findLatestDocOfType(docs: any[], type: string): any {
+  private findLatestDocOfType(
+    docs: any[],
+    type: string
+  ): any {
 
     return docs
       .filter(d => d.type === type)
-      .sort((a, b) => new Date(b.expiryDate).getTime() - new Date(a.expiryDate).getTime())[0];
+      .sort(
+        (a, b) =>
+          new Date(b.expiryDate).getTime() -
+          new Date(a.expiryDate).getTime()
+      )[0];
 
   }
 
   isVehicleEligible(vehicle: Vehicle): boolean {
 
-    const docs = this.getVehicleDocuments(vehicle.id);
+    const docs = this.getVehicleDocuments(
+      vehicle.id
+    );
 
     return this.requiredVehicleDocTypes.every(type => {
-      const doc = this.findLatestDocOfType(docs, type);
+
+      const doc = this.findLatestDocOfType(
+        docs,
+        type
+      );
+
       return this.isDocValid(doc);
+
     });
 
   }
 
-  vehicleEligibilityReason(vehicle: Vehicle): string {
+  vehicleEligibilityReason(
+    vehicle: Vehicle
+  ): string {
 
     if (this.isVehicleEligible(vehicle)) {
       return 'All required documents are valid';
     }
 
-    const docs = this.getVehicleDocuments(vehicle.id);
+    const docs = this.getVehicleDocuments(
+      vehicle.id
+    );
 
     const issues: string[] = [];
 
     this.requiredVehicleDocTypes.forEach(type => {
 
-      const doc = this.findLatestDocOfType(docs, type);
-      const label = type.replace('_', ' ').toLowerCase();
+      const doc = this.findLatestDocOfType(
+        docs,
+        type
+      );
+
+      const label = type
+        .replace('_', ' ')
+        .toLowerCase();
 
       if (!doc) {
-        issues.push(`missing ${label}`);
+
+        issues.push(
+          `missing ${label}`
+        );
+
       } else if (!this.isDocValid(doc)) {
-        issues.push(`${label} expired`);
+
+        issues.push(
+          `${label} expired`
+        );
+
       }
 
     });
@@ -279,19 +431,35 @@ export class Vehicles implements OnInit {
     reasons: string[];
   } {
 
-    const docs = this.getVehicleDocuments(vehicle.id);
+    const docs = this.getVehicleDocuments(
+      vehicle.id
+    );
 
     const reasons: string[] = [];
 
     this.requiredVehicleDocTypes.forEach(type => {
 
-      const doc = this.findLatestDocOfType(docs, type);
-      const label = type.replace('_', ' ').toLowerCase();
+      const doc = this.findLatestDocOfType(
+        docs,
+        type
+      );
+
+      const label = type
+        .replace('_', ' ')
+        .toLowerCase();
 
       if (!doc) {
-        reasons.push(`Missing ${label}`);
+
+        reasons.push(
+          `Missing ${label}`
+        );
+
       } else if (!this.isDocValid(doc)) {
-        reasons.push(`${label.charAt(0).toUpperCase() + label.slice(1)} expired`);
+
+        reasons.push(
+          `${label.charAt(0).toUpperCase() + label.slice(1)} expired`
+        );
+
       }
 
     });
@@ -309,9 +477,13 @@ export class Vehicles implements OnInit {
 
   filteredVehicles = computed(() => {
 
-    let data = [...this.vehicles()];
+    let data = this.isDriver
+      ? [...this.myVehicles()]
+      : [...this.vehicles()];
 
-    const search = this.search().trim().toLowerCase();
+    const search = this.search()
+      .trim()
+      .toLowerCase();
 
     if (search) {
 
@@ -324,22 +496,27 @@ export class Vehicles implements OnInit {
 
     }
 
-    const availability = this.availabilityFilter();
+    const availability =
+      this.availabilityFilter();
 
     if (availability !== 'ALL') {
 
       data = data.filter(v =>
-        this.vehicleStatusMap().get(v.id) === availability
+        this.vehicleStatusMap().get(v.id) ===
+        availability
       );
 
     }
 
-    const eligibility = this.eligibilityFilter();
+    const eligibility =
+      this.eligibilityFilter();
 
     if (eligibility !== 'ALL') {
 
       data = data.filter(v =>
-        eligibility === 'ELIGIBLE' ? this.isVehicleEligible(v) : !this.isVehicleEligible(v)
+        eligibility === 'ELIGIBLE'
+          ? this.isVehicleEligible(v)
+          : !this.isVehicleEligible(v)
       );
 
     }
@@ -351,11 +528,25 @@ export class Vehicles implements OnInit {
       let valueA = a[column];
       let valueB = b[column];
 
-      if (typeof valueA === 'string') valueA = valueA.toLowerCase();
-      if (typeof valueB === 'string') valueB = valueB.toLowerCase();
+      if (typeof valueA === 'string') {
+        valueA = valueA.toLowerCase();
+      }
 
-      if (valueA < valueB) return this.sortDirection() === 'asc' ? -1 : 1;
-      if (valueA > valueB) return this.sortDirection() === 'asc' ? 1 : -1;
+      if (typeof valueB === 'string') {
+        valueB = valueB.toLowerCase();
+      }
+
+      if (valueA < valueB) {
+        return this.sortDirection() === 'asc'
+          ? -1
+          : 1;
+      }
+
+      if (valueA > valueB) {
+        return this.sortDirection() === 'asc'
+          ? 1
+          : -1;
+      }
 
       return 0;
 
@@ -367,14 +558,25 @@ export class Vehicles implements OnInit {
 
   paginatedVehicles = computed(() => {
 
-    const start = (this.currentPage() - 1) * this.pageSize();
+    const start =
+      (this.currentPage() - 1) *
+      this.pageSize();
 
-    return this.filteredVehicles().slice(start, start + this.pageSize());
+    return this.filteredVehicles().slice(
+      start,
+      start + this.pageSize()
+    );
 
   });
 
   totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.filteredVehicles().length / this.pageSize()))
+    Math.max(
+      1,
+      Math.ceil(
+        this.filteredVehicles().length /
+        this.pageSize()
+      )
+    )
   );
 
   // ==========================================================
@@ -409,19 +611,35 @@ export class Vehicles implements OnInit {
 
       next: (result) => {
 
-        this.vehicles.set(result.vehicles);
-        this.missions.set(result.missions);
-        this.vehicleDocuments.set(result.vehicleDocuments);
+        this.vehicles.set(
+          result.vehicles
+        );
+
+        this.missions.set(
+          result.missions
+        );
+
+        this.vehicleDocuments.set(
+          result.vehicleDocuments
+        );
 
         this.loading.set(false);
 
         this.route.queryParams.subscribe(params => {
 
+          // Drivers cannot use edit/delete query parameters.
+          if (this.isDriver) {
+            return;
+          }
+
           const editId = params['edit'];
 
           if (editId) {
 
-            const vehicle = this.vehicles().find(v => v.id === editId);
+            const vehicle =
+              this.vehicles().find(
+                v => v.id === editId
+              );
 
             if (vehicle) {
 
@@ -442,7 +660,10 @@ export class Vehicles implements OnInit {
 
           if (deleteId) {
 
-            const vehicle = this.vehicles().find(v => v.id === deleteId);
+            const vehicle =
+              this.vehicles().find(
+                v => v.id === deleteId
+              );
 
             if (vehicle) {
 
@@ -460,7 +681,10 @@ export class Vehicles implements OnInit {
 
         });
 
-        setTimeout(() => feather.replace(), 0);
+        setTimeout(
+          () => feather.replace(),
+          0
+        );
 
       },
 
@@ -469,8 +693,6 @@ export class Vehicles implements OnInit {
         console.error(err);
 
         this.loading.set(false);
-
-
 
       }
 
@@ -488,41 +710,55 @@ export class Vehicles implements OnInit {
 
     this.currentPage.set(1);
 
-    setTimeout(() => feather.replace(), 0);
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
-  filterAvailability(value: 'ALL' | 'AVAILABLE' | 'IN_MISSION') {
+  filterAvailability(
+    value: 'ALL' | 'AVAILABLE' | 'IN_MISSION'
+  ) {
 
     this.availabilityFilter.set(value);
 
     this.currentPage.set(1);
 
-    setTimeout(() => feather.replace(), 0);
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
-  filterEligibility(value: 'ALL' | 'ELIGIBLE' | 'INELIGIBLE') {
+  filterEligibility(
+    value: 'ALL' | 'ELIGIBLE' | 'INELIGIBLE'
+  ) {
 
     this.eligibilityFilter.set(value);
 
     this.currentPage.set(1);
 
-    setTimeout(() => feather.replace(), 0);
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
   clearFilters() {
 
     this.search.set('');
-
     this.availabilityFilter.set('ALL');
-
     this.eligibilityFilter.set('ALL');
 
     this.currentPage.set(1);
 
-    setTimeout(() => feather.replace(), 0);
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
@@ -534,7 +770,11 @@ export class Vehicles implements OnInit {
 
     if (this.sortColumn() === column) {
 
-      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+      this.sortDirection.set(
+        this.sortDirection() === 'asc'
+          ? 'desc'
+          : 'asc'
+      );
 
     } else {
 
@@ -542,6 +782,11 @@ export class Vehicles implements OnInit {
       this.sortDirection.set('asc');
 
     }
+
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
@@ -551,17 +796,38 @@ export class Vehicles implements OnInit {
 
   nextPage() {
 
-    if (this.currentPage() < this.totalPages()) {
-      this.currentPage.update(v => v + 1);
+    if (
+      this.currentPage() <
+      this.totalPages()
+    ) {
+
+      this.currentPage.update(
+        v => v + 1
+      );
+
     }
+
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
   previousPage() {
 
     if (this.currentPage() > 1) {
-      this.currentPage.update(v => v - 1);
+
+      this.currentPage.update(
+        v => v - 1
+      );
+
     }
+
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
@@ -571,32 +837,45 @@ export class Vehicles implements OnInit {
 
   onPhotosSelected(event: Event) {
 
-    const input = event.target as HTMLInputElement;
+    const input =
+      event.target as HTMLInputElement;
 
     if (!input.files?.length) return;
 
-    const newFiles = Array.from(input.files);
+    const newFiles =
+      Array.from(input.files);
 
     newFiles.forEach(file => {
 
-      const alreadySelected = this.selectedPhotos().some(
-        existing =>
-          existing.name === file.name &&
-          existing.size === file.size &&
-          existing.lastModified === file.lastModified
-      );
+      const alreadySelected =
+        this.selectedPhotos().some(
+          existing =>
+            existing.name === file.name &&
+            existing.size === file.size &&
+            existing.lastModified === file.lastModified
+        );
 
       if (alreadySelected) return;
 
-      this.selectedPhotos.update(list => [...list, file]);
+      this.selectedPhotos.update(
+        list => [...list, file]
+      );
 
       const reader = new FileReader();
 
       reader.onload = () => {
 
-        this.photoPreviews.update(list => [...list, reader.result as string]);
+        this.photoPreviews.update(
+          list => [
+            ...list,
+            reader.result as string
+          ]
+        );
 
-        setTimeout(() => feather.replace(), 0);
+        setTimeout(
+          () => feather.replace(),
+          0
+        );
 
       };
 
@@ -610,33 +889,50 @@ export class Vehicles implements OnInit {
 
   removeSelectedPhoto(index: number) {
 
-    this.selectedPhotos.update(list => list.filter((_, i) => i !== index));
-    this.photoPreviews.update(list => list.filter((_, i) => i !== index));
-    setTimeout(() => feather.replace(), 0);
+    this.selectedPhotos.update(
+      list => list.filter(
+        (_, i) => i !== index
+      )
+    );
+
+    this.photoPreviews.update(
+      list => list.filter(
+        (_, i) => i !== index
+      )
+    );
+
+    setTimeout(
+      () => feather.replace(),
+      0
+    );
 
   }
 
   // ==========================================================
-  // PHOTOS — already saved on the vehicle (edit mode)
+  // PHOTOS — already saved on the vehicle
   // ==========================================================
 
-  removeExistingPhoto(vehicleId: string, photoId: string): void {
+  removeExistingPhoto(
+    vehicleId: string,
+    photoId: string
+  ): void {
 
-    this.vehicleService.deletePhoto(vehicleId, photoId).subscribe({
+    this.vehicleService.deletePhoto(
+      vehicleId,
+      photoId
+    ).subscribe({
 
       next: (updatedVehicle) => {
 
-        this.existingPhotos.set(updatedVehicle.photos ?? []);
-
-
+        this.existingPhotos.set(
+          updatedVehicle.photos ?? []
+        );
 
       },
 
       error: err => {
 
         console.error(err);
-
-
 
       }
 
@@ -645,7 +941,7 @@ export class Vehicles implements OnInit {
   }
 
   // ==========================================================
-  // SAVE VEHICLE (CREATE / UPDATE)
+  // SAVE VEHICLE
   // ==========================================================
 
   saveVehicle() {
@@ -662,63 +958,87 @@ export class Vehicles implements OnInit {
     }
 
     const vehicle = {
-      plateNumber: this.plateNumber.trim().toUpperCase(),
-      brand: this.brand.trim(),
-      model: this.model.trim(),
+
+      plateNumber:
+        this.plateNumber
+          .trim()
+          .toUpperCase(),
+
+      brand:
+        this.brand.trim(),
+
+      model:
+        this.model.trim(),
+
       year: this.year
+
     };
 
     if (!this.editMode) {
 
-      this.vehicleService.create(vehicle).subscribe({
+      this.vehicleService.create(
+        vehicle
+      ).subscribe({
 
         next: (createdVehicle) => {
 
-          const photos = this.selectedPhotos();
+          const photos =
+            this.selectedPhotos();
 
           if (photos.length > 0) {
 
-            const uploads = photos.map(photo =>
-              this.vehicleService.uploadPhoto(createdVehicle.id, photo)
-            );
+            const uploads =
+              photos.map(photo =>
+                this.vehicleService.uploadPhoto(
+                  createdVehicle.id,
+                  photo
+                )
+              );
 
-            forkJoin(uploads).subscribe({
+            forkJoin(uploads)
+              .subscribe({
 
-              next: () => {
+                next: () => {
 
+                  this.resetForm();
 
+                  bootstrap.Modal.getInstance(
+                    document.getElementById(
+                      'vehicleModal'
+                    )
+                  )?.hide();
 
-                this.resetForm();
+                  this.loadVehicles();
 
-                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+                },
 
-                this.loadVehicles();
+                error: err => {
 
-              },
+                  console.error(err);
 
-              error: err => {
+                  this.resetForm();
 
-                console.error(err);
+                  bootstrap.Modal.getInstance(
+                    document.getElementById(
+                      'vehicleModal'
+                    )
+                  )?.hide();
 
+                  this.loadVehicles();
 
+                }
 
-                this.resetForm();
-
-                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
-
-                this.loadVehicles();
-
-              }
-
-            });
+              });
 
           } else {
 
-
-
             this.resetForm();
 
-            bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+            bootstrap.Modal.getInstance(
+              document.getElementById(
+                'vehicleModal'
+              )
+            )?.hide();
 
             this.loadVehicles();
 
@@ -729,8 +1049,6 @@ export class Vehicles implements OnInit {
         error: err => {
 
           console.error(err);
-
-
 
         }
 
@@ -738,54 +1056,70 @@ export class Vehicles implements OnInit {
 
     } else {
 
-      this.vehicleService.update(this.editingVehicleId!, vehicle).subscribe({
+      this.vehicleService.update(
+        this.editingVehicleId!,
+        vehicle
+      ).subscribe({
 
         next: (updatedVehicle) => {
 
-          const photos = this.selectedPhotos();
+          const photos =
+            this.selectedPhotos();
 
           if (photos.length > 0) {
 
-            const uploads = photos.map(photo =>
-              this.vehicleService.uploadPhoto(updatedVehicle.id, photo)
-            );
+            const uploads =
+              photos.map(photo =>
+                this.vehicleService.uploadPhoto(
+                  updatedVehicle.id,
+                  photo
+                )
+              );
 
-            forkJoin(uploads).subscribe({
+            forkJoin(uploads)
+              .subscribe({
 
-              next: () => {
+                next: () => {
 
+                  this.resetForm();
 
-                this.resetForm();
+                  bootstrap.Modal.getInstance(
+                    document.getElementById(
+                      'vehicleModal'
+                    )
+                  )?.hide();
 
-                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+                  this.loadVehicles();
 
-                this.loadVehicles();
+                },
 
-              },
+                error: err => {
 
-              error: err => {
+                  console.error(err);
 
-                console.error(err);
+                  this.resetForm();
 
+                  bootstrap.Modal.getInstance(
+                    document.getElementById(
+                      'vehicleModal'
+                    )
+                  )?.hide();
 
+                  this.loadVehicles();
 
-                this.resetForm();
+                }
 
-                bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
-
-                this.loadVehicles();
-
-              }
-
-            });
+              });
 
           } else {
 
-
-
             this.resetForm();
 
-            bootstrap.Modal.getInstance(document.getElementById('vehicleModal'))?.hide();
+            bootstrap.Modal.getInstance(
+              document.getElementById(
+                'vehicleModal'
+              )
+            )?.hide();
 
             this.loadVehicles();
 
@@ -796,8 +1130,6 @@ export class Vehicles implements OnInit {
         error: err => {
 
           console.error(err);
-
-
 
         }
 
@@ -828,7 +1160,10 @@ export class Vehicles implements OnInit {
 
     this.submitted.set(false);
 
-    const input = document.getElementById('vehiclePhotosInput') as HTMLInputElement;
+    const input =
+      document.getElementById(
+        'vehiclePhotosInput'
+      ) as HTMLInputElement;
 
     if (input) {
       input.value = '';
@@ -841,7 +1176,12 @@ export class Vehicles implements OnInit {
   // ==========================================================
 
   viewVehicleDetails(id: string) {
-    this.router.navigate(['/vehicles', id]);
+
+    this.router.navigate([
+      '/vehicles',
+      id
+    ]);
+
   }
 
   // ==========================================================
@@ -850,7 +1190,12 @@ export class Vehicles implements OnInit {
 
   editVehicle(id: string) {
 
-    const vehicle = this.vehicles().find(v => v.id === id);
+    if (this.isDriver) return;
+
+    const vehicle =
+      this.vehicles().find(
+        v => v.id === id
+      );
 
     if (!vehicle) return;
 
@@ -859,17 +1204,31 @@ export class Vehicles implements OnInit {
 
     this.submitted.set(false);
 
-    this.plateNumber = vehicle.plateNumber;
-    this.brand = vehicle.brand;
-    this.model = vehicle.model;
-    this.year = vehicle.year;
+    this.plateNumber =
+      vehicle.plateNumber;
+
+    this.brand =
+      vehicle.brand;
+
+    this.model =
+      vehicle.model;
+
+    this.year =
+      vehicle.year;
 
     this.selectedPhotos.set([]);
     this.photoPreviews.set([]);
 
-    this.existingPhotos.set(vehicle.photos ?? []);
+    this.existingPhotos.set(
+      vehicle.photos ?? []
+    );
 
-    const modal = new bootstrap.Modal(document.getElementById('vehicleModal'));
+    const modal =
+      new bootstrap.Modal(
+        document.getElementById(
+          'vehicleModal'
+        )
+      );
 
     modal.show();
 
@@ -881,9 +1240,16 @@ export class Vehicles implements OnInit {
 
   deleteVehicle(id: string) {
 
+    if (this.isDriver) return;
+
     this.vehicleToDeleteId.set(id);
 
-    const modal = new bootstrap.Modal(document.getElementById('deleteVehicleModal'));
+    const modal =
+      new bootstrap.Modal(
+        document.getElementById(
+          'deleteVehicleModal'
+        )
+      );
 
     modal.show();
 
@@ -891,36 +1257,45 @@ export class Vehicles implements OnInit {
 
   confirmDeleteVehicle() {
 
-    const id = this.vehicleToDeleteId();
+    if (this.isDriver) return;
+
+    const id =
+      this.vehicleToDeleteId();
 
     if (!id) return;
 
-    this.vehicleService.delete(id).subscribe({
+    this.vehicleService.delete(id)
+      .subscribe({
 
-      next: () => {
+        next: () => {
 
-        this.loadVehicles();
+          this.loadVehicles();
 
-        this.vehicleToDeleteId.set(null);
+          this.vehicleToDeleteId.set(null);
 
-        bootstrap.Modal.getInstance(document.getElementById('deleteVehicleModal'))?.hide();
+          bootstrap.Modal.getInstance(
+            document.getElementById(
+              'deleteVehicleModal'
+            )
+          )?.hide();
 
+        },
 
-      },
+        error: err => {
 
-      error: err => {
+          console.error(err);
 
-        console.error(err);
+          bootstrap.Modal.getInstance(
+            document.getElementById(
+              'deleteVehicleModal'
+            )
+          )?.hide();
 
-        bootstrap.Modal.getInstance(document.getElementById('deleteVehicleModal'))?.hide();
+          this.vehicleToDeleteId.set(null);
 
+        }
 
-
-        this.vehicleToDeleteId.set(null);
-
-      }
-
-    });
+      });
 
   }
 
@@ -934,12 +1309,19 @@ export class Vehicles implements OnInit {
 
   openCreateModal() {
 
+    if (this.isDriver) return;
+
     this.editMode = false;
     this.editingVehicleId = null;
 
     this.resetForm();
 
-    const modal = new bootstrap.Modal(document.getElementById('vehicleModal'));
+    const modal =
+      new bootstrap.Modal(
+        document.getElementById(
+          'vehicleModal'
+        )
+      );
 
     modal.show();
 
