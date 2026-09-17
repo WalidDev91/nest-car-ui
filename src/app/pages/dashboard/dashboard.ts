@@ -28,6 +28,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   @ViewChild('missionStatusChart') missionStatusChartRef!: ElementRef;
   @ViewChild('missionsTrendChart') missionsTrendChartRef!: ElementRef;
   @ViewChild('documentStatusChart') documentStatusChartRef!: ElementRef;
+  @ViewChild('myMissionStatusChart') myMissionStatusChartRef!: ElementRef;
 
   // summary cards
   totalVehicles = signal<number>(0);
@@ -78,6 +79,12 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   myIdCardDoc = signal<DriverDocument | null>(null);
 
+  myMissionStatusCounts = signal<StatusCount[]>([]);
+
+  myRecentMissions = signal<Mission[]>([]);
+
+  allMyMissions: Mission[] = [];
+
   // ==========================================================
   // CHART INSTANCES — kept so we can destroy() before rebuilding,
   // both on initial load and whenever the theme toggles.
@@ -86,9 +93,11 @@ export class Dashboard implements OnInit, AfterViewInit {
   private missionStatusChart: Chart | null = null;
   private missionsTrendChart: Chart | null = null;
   private documentStatusChartInstance: Chart | null = null;
+  private myMissionStatusChart: Chart | null = null;
 
   private missionChartsReady = false;
   private documentChartReady = false;
+  private myMissionChartReady = false;
 
   constructor(
     private userService: UserService,
@@ -112,6 +121,10 @@ export class Dashboard implements OnInit, AfterViewInit {
 
       if (this.documentChartReady) {
         this.buildDocumentChart();
+      }
+
+      if (this.myMissionChartReady) {
+        this.buildMyMissionStatusChart();
       }
 
     });
@@ -164,7 +177,7 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   // ==========================================================
   // DRIVER VIEW — personal missions + document status only.
-  // No fleet-wide numbers, no other drivers, no charts.
+  // No fleet-wide numbers, no other drivers.
   // ==========================================================
 
   loadDriverView(): void {
@@ -176,6 +189,8 @@ export class Dashboard implements OnInit, AfterViewInit {
       next: (data) => {
 
         const myMissions = data.filter(m => m.driverId === this.userId);
+
+        this.allMyMissions = myMissions;
 
         const current = myMissions.find(m =>
           m.status !== 'CANCELLED' &&
@@ -194,7 +209,18 @@ export class Dashboard implements OnInit, AfterViewInit {
           myMissions.filter(m => m.status === 'COMPLETED').length
         );
 
+        // Most recent missions first, regardless of status — gives the
+        // driver a quick history/overview, mirroring the admin's
+        // "Recent Missions" table.
+        const recent = [...myMissions].sort(
+          (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+        );
+
+        this.myRecentMissions.set(recent.slice(0, 5));
+
         this.dataLoaded = true;
+
+        this.buildMyMissionChart();
 
       },
 
@@ -281,7 +307,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   // ==========================================================
-  // MISSION CHARTS
+  // MISSION CHARTS (fleet-wide, non-driver view)
   // ==========================================================
 
   buildMissionCharts(): void {
@@ -402,7 +428,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   // ==========================================================
-  // DOCUMENT STATUS CHART
+  // DOCUMENT STATUS CHART (fleet-wide, non-driver view)
   // ==========================================================
 
   buildDocumentChart(): void {
@@ -466,4 +492,60 @@ export class Dashboard implements OnInit, AfterViewInit {
     }, 0);
 
   }
+
+  // ==========================================================
+  // MY MISSION STATUS CHART (driver view)
+  // ==========================================================
+
+  buildMyMissionChart(): void {
+    setTimeout(() => {
+      this.buildMyMissionStatusChart();
+      this.myMissionChartReady = true;
+    }, 0);
+  }
+
+  buildMyMissionStatusChart(): void {
+
+    if (!this.myMissionStatusChartRef) return;
+
+    const counts = {
+      PLANNED: this.allMyMissions.filter(m => m.status === 'PLANNED').length,
+      ONGOING: this.allMyMissions.filter(m => m.status === 'ONGOING').length,
+      COMPLETED: this.allMyMissions.filter(m => m.status === 'COMPLETED').length,
+      CANCELLED: this.allMyMissions.filter(m => m.status === 'CANCELLED').length,
+    };
+
+    this.myMissionStatusCounts.set([
+      { label: 'Planned', count: counts.PLANNED, color: '#ffc107' },
+      { label: 'Ongoing', count: counts.ONGOING, color: '#3b7ddd' },
+      { label: 'Completed', count: counts.COMPLETED, color: '#28a745' },
+      { label: 'Cancelled', count: counts.CANCELLED, color: '#dc3545' },
+    ]);
+
+    const palette = this.getChartPalette();
+
+    this.myMissionStatusChart?.destroy();
+
+    this.myMissionStatusChart = new Chart(this.myMissionStatusChartRef.nativeElement, {
+      type: 'doughnut',
+      data: {
+        labels: ['Planned', 'Ongoing', 'Completed', 'Cancelled'],
+        datasets: [{
+          data: [counts.PLANNED, counts.ONGOING, counts.COMPLETED, counts.CANCELLED],
+          backgroundColor: ['#ffc107', '#3b7ddd', '#28a745', '#dc3545'],
+          borderColor: palette.surfaceColor,
+          borderWidth: 5
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        cutout: '75%',
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+  }
+
 }
