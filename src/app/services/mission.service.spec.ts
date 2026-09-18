@@ -105,6 +105,7 @@ describe('MissionService', () => {
     );
 
     expect(req.request.method).toBe('PUT');
+
     expect(req.request.body).toEqual(request);
 
     req.flush({});
@@ -163,8 +164,9 @@ describe('MissionService', () => {
       'Front of vehicle'
     ).subscribe();
 
+    // UPDATED ROUTE MATCH
     const req = httpMock.expectOne(
-      `${environment.apiUrl}/missions/123/inspection/photos`
+      `${environment.apiUrl}/missions/inspections/123/photos`
     );
 
     expect(req.request.method).toBe('POST');
