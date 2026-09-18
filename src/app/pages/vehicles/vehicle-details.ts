@@ -36,6 +36,16 @@ export class VehicleDetails implements OnInit {
   error = signal('');
 
   // ==========================================================
+  // ROLE
+  // ==========================================================
+
+  role = localStorage.getItem('role') ?? '';
+
+  get isDriver(): boolean {
+    return this.role === 'DRIVER';
+  }
+
+  // ==========================================================
   // GALLERY
   // ==========================================================
 
@@ -64,6 +74,10 @@ export class VehicleDetails implements OnInit {
   }
 
   onAddPhotoClick(): void {
+
+    if (this.isDriver) return;
+
+    // Photo upload can be implemented here later.
 
   }
 
@@ -132,7 +146,7 @@ export class VehicleDetails implements OnInit {
   // LOAD VEHICLE
   // ==========================================================
 
-  loadVehicle(id: string) {
+  loadVehicle(id: string): void {
 
     this.loading.set(true);
     this.error.set('');
@@ -178,32 +192,45 @@ export class VehicleDetails implements OnInit {
   // DOCUMENTS
   // ==========================================================
 
-  loadDocuments(vehicleId: string) {
+  loadDocuments(vehicleId: string): void {
 
-    this.vehicleDocumentService.getByVehicleId(vehicleId).subscribe({
+    this.vehicleDocumentService
+      .getByVehicleId(vehicleId)
+      .subscribe({
 
-      next: docs => {
+        next: docs => {
 
-        this.documents.set(docs);
+          this.documents.set(docs);
 
-        this.hasLicense.set(docs.some(d => d.type === 'LICENSE'));
+          this.hasLicense.set(
+            docs.some(d => d.type === 'LICENSE')
+          );
 
-        this.hasInsurance.set(docs.some(d => d.type === 'INSURANCE'));
+          this.hasInsurance.set(
+            docs.some(d => d.type === 'INSURANCE')
+          );
 
-        this.hasTechnicalCheck.set(docs.some(d => d.type === 'TECHNICAL_CHECK'));
+          this.hasTechnicalCheck.set(
+            docs.some(d => d.type === 'TECHNICAL_CHECK')
+          );
 
-        this.hasVehicleTax.set(docs.some(d => d.type === 'VEHICLE_TAX'));
+          this.hasVehicleTax.set(
+            docs.some(d => d.type === 'VEHICLE_TAX')
+          );
 
-        this.hasOtherDocument.set(docs.some(d => d.type === 'OTHER'));
+          this.hasOtherDocument.set(
+            docs.some(d => d.type === 'OTHER')
+          );
 
-      },
+        },
 
-      error: err => {
-        console.error(err);
+        error: err => {
 
-      }
+          console.error(err);
 
-    });
+        }
+
+      });
 
   }
 
@@ -211,19 +238,21 @@ export class VehicleDetails implements OnInit {
   // MISSIONS
   // ==========================================================
 
-  loadMissions(vehicleId: string) {
+  loadMissions(vehicleId: string): void {
 
-    this.missionService.getByVehicleId(vehicleId).subscribe({
+    this.missionService
+      .getByVehicleId(vehicleId)
+      .subscribe({
 
-      next: missions => {
-        this.missions.set(missions);
-      },
+        next: missions => {
+          this.missions.set(missions);
+        },
 
-      error: err => {
-        console.error(err);
-      }
+        error: err => {
+          console.error(err);
+        }
 
-    });
+      });
 
   }
 
@@ -231,7 +260,9 @@ export class VehicleDetails implements OnInit {
   // TABS
   // ==========================================================
 
-  selectTab(tab: 'info' | 'documents' | 'missions') {
+  selectTab(
+    tab: 'info' | 'documents' | 'missions'
+  ): void {
 
     this.selectedTab.set(tab);
 
@@ -243,7 +274,7 @@ export class VehicleDetails implements OnInit {
   // ACTIONS
   // ==========================================================
 
-  refresh() {
+  refresh(): void {
 
     const vehicle = this.vehicle();
 
@@ -253,60 +284,74 @@ export class VehicleDetails implements OnInit {
 
   }
 
-  goBack() {
+  goBack(): void {
     this.router.navigate(['/vehicles']);
   }
 
   editVehicle(): void {
 
+    if (this.isDriver) return;
+
     const vehicle = this.vehicle();
 
     if (!vehicle) return;
 
-    this.router.navigate(['/vehicles'], { queryParams: { edit: vehicle.id } });
+    this.router.navigate(
+      ['/vehicles'],
+      { queryParams: { edit: vehicle.id } }
+    );
 
   }
 
   deleteVehicle(): void {
 
+    if (this.isDriver) return;
+
     const vehicle = this.vehicle();
 
     if (!vehicle) return;
 
-    this.router.navigate(['/vehicles'], { queryParams: { delete: vehicle.id } });
+    this.router.navigate(
+      ['/vehicles'],
+      { queryParams: { delete: vehicle.id } }
+    );
 
   }
-
-
 
   viewMissionDetails(id: string): void {
     this.router.navigate(['/missions', id]);
   }
 
-
   previewVehicleDocument(id: string): void {
 
-    this.vehicleDocumentService.previewVehicleDocument(id).subscribe({
+    this.vehicleDocumentService
+      .previewVehicleDocument(id)
+      .subscribe({
 
-      next: (blob) => {
+        next: (blob) => {
 
-        const url = URL.createObjectURL(blob);
+          const url = URL.createObjectURL(blob);
 
-        window.open(url, '_blank');
+          window.open(url, '_blank');
 
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
+          setTimeout(
+            () => URL.revokeObjectURL(url),
+            60000
+          );
 
-      },
+        },
 
-      error: (error) => {
+        error: (error) => {
 
-        console.error('Failed to preview vehicle document', error);
+          console.error(
+            'Failed to preview vehicle document',
+            error
+          );
 
+        }
 
-
-      }
-
-    });
+      });
 
   }
+
 }

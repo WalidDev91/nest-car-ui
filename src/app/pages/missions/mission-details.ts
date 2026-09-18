@@ -35,6 +35,16 @@ export class MissionDetails implements OnInit {
   loading = signal(false);
 
   // ==========================================================
+  // ROLE
+  // ==========================================================
+
+  role = localStorage.getItem('role') ?? '';
+
+  get isDriver(): boolean {
+    return this.role === 'DRIVER';
+  }
+
+  // ==========================================================
   // TABS
   // ==========================================================
 
@@ -94,7 +104,11 @@ export class MissionDetails implements OnInit {
 
   totalPhotos = computed(() =>
     this.mission()?.vehicleInspections
-      ?.reduce((total, inspection) => total + (inspection.photos?.length ?? 0), 0) ?? 0
+      ?.reduce(
+        (total, inspection) =>
+          total + (inspection.photos?.length ?? 0),
+        0
+      ) ?? 0
   );
 
   totalDocuments = computed(() =>
@@ -144,7 +158,9 @@ export class MissionDetails implements OnInit {
         this.vehicleId = data.vehicleId ?? null;
 
         this.documentsVerified.set(data.documentsVerified ?? false);
-        this.verificationDate.set(data.documentsVerificationDate ?? null);
+        this.verificationDate.set(
+          data.documentsVerificationDate ?? null
+        );
 
         this.resetInspectionForm();
 
@@ -169,7 +185,9 @@ export class MissionDetails implements OnInit {
   loadDrivers(): void {
 
     this.userService.getAll().subscribe({
-      next: users => this.drivers.set(users.filter(u => u.role === 'DRIVER'))
+      next: users => this.drivers.set(
+        users.filter(u => u.role === 'DRIVER')
+      )
     });
 
   }
@@ -196,7 +214,9 @@ export class MissionDetails implements OnInit {
   // TABS
   // ==========================================================
 
-  selectTab(tab: 'info' | 'assignment' | 'documents' | 'inspection' | 'photos'): void {
+  selectTab(
+    tab: 'info' | 'assignment' | 'documents' | 'inspection' | 'photos'
+  ): void {
 
     this.selectedTab.set(tab);
 
@@ -210,21 +230,31 @@ export class MissionDetails implements OnInit {
 
   editMission(): void {
 
+    if (this.isDriver) return;
+
     const mission = this.mission();
 
     if (!mission) return;
 
-    this.router.navigate(['/missions'], { queryParams: { edit: mission.id } });
+    this.router.navigate(
+      ['/missions'],
+      { queryParams: { edit: mission.id } }
+    );
 
   }
 
   deleteMission(): void {
 
+    if (this.isDriver) return;
+
     const mission = this.mission();
 
     if (!mission) return;
 
-    this.router.navigate(['/missions'], { queryParams: { delete: mission.id } });
+    this.router.navigate(
+      ['/missions'],
+      { queryParams: { delete: mission.id } }
+    );
 
   }
 
@@ -233,6 +263,8 @@ export class MissionDetails implements OnInit {
   // ==========================================================
 
   openAssignmentModal(): void {
+
+    if (this.isDriver) return;
 
     const current = this.mission();
 
@@ -243,13 +275,19 @@ export class MissionDetails implements OnInit {
     this.driverId = current.driverId ?? null;
     this.vehicleId = current.vehicleId ?? null;
 
-    const modal = new bootstrap.Modal(document.getElementById('assignmentModal'));
+    const modalElement = document.getElementById('assignmentModal');
+
+    if (!modalElement) return;
+
+    const modal = new bootstrap.Modal(modalElement);
 
     modal.show();
 
   }
 
   updateAssignment(): void {
+
+    if (this.isDriver) return;
 
     const current = this.mission();
 
@@ -260,7 +298,10 @@ export class MissionDetails implements OnInit {
       vehicleId: this.vehicleId
     };
 
-    this.missionService.assignMission(current.id, request).subscribe({
+    this.missionService.assignMission(
+      current.id,
+      request
+    ).subscribe({
 
       next: (updatedMission) => {
 
@@ -269,16 +310,17 @@ export class MissionDetails implements OnInit {
         this.driverId = updatedMission.driverId ?? null;
         this.vehicleId = updatedMission.vehicleId ?? null;
 
-        bootstrap.Modal.getInstance(document.getElementById('assignmentModal'))?.hide();
-
-
+        bootstrap.Modal
+          .getInstance(
+            document.getElementById('assignmentModal')
+          )
+          ?.hide();
 
       },
 
       error: (err: any) => {
 
         console.error(err);
-
 
       }
 
@@ -292,127 +334,157 @@ export class MissionDetails implements OnInit {
 
   validateDocuments(): void {
 
+    if (this.isDriver) return;
+
     const current = this.mission();
 
     if (!current) return;
 
-    this.missionService.updateDocumentsVerification(current.id, true).subscribe({
+    this.missionService
+      .updateDocumentsVerification(current.id, true)
+      .subscribe({
 
-      next: (updatedMission: Mission) => {
+        next: (updatedMission: Mission) => {
 
-        this.mission.set(updatedMission);
+          this.mission.set(updatedMission);
 
-        this.documentsVerified.set(updatedMission.documentsVerified ?? false);
-        this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
+          this.documentsVerified.set(
+            updatedMission.documentsVerified ?? false
+          );
 
+          this.verificationDate.set(
+            updatedMission.documentsVerificationDate ?? null
+          );
 
+          setTimeout(() => feather.replace(), 0);
 
-        setTimeout(() => feather.replace(), 0);
+        },
 
-      },
+        error: (err: any) => {
 
-      error: (err: any) => {
+          console.error(err);
 
-        console.error(err);
+        }
 
-
-
-      }
-
-    });
+      });
 
   }
 
   rejectDocuments(): void {
 
+    if (this.isDriver) return;
+
     const current = this.mission();
 
     if (!current) return;
 
-    this.missionService.updateDocumentsVerification(current.id, false).subscribe({
+    this.missionService
+      .updateDocumentsVerification(current.id, false)
+      .subscribe({
 
-      next: (updatedMission: Mission) => {
+        next: (updatedMission: Mission) => {
 
-        this.mission.set(updatedMission);
+          this.mission.set(updatedMission);
 
-        this.documentsVerified.set(updatedMission.documentsVerified ?? false);
-        this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
+          this.documentsVerified.set(
+            updatedMission.documentsVerified ?? false
+          );
 
+          this.verificationDate.set(
+            updatedMission.documentsVerificationDate ?? null
+          );
 
+          setTimeout(() => feather.replace(), 0);
 
-        setTimeout(() => feather.replace(), 0);
+        },
 
-      },
+        error: (err: any) => {
 
-      error: (err: any) => {
+          console.error(err);
 
-        console.error(err);
+        }
 
-
-
-      }
-
-    });
+      });
 
   }
 
   editDocumentsVerification(): void {
 
+    if (this.isDriver) return;
+
     const current = this.mission();
 
     if (!current || !current.documentsVerificationDate) return;
 
-    this.selectedValidationStatus = current.documentsVerified ? 'APPROVED' : 'REJECTED';
+    this.selectedValidationStatus =
+      current.documentsVerified
+        ? 'APPROVED'
+        : 'REJECTED';
 
-    const modalElement = document.getElementById('changeValidationModal');
+    const modalElement =
+      document.getElementById('changeValidationModal');
 
     if (!modalElement) return;
 
-    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+    bootstrap.Modal
+      .getOrCreateInstance(modalElement)
+      .show();
 
   }
 
   saveDocumentsVerification(): void {
+
+    if (this.isDriver) return;
 
     const current = this.mission();
 
     if (!current) return;
 
     // NOTE: 'PENDING' sends null to reset the verification decision.
-    // This requires MissionService.updateDocumentsVerification (and the
-    // backend endpoint behind it) to accept `verified: boolean | null`,
-    // not just boolean — confirm/extend that signature if it's not there yet.
+    // This requires MissionService.updateDocumentsVerification
+    // (and the backend endpoint behind it) to accept
+    // verified: boolean | null.
     const verified: boolean | null =
       this.selectedValidationStatus === 'PENDING'
         ? null
         : this.selectedValidationStatus === 'APPROVED';
 
-    this.missionService.updateDocumentsVerification(current.id, verified as any).subscribe({
+    this.missionService
+      .updateDocumentsVerification(
+        current.id,
+        verified as any
+      )
+      .subscribe({
 
-      next: (updatedMission: Mission) => {
+        next: (updatedMission: Mission) => {
 
-        this.mission.set(updatedMission);
+          this.mission.set(updatedMission);
 
-        this.documentsVerified.set(updatedMission.documentsVerified ?? false);
-        this.verificationDate.set(updatedMission.documentsVerificationDate ?? null);
+          this.documentsVerified.set(
+            updatedMission.documentsVerified ?? false
+          );
 
-        bootstrap.Modal.getInstance(document.getElementById('changeValidationModal'))?.hide();
+          this.verificationDate.set(
+            updatedMission.documentsVerificationDate ?? null
+          );
 
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('changeValidationModal')
+            )
+            ?.hide();
 
+          setTimeout(() => feather.replace(), 0);
 
-        setTimeout(() => feather.replace(), 0);
+        },
 
-      },
+        error: (err: any) => {
 
-      error: (err: any) => {
+          console.error(err);
 
-        console.error(err);
+        }
 
-
-
-      }
-
-    });
+      });
 
   }
 
@@ -451,7 +523,9 @@ export class MissionDetails implements OnInit {
       next: () => {
 
         bootstrap.Modal
-          .getInstance(document.getElementById('inspectionModal'))
+          .getInstance(
+            document.getElementById('inspectionModal')
+          )
           ?.hide();
 
         this.loadMission(current.id);
@@ -467,6 +541,7 @@ export class MissionDetails implements OnInit {
       }
 
     });
+
   }
 
   // ==========================================================
@@ -479,11 +554,15 @@ export class MissionDetails implements OnInit {
 
     this.inspectionToDeleteId = inspectionId;
 
-    const modal = new bootstrap.Modal(
-      document.getElementById('deleteInspectionModal')
-    );
+    const modalElement =
+      document.getElementById('deleteInspectionModal');
+
+    if (!modalElement) return;
+
+    const modal = new bootstrap.Modal(modalElement);
 
     modal.show();
+
   }
 
   confirmDeleteInspection(): void {
@@ -493,37 +572,42 @@ export class MissionDetails implements OnInit {
 
     if (!mission || !inspectionId) return;
 
-    this.missionService.deleteInspection(
-      inspectionId
-    ).subscribe({
+    this.missionService
+      .deleteInspection(inspectionId)
+      .subscribe({
 
-      next: (updatedMission: Mission) => {
+        next: (updatedMission: Mission) => {
 
-        this.mission.set(updatedMission);
+          this.mission.set(updatedMission);
 
-        this.inspectionToDeleteId = null;
+          this.inspectionToDeleteId = null;
 
-        bootstrap.Modal
-          .getInstance(document.getElementById('deleteInspectionModal'))
-          ?.hide();
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('deleteInspectionModal')
+            )
+            ?.hide();
 
-        setTimeout(() => feather.replace(), 0);
+          setTimeout(() => feather.replace(), 0);
 
-      },
+        },
 
-      error: err => {
+        error: err => {
 
-        console.error(err);
+          console.error(err);
 
-        this.inspectionToDeleteId = null;
+          this.inspectionToDeleteId = null;
 
-        bootstrap.Modal
-          .getInstance(document.getElementById('deleteInspectionModal'))
-          ?.hide();
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('deleteInspectionModal')
+            )
+            ?.hide();
 
-      }
+        }
 
-    });
+      });
+
   }
 
   // ==========================================================
@@ -541,7 +625,9 @@ export class MissionDetails implements OnInit {
     const reader = new FileReader();
 
     reader.onload = () => {
+
       this.photoPreview = reader.result as string;
+
     };
 
     reader.readAsDataURL(this.selectedPhoto);
@@ -552,56 +638,64 @@ export class MissionDetails implements OnInit {
 
     if (!this.selectedPhoto) return;
 
-    const inspection = this.getInspection(this.selectedInspectionType);
+    const inspection =
+      this.getInspection(this.selectedInspectionType);
 
     if (!inspection) return;
 
-    this.missionService.uploadInspectionPhoto(
-      inspection.id,
-      this.selectedPhoto
-    ).subscribe({
+    this.missionService
+      .uploadInspectionPhoto(
+        inspection.id,
+        this.selectedPhoto
+      )
+      .subscribe({
 
-      next: () => {
+        next: () => {
 
-        this.selectedPhoto = null;
-        this.photoPreview = null;
+          this.selectedPhoto = null;
+          this.photoPreview = null;
 
-        const input =
-          document.getElementById('missionPhotoInput') as HTMLInputElement;
+          const input =
+            document.getElementById(
+              'missionPhotoInput'
+            ) as HTMLInputElement;
 
-        if (input) {
-          input.value = '';
+          if (input) {
+            input.value = '';
+          }
+
+          const current = this.mission();
+
+          if (current) {
+            this.loadMission(current.id);
+          }
+
+          setTimeout(() => feather.replace(), 0);
+
+        },
+
+        error: err => {
+
+          if (err.status === 403) {
+
+            const modalElement =
+              document.getElementById('photoSizeModal');
+
+            if (modalElement) {
+              bootstrap.Modal
+                .getOrCreateInstance(modalElement)
+                .show();
+            }
+
+            return;
+
+          }
+
+          console.error(err);
+
         }
 
-        const current = this.mission();
-
-        if (current) {
-          this.loadMission(current.id);
-        }
-
-        setTimeout(() => feather.replace(), 0);
-
-      },
-
-      error: err => {
-
-        if (err.status === 403) {
-
-          bootstrap.Modal
-            .getOrCreateInstance(
-              document.getElementById('photoSizeModal')
-            )
-            .show();
-
-          return;
-
-        }
-
-        console.error(err);
-
-      }
-
-    });
+      });
 
   }
 
@@ -609,7 +703,12 @@ export class MissionDetails implements OnInit {
 
     this.photoToDeleteId.set(photoId);
 
-    const modal = new bootstrap.Modal(document.getElementById('deletePhotoModal'));
+    const modalElement =
+      document.getElementById('deletePhotoModal');
+
+    if (!modalElement) return;
+
+    const modal = new bootstrap.Modal(modalElement);
 
     modal.show();
 
@@ -623,35 +722,44 @@ export class MissionDetails implements OnInit {
 
     if (!current || !photoId) return;
 
-    this.missionService.deleteInspectionPhoto(current.id, photoId).subscribe({
+    this.missionService
+      .deleteInspectionPhoto(
+        current.id,
+        photoId
+      )
+      .subscribe({
 
-      next: (updatedMission: Mission) => {
+        next: (updatedMission: Mission) => {
 
-        this.mission.set(updatedMission);
+          this.mission.set(updatedMission);
 
-        this.photoToDeleteId.set(null);
+          this.photoToDeleteId.set(null);
 
-        bootstrap.Modal.getInstance(document.getElementById('deletePhotoModal'))?.hide();
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('deletePhotoModal')
+            )
+            ?.hide();
 
+          setTimeout(() => feather.replace(), 0);
 
+        },
 
-        setTimeout(() => feather.replace(), 0);
+        error: (err: any) => {
 
-      },
+          console.error(err);
 
-      error: (err: any) => {
+          this.photoToDeleteId.set(null);
 
-        console.error(err);
+          bootstrap.Modal
+            .getInstance(
+              document.getElementById('deletePhotoModal')
+            )
+            ?.hide();
 
-        this.photoToDeleteId.set(null);
+        }
 
-        bootstrap.Modal.getInstance(document.getElementById('deletePhotoModal'))?.hide();
-
-
-
-      }
-
-    });
+      });
 
   }
 
@@ -659,29 +767,35 @@ export class MissionDetails implements OnInit {
   // DOCUMENTS
   // ==========================================================
 
-  previewMissionDocument(id: string) {
+  previewMissionDocument(id: string): void {
 
-    this.missionDocumentService.previewMissionDocument(id).subscribe({
+    this.missionDocumentService
+      .previewMissionDocument(id)
+      .subscribe({
 
-      next: (blob) => {
+        next: (blob) => {
 
-        const url = URL.createObjectURL(blob);
+          const url = URL.createObjectURL(blob);
 
-        window.open(url, '_blank');
+          window.open(url, '_blank');
 
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
+          setTimeout(
+            () => URL.revokeObjectURL(url),
+            60000
+          );
 
-      },
+        },
 
-      error: (error) => {
+        error: (error) => {
 
-        console.error('Failed to preview mission document', error);
+          console.error(
+            'Failed to preview mission document',
+            error
+          );
 
+        }
 
-
-      }
-
-    });
+      });
 
   }
 
@@ -692,10 +806,19 @@ export class MissionDetails implements OnInit {
   getStatusClass(status: string): string {
 
     switch (status) {
-      case 'ONGOING': return 'bg-info';
-      case 'COMPLETED': return 'bg-success';
-      case 'CANCELLED': return 'bg-danger';
-      default: return 'bg-warning';
+
+      case 'ONGOING':
+        return 'bg-info';
+
+      case 'COMPLETED':
+        return 'bg-success';
+
+      case 'CANCELLED':
+        return 'bg-danger';
+
+      default:
+        return 'bg-warning';
+
     }
 
   }
@@ -708,20 +831,26 @@ export class MissionDetails implements OnInit {
     this.router.navigate(['/missions']);
   }
 
-
   // ==========================================================
   // INSPECTION HELPERS
   // ==========================================================
 
-  getInspection(type: 'BEFORE' | 'AFTER'): MissionVehicleInspection | undefined {
+  getInspection(
+    type: 'BEFORE' | 'AFTER'
+  ): MissionVehicleInspection | undefined {
 
-    return this.mission()?.vehicleInspections?.find(
-      inspection => inspection.inspectionType === type
-    );
+    return this.mission()
+      ?.vehicleInspections
+      ?.find(
+        inspection =>
+          inspection.inspectionType === type
+      );
 
   }
 
-  openInspectionModal(type: 'BEFORE' | 'AFTER'): void {
+  openInspectionModal(
+    type: 'BEFORE' | 'AFTER'
+  ): void {
 
     const inspection = this.getInspection(type);
 
@@ -729,15 +858,32 @@ export class MissionDetails implements OnInit {
 
     if (inspection) {
 
-      this.inspectionMileage = inspection.mileage ?? null;
-      this.inspectionFuelLevel = inspection.fuelLevel ?? null;
-      this.inspectionTirePressure = inspection.tirePressure ?? '';
-      this.inspectionOilChange = inspection.oilChange ?? '';
-      this.inspectionWaterCheck = inspection.waterCheck ?? '';
-      this.inspectionPartsCondition = inspection.partsCondition ?? '';
-      this.inspectionRepairStatus = inspection.repairStatus ?? '';
-      this.inspectionAccidentOccurred = inspection.accidentOccurred ?? false;
-      this.inspectionNotes = inspection.notes ?? '';
+      this.inspectionMileage =
+        inspection.mileage ?? null;
+
+      this.inspectionFuelLevel =
+        inspection.fuelLevel ?? null;
+
+      this.inspectionTirePressure =
+        inspection.tirePressure ?? '';
+
+      this.inspectionOilChange =
+        inspection.oilChange ?? '';
+
+      this.inspectionWaterCheck =
+        inspection.waterCheck ?? '';
+
+      this.inspectionPartsCondition =
+        inspection.partsCondition ?? '';
+
+      this.inspectionRepairStatus =
+        inspection.repairStatus ?? '';
+
+      this.inspectionAccidentOccurred =
+        inspection.accidentOccurred ?? false;
+
+      this.inspectionNotes =
+        inspection.notes ?? '';
 
     } else {
 
@@ -747,11 +893,14 @@ export class MissionDetails implements OnInit {
 
     }
 
-    const modalElement = document.getElementById('inspectionModal');
+    const modalElement =
+      document.getElementById('inspectionModal');
 
     if (!modalElement) return;
 
-    bootstrap.Modal.getOrCreateInstance(modalElement).show();
+    bootstrap.Modal
+      .getOrCreateInstance(modalElement)
+      .show();
 
   }
 
@@ -768,7 +917,5 @@ export class MissionDetails implements OnInit {
     this.inspectionNotes = '';
 
   }
-
-
 
 }

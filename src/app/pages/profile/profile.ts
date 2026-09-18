@@ -9,6 +9,7 @@ import { UserService } from '../../services/user.service';
 import { DriverDocumentService } from '../../services/driver-document.service';
 import { UserRequestService } from '../../services/user-request.service';
 import { environment } from '../../../environments/environment';
+import feather from 'feather-icons';
 
 @Component({
   selector: 'app-profile',
@@ -125,6 +126,8 @@ export class Profile implements OnInit {
           this.loadDriverDocs(user.id);
         }
 
+        setTimeout(() => feather.replace(), 0);
+
       },
 
       error: err => {
@@ -169,6 +172,8 @@ export class Profile implements OnInit {
     tab: 'info' | 'security' | 'documents' | 'requests'
   ): void {
     this.selectedTab.set(tab);
+
+    setTimeout(() => feather.replace(), 0);
   }
 
   // ==========================
