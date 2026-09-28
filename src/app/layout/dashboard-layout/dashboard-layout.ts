@@ -3,12 +3,13 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Navbar } from '../navbar/navbar';
 import { Sidebar } from '../sidebar/sidebar';
 import { Footer } from '../footer/footer';
+import { ChatWidget } from '../chat-widget/chat-widget';
 import { filter } from 'rxjs/operators';
 import feather from 'feather-icons';
 
 @Component({
   selector: 'app-dashboard-layout',
-  imports: [RouterOutlet, Navbar, Sidebar, Footer],
+  imports: [RouterOutlet, Navbar, Sidebar, Footer, ChatWidget],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css',
 })
