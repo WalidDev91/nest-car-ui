@@ -73,6 +73,12 @@ export class Users implements OnInit {
     ).length
   );
 
+  superAdmin = computed(() =>
+    this.users().filter(u =>
+      u.role === 'SUPER_ADMIN'
+    ).length
+  );
+
   drivers = computed(() =>
     this.users().filter(u =>
       u.role === 'DRIVER'

@@ -47,8 +47,8 @@
             <i data-feather="shield"></i>
           </div>
           <div class="ms-3">
-            <h6 class="mb-0 text-muted">Admins</h6>
-            <h3 class="mb-0">{{ admins() }}</h3>
+            <h6 class="mb-0 text-muted">Super Admin</h6>
+            <h3 class="mb-0">{{ superAdmin() }}</h3>
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@
           <select class="form-select" [value]="selectedRole()" (change)="filterRole($any($event.target).value)">
             <option value="ALL">All Roles</option>
             <option value="SUPER_ADMIN">Super Admin</option>
-            <option value="ADMIN">Admin</option>
+           <!--  <option value="ADMIN">Admin</option> -->
             <option value="FLEET_MANAGER">Fleet Manager</option>
             <option value="DRIVER">Driver</option>
           </select>
@@ -344,7 +344,7 @@
           <select class="form-select" [(ngModel)]="selectedRoleValue">
             <option value="DRIVER">Driver</option>
             <option value="FLEET_MANAGER">Fleet Manager</option>
-            <option value="ADMIN">Admin</option>
+            <!-- <option value="ADMIN">Admin</option> -->
           </select>
         </div>
         <div class="alert alert-warning mt-3 mb-0">

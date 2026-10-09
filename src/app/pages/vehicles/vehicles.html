@@ -1024,7 +1024,7 @@
       <div class="modal-header">
 
         <h5 class="modal-title">
-          {{ editMode ? 'Edit Vehicle' : 'Create Vehicle' }}
+          {{ editMode ? 'Edit Vehicle' : 'Add Vehicle' }}
         </h5>
 
         <button type="button" class="btn-close" data-bs-dismiss="modal">
@@ -1105,14 +1105,36 @@
               Vehicle Photos
             </label>
 
-            <input id="vehiclePhotosInput" class="form-control" type="file" accept="image/*" multiple
-              (change)="onPhotosSelected($event)">
+            <div class="input-group">
+
+              <!-- Hidden real file input -->
+              <input #vehiclePhotosInput id="vehiclePhotosInput" type="file" accept="image/*" multiple hidden
+                (change)="onPhotosSelected($event)">
+
+              <!-- Our visible button -->
+              <button type="button" class="btn btn-outline-primary" (click)="vehiclePhotosInput.click()">
+
+                Choose files
+
+              </button>
+
+              <!-- Our visible filename/count -->
+              <div class="form-control bg-light">
+
+                {{ selectedPhotos().length > 0
+                ? selectedPhotos().length + ' file(s) selected'
+                : 'No file chosen' }}
+
+              </div>
+
+            </div>
 
             <small class="text-muted">
               You can select multiple photos.
             </small>
 
           </div>
+
 
 
           <!-- EXISTING PHOTOS -->
@@ -1233,7 +1255,7 @@
           <i data-feather="save" class="align-middle me-1">
           </i>
 
-          {{ editMode ? 'Update Vehicle' : 'Create Vehicle' }}
+          {{ editMode ? 'Update Vehicle' : 'Add Vehicle' }}
 
         </button>
 
