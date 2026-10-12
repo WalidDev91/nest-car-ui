@@ -25,19 +25,29 @@
             <div class="card-body">
               <div class="m-sm-3">
 
-                <!-- ERROR -->
+                <!-- ERROR ALERT -->
                 <div class="form-error-alert" *ngIf="error()">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="flex-shrink-0">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
-
                   </svg>
 
-                  <span>{{ error() }}</span>
+                  <!-- DEACTIVATED ACCOUNT MESSAGE -->
+                  <span *ngIf="error() === 'ACCOUNT_DEACTIVATED'">
+                    Your account has been deactivated by your super administrator. Please contact <span
+                      style="font-weight: 700; color: inherit !important;">noreply.mvpnestcarsupport@gmail.com</span>
+                    for assistance.
+                  </span>
+
+                  <!-- STANDARD GENERIC ERROR -->
+                  <span *ngIf="error() !== 'ACCOUNT_DEACTIVATED'">
+                    {{ error() }}
+                  </span>
                 </div>
+
 
                 <form (ngSubmit)="login()">
 
@@ -183,7 +193,8 @@
           </label>
 
           <input class="form-control form-control-lg text-center" type="text" name="otpCode" inputmode="numeric"
-            maxlength="6" autocomplete="one-time-code" placeholder="Enter 6-digit code" [(ngModel)]="otpCode">
+            maxlength="6" autocomplete="one-time-code" placeholder="Enter 6-digit code" [(ngModel)]="otpCode"
+            [disabled]="lockoutTimer() > 0 || otpLoading()">
 
         </div>
 
@@ -194,8 +205,8 @@
             Didn't receive the code?
           </span>
 
-          <button type="button" class="btn btn-link p-0 ms-1" [disabled]="otpLoading() || resendLoading()"
-            (click)="resendOtp()">
+          <button type="button" class="btn btn-link p-0 ms-1"
+            [disabled]="otpLoading() || resendLoading() || lockoutTimer() > 0" (click)="resendOtp()">
 
             {{ resendLoading() ? 'Sending...' : 'Resend code' }}
 
@@ -215,10 +226,11 @@
 
         </button>
 
-        <button type="button" class="btn btn-primary" [disabled]="otpLoading() || resendLoading()"
+        <button type="button" class="btn btn-primary" [disabled]="otpLoading() || resendLoading() || lockoutTimer() > 0"
           (click)="verifyOtp()">
 
-          {{ otpLoading() ? 'Verifying...' : 'Verify code' }}
+          {{ lockoutTimer() > 0 ? ('Locked (' + lockoutTimer() + 's)') : (otpLoading() ? 'Verifying...' : 'Verify code')
+          }}
 
         </button>
 

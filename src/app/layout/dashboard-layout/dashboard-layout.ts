@@ -26,4 +26,10 @@ export class DashboardLayout implements OnInit {
       setTimeout(() => feather.replace(), 0);
     });
   }
+
+  get canUseAssistant(): boolean {
+    const role = localStorage.getItem('role');
+    return role === 'SUPER_ADMIN' || role === 'ADMIN' || role === 'FLEET_MANAGER';
+  }
+
 }

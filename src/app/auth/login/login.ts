@@ -98,33 +98,37 @@ export class Login {
       },
 
       error: (err) => {
-
         console.error('Login failed:', err);
-
-        this.error.set('Invalid email or password.');
-
         this.loading.set(false);
 
+        if (err.status === 403 && err.error?.code === 'ACCOUNT_DEACTIVATED') {
+          this.error.set('ACCOUNT_DEACTIVATED');
+        } else {
+          this.error.set('Invalid email or password.');
+        }
       }
-
     });
 
   }
+
+
+
+  // Add these signals near your other state variables
+  failedOtpAttempts = signal(0);
+  lockoutTimer = signal(0);
+  private timerInterval: any = null;
 
   // ==========================================================
   // VERIFY OTP
   // ==========================================================
 
   verifyOtp() {
+    if (this.lockoutTimer() > 0) return;
 
     this.otpError.set('');
 
     if (!this.otpCode.trim()) {
-
-      this.otpError.set(
-        'Please enter the SMS code.'
-      );
-
+      this.otpError.set('Please enter the SMS code.');
       return;
     }
 
@@ -136,12 +140,8 @@ export class Login {
     }).subscribe({
 
       next: (response: any) => {
-
         this.otpLoading.set(false);
-
-        // Important:
-        // Remove the Bootstrap modal backdrop before
-        // navigating to the dashboard.
+        this.resetLockoutState();
         this.cleanupOtpModal();
 
         localStorage.setItem('token', response.token);
@@ -150,34 +150,59 @@ export class Login {
         localStorage.setItem('firstName', response.firstName);
         localStorage.setItem('lastName', response.lastName);
         localStorage.setItem('userId', response.id);
-        localStorage.setItem(
-          'imageUrl',
-          response.imageUrl ?? ''
-        );
+        localStorage.setItem('imageUrl', response.imageUrl ?? '');
 
         this.themeService.reloadForCurrentUser();
-
         this.router.navigate(['/dashboard']);
-
       },
 
       error: (err) => {
-
-        console.error(
-          'OTP verification failed:',
-          err
-        );
-
-        this.otpError.set(
-          'Invalid or expired code.'
-        );
-
+        console.error('OTP verification failed:', err);
         this.otpLoading.set(false);
 
+        // Increment attempt count
+        const attempts = this.failedOtpAttempts() + 1;
+        this.failedOtpAttempts.set(attempts);
+
+        if (attempts >= 3) {
+          this.startLockoutTimer(15);
+        } else {
+          const remaining = 3 - attempts;
+          this.otpError.set(`Invalid or expired code. ${remaining} attempt${remaining > 1 ? 's' : ''} remaining.`);
+        }
       }
 
     });
+  }
 
+  // ==========================================================
+  // LOCKOUT TIMER LOGIC
+  // ==========================================================
+
+  private startLockoutTimer(seconds: number) {
+    this.lockoutTimer.set(seconds);
+    this.otpError.set(`Too many failed attempts. Please try again in ${seconds}s.`);
+
+    if (this.timerInterval) clearInterval(this.timerInterval);
+
+    this.timerInterval = setInterval(() => {
+      const current = this.lockoutTimer() - 1;
+      this.lockoutTimer.set(current);
+
+      if (current > 0) {
+        this.otpError.set(`Too many failed attempts. Please try again in ${current}s.`);
+      } else {
+        clearInterval(this.timerInterval);
+        this.failedOtpAttempts.set(0); // Reset attempts after timer completes
+        this.otpError.set('');
+      }
+    }, 1000);
+  }
+
+  private resetLockoutState() {
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    this.failedOtpAttempts.set(0);
+    this.lockoutTimer.set(0);
   }
 
   // ==========================================================
@@ -185,33 +210,24 @@ export class Login {
   // ==========================================================
 
   resendOtp() {
+    if (this.lockoutTimer() > 0) return;
 
     this.otpError.set('');
     this.resendLoading.set(true);
 
     this.authService.resendOtp(this.email).subscribe({
-
       next: () => {
-
         this.resendLoading.set(false);
         this.otpCode = '';
-
+        this.resetLockoutState(); // Reset attempts when new OTP is sent
       },
-
       error: (err) => {
-
         console.error('Resend OTP failed:', err);
-
-        // SMS may still have been sent successfully even if
-        // Angular cannot parse the backend response.
         this.resendLoading.set(false);
         this.otpCode = '';
         this.otpError.set('');
-
       }
-
     });
-
   }
 
   // ==========================================================
@@ -221,6 +237,7 @@ export class Login {
   closeOtpModal() {
 
     this.cleanupOtpModal();
+    this.resetLockoutState();
 
     this.showOtpModal.set(false);
     this.otpCode = '';
