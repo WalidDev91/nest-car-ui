@@ -325,7 +325,9 @@ export class Missions implements OnInit {
 
   status: 'PLANNED' | 'ONGOING' | 'COMPLETED' | 'CANCELLED' = 'PLANNED';
 
-  availabilityError = signal<'DRIVER' | 'VEHICLE' | 'BOTH' | 'DRIVER_INELIGIBLE' | null>(null);
+  availabilityError = signal<'DRIVER' | 'VEHICLE' | 'BOTH' | 'DRIVER_INELIGIBLE' | 'VEHICLE_INELIGIBLE' | null>(null);
+
+  vehicleIneligibleReason = signal('');
 
   driverId: string | null = null;
   vehicleId: string | null = null;
@@ -672,6 +674,18 @@ export class Missions implements OnInit {
     if (message === 'Driver is not eligible to work') {
 
       this.availabilityError.set('DRIVER_INELIGIBLE');
+
+      new bootstrap.Modal(
+        document.getElementById('availabilityModal')
+      ).show();
+
+      return true;
+    }
+
+    if (message?.startsWith('Vehicle is not eligible')) {
+
+      this.availabilityError.set('VEHICLE_INELIGIBLE');
+      this.vehicleIneligibleReason.set(message.replace('Vehicle is not eligible: ', ''));
 
       new bootstrap.Modal(
         document.getElementById('availabilityModal')

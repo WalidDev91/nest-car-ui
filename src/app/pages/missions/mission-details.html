@@ -149,6 +149,7 @@
 
                             </button>
                         </li>
+                        <!-- 
 
                         <li class="nav-item">
                             <button class="nav-link" [class.active]="selectedTab() === 'assignment'"
@@ -159,6 +160,7 @@
 
                             </button>
                         </li>
+                        -->
 
                         <li class="nav-item">
                             <button class="nav-link" [class.active]="selectedTab() === 'documents'"
@@ -296,9 +298,9 @@
 
                     </div>
 
-                    <!-- ===================================================== -->
-                    <!-- ASSIGNMENT -->
-                    <!-- ===================================================== -->
+                    <!--
+                                ASSIGNMENT
+                    
 
                     <div *ngIf="selectedTab() === 'assignment'">
 
@@ -345,6 +347,7 @@
                         </div>
 
                     </div>
+                    -->
 
                     <!-- ===================================================== -->
                     <!-- DOCUMENT VERIFICATION -->
@@ -841,7 +844,7 @@
                                 Photos captured during vehicle inspections.
                             </p>
 
-                         
+
                             <div class="d-flex align-items-center gap-2">
 
                                 <label class="form-label mb-0 small text-muted">
@@ -857,7 +860,7 @@
                                 </select>
 
                             </div>
-                            
+
 
                         </div>
 
@@ -1551,9 +1554,11 @@
                             Not Verified
                         </option>
 
+                        <!-- 
                         <option value="PENDING">
                             Pending
                         </option>
+                        -->
 
                     </select>
 

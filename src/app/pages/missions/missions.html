@@ -1371,6 +1371,28 @@
 
                 </div>
 
+
+                <!-- VEHICLE INELIGIBLE -->
+
+                <div *ngIf="availabilityError() === 'VEHICLE_INELIGIBLE'">
+
+                    <h5 class="mb-3">
+                        Vehicle not eligible
+                    </h5>
+
+                    <p class="text-muted mb-2">
+                        The selected vehicle cannot be assigned
+                        because its required documents are not valid.
+                    </p>
+
+                    <!-- 
+                    <p class="text-muted mb-0">
+                        <strong>{{ vehicleIneligibleReason() }}</strong>
+                    </p>
+                    -->
+
+                </div>
+
             </div>
 
 

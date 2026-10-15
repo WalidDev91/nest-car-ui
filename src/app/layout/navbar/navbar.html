@@ -104,14 +104,20 @@
 
 								<div class="flex-grow-1">
 
-									<div>
-										{{ notification.title }}
+									<div class="d-flex justify-content-between align-items-start gap-2">
+
+										<div>
+											{{ notification.title }}
+										</div>
+
+										<small class="text-muted text-nowrap">
+											{{ notification.createdAt | date:'dd/MM/yyyy HH:mm' }}
+										</small>
+
 									</div>
 
 									<div class="small notification-message">
-
 										{{ notification.message }}
-
 									</div>
 
 								</div>
