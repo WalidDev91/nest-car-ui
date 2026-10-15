@@ -6,10 +6,11 @@ import { Footer } from '../footer/footer';
 import { ChatWidget } from '../chat-widget/chat-widget';
 import { filter } from 'rxjs/operators';
 import feather from 'feather-icons';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-layout',
-  imports: [RouterOutlet, Navbar, Sidebar, Footer, ChatWidget],
+  imports: [RouterOutlet, Navbar, Sidebar, Footer, ChatWidget, NgIf],
   templateUrl: './dashboard-layout.html',
   styleUrl: './dashboard-layout.css',
 })

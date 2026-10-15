@@ -274,4 +274,13 @@
     .chat-panel {
         width: calc(100vw - 24px);
     }
+
+
+    :host ::ng-deep img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-top: 6px;
+    }
 }

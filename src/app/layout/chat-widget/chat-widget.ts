@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { marked } from 'marked';
 import { ThemeService } from '../../services/theme.service';
+import { environment } from '../../../environments/environment';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -22,8 +23,7 @@ export class ChatWidget {
 
   @ViewChild('scrollArea') scrollArea?: ElementRef<HTMLDivElement>;
 
-  // Change this if your services use an environment file / different base URL
-  private readonly apiUrl = 'http://localhost:8080/api/assistant/chat';
+  private readonly apiUrl = `${environment.apiUrl}/assistant/chat`;
 
   isOpen = signal(false);
   loading = signal(false);
@@ -96,7 +96,12 @@ export class ChatWidget {
 
   private addAssistantMessage(text: string, error = false): void {
 
-    const html = marked.parse(text, { async: false }) as string;
+    // Make /uploads/ image links work in dev (uploadsUrl is '' in production)
+    const withUploadsUrl = text.replace(/\]\(\/uploads\//g, `](${environment.uploadsUrl}/uploads/`);
+
+    //const html = marked.parse(withUploadsUrl, { async: false }) as string;
+    const html = (marked.parse(withUploadsUrl, { async: false }) as string)
+      .replace(/<img /g, '<img width="180" ');
 
     this.messages.update(m => [...m, { role: 'assistant', text, html, error }]);
     this.loading.set(false);
