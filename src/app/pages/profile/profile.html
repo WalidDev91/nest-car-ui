@@ -203,7 +203,7 @@
 
 
                         <!-- REQUESTS -->
-                        <li class="nav-item" *ngIf="!isSuperAdmin()">
+                        <li class="nav-item" *ngIf="isDriver()">
 
                             <button type="button" class="nav-link" [class.active]="selectedTab() === 'requests'"
                                 (click)="selectTab('requests')">
