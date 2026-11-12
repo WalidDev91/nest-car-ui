@@ -154,7 +154,7 @@
                         </th>
 
                         <th>Eligibility</th>
-                        <th class="text-end">Actions</th>
+                        <th class="text-end" *ngIf="isSuperAdmin()">Actions</th>
 
                     </tr>
 
@@ -213,7 +213,7 @@
                             </div>
                         </td>
 
-                        <td class="text-end">
+                        <td class="text-end" *ngIf="isSuperAdmin()">
 
                             <button class="btn btn-sm btn-outline-secondary" (click)="viewDetails(driver.id)"
                                 title="View">

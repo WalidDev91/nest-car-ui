@@ -392,4 +392,11 @@ export class Drivers implements OnInit {
     return this.getEligibility(driver).eligible ? 'Eligible' : 'Ineligible';
   }
 
+
+  role = localStorage.getItem('role') ?? '';
+  userId = localStorage.getItem('userId') ?? '';
+
+  isSuperAdmin(): boolean {
+    return this.role === 'SUPER_ADMIN';
+  }
 }
